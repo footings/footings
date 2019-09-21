@@ -1,19 +1,20 @@
-
 from networkx import DiGraph, ancestors, descendants
 from .function import _BaseFunction
+
 
 class Registry:
     """
     
     """
+
     # need to test tuple length 2
     # need to ensure not a duplicate
     def __init__(self, *functions, name=None):
-        self._G  = DiGraph()
+        self._G = DiGraph()
         self.name = name
         for f in functions:
             self.register(f)
-    
+
     def register(self, *functions):
         def inner(f):
             assert issubclass(type(f), _BaseFunction)
@@ -24,6 +25,7 @@ class Registry:
             out = [x[0] for x in f.columns_output]
             self._G.add_edges_from([(i, o) for i in inp for o in out])
             return self
+
         for f in functions:
             inner(f)
         return self
@@ -52,4 +54,3 @@ class Registry:
 
     # def __repr__(self):
     #     pass
-
