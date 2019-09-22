@@ -1,6 +1,8 @@
 from numpy import cumprod, cumsum
+from pandas.util.testing import assert_frame_equal
 import pandas as pd
 import dask.dataframe as dd
+import unittest
 
 from footings import (
     FootingsModel,
@@ -14,7 +16,7 @@ from footings import (
 from footings.model import _build_model_graph, _get_functions, FootingsModel
 
 
-class TestModel:
+class TestModel(unittest.TestCase):
     """
     """
 
@@ -49,6 +51,11 @@ class TestModel:
             return cumsum(disc_cash)
 
         reg = Registry(calc_v, calc_disc_factor, calc_disc_cash, calc_pv)
-        # z = _build_model_graph(df, reg, None)
-        # _get_functions()
-        # m = FootingsModel(ddf, reg)
+        m = FootingsModel(ddf, reg)
+        test = df.assign(
+            v=lambda x: calc_v(x["i"]),
+            disc_factor=lambda x: calc_disc_factor(x["v"]),
+            disc_cash=lambda x: calc_disc_cash(x["cash"], x["disc_factor"]),
+            pv=lambda x: calc_pv(x["disc_cash"]),
+        )
+        assert_frame_equal(m.compute(), test)

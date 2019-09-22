@@ -1,3 +1,4 @@
+from footings.assumption import Assumption, as_assumption
 from footings.calculation import Calculation, as_calculation
 from footings.type import Column, CReturn, Frame, FReturn, Setting
 from footings.registry import Registry

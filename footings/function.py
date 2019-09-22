@@ -40,9 +40,7 @@ def func_annotation_valid(function):
         raise AssertionError(_generate_message(msg2, unk_types))
 
     if len(not_inste) > 0:
-        msg3 = (
-            "The following function parameters are assigned non instantiated types - "
-        )
+        msg3 = "The following function parameters are assigned non instantiated types - "
         raise AssertionError(_generate_message(msg3, not_inste))
 
     # validate input combinations
@@ -133,9 +131,7 @@ def _get_params(function):
 
 def to_df_function(function, params, ret):
     def wrapper(_df, **kwargs):
-        exp = lambda x: function(
-            **{k: x[k] for k in params["Columns"].keys()}, **kwargs
-        )
+        exp = lambda x: function(**{k: x[k] for k in params["Columns"].keys()}, **kwargs)
         _df = _df.assign(**{ret[0]: exp})
         return _df
 
@@ -181,16 +177,16 @@ def _get_setting_inputs(function):
     return l
 
 
-def _get_column_ouputs(function, output_attrs=None):
+def _get_column_ouputs(function, ff_function, output_attrs=None):
     l = []
     for k, v in function.__annotations__.items():
         if k == "return" and output_attrs is None:
             for c, t in v.columns.items():
-                l.append((c, {"src": function, "class": Column, "dtype": t}))
+                l.append((c, {"src": ff_function, "class": Column, "dtype": t}))
         elif k == "return" and output_attrs is not None:
             for c, t in v.columns.items():
                 l.append(
-                    (c, {"src": function, "class": Column, "dtype": t, **output_attrs})
+                    (c, {"src": ff_function, "class": Column, "dtype": t, **output_attrs})
                 )
     return l
 
@@ -204,13 +200,14 @@ class _BaseFunction:
 
         func_annotation_valid(function)
 
+        ff_function = to_ff_function(function)
         self.annotations = function.__annotations__
         self.function = function
-        self.ff_function = to_ff_function(function)
+        self.ff_function = ff_function
         self.name = function.__name__
         self.columns_input = _get_column_inputs(function)
         self.setting_input = _get_setting_inputs(function)
-        self.columns_output = _get_column_ouputs(function, output_attrs)
+        self.columns_output = _get_column_ouputs(function, ff_function, output_attrs)
 
     def __call__(self, *args, **kwargs):
         return self.function(*args, **kwargs)

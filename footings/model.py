@@ -8,25 +8,50 @@ from .utils import _generate_message
 from .function import _BaseFunction
 
 
-class DaskComponents(DaskMethodsMixin):
+class DaskComponents:
     """
     """
 
     def compute(self, **kwargs):
-        return super().compute(**kwargs)
+        return self._frame.compute(**kwargs)
 
     def persist(self, **kwargs):
-        return super().persist(**kwargs)
+        return self._frame.persist(**kwargs)
 
-    def visualize(self, filename="mydask", format=None, optimize_graph=False, **kwargs):
-        return super().visualize(
+    def visualize_graph(
+        self, filename="mydask", format=None, optimize_graph=False, **kwargs
+    ):
+        return self.frame.visualize(
+            filename=filename, format=format, optimize_graph=optimize_graph, **kwargs
+        )
+
+    def visualize_frame(
+        self, filename="mydask", format=None, optimize_graph=False, **kwargs
+    ):
+        return self.frame.visualize(
             filename=filename, format=format, optimize_graph=optimize_graph, **kwargs
         )
 
 
+class FootingsModelMethods:
+    """
+    """
+
+    def audit(self, *args, **kwargs):
+        pass
+
+    def reduce_by(self, function, *args, **kwargs):
+        pass
+
+    def summary(self):
+        pass
+
+    def details(self):
+        pass
+
+
 def _build_model_graph(frame, registry, settings):
     G = registry._G
-    # settings = settings if settings is not None else {}
 
     # get nodes that do not have a src as they will be either -
     # 1. from the starting frame or
@@ -39,9 +64,8 @@ def _build_model_graph(frame, registry, settings):
         elif "src" not in d and d["class"] == Setting:
             nodes_check_settings.append(n)
 
-    print(nodes_check_frame)
     for n in nodes_check_frame:
-        assert n in frame
+        assert n in frame.columns
         G.nodes[n]["src"] = frame
 
     if len(nodes_check_settings) > 0 and settings == {}:
@@ -86,9 +110,7 @@ class FootingsModel(DaskComponents):
 
         assert type(frame) is dd.DataFrame
         if calculate is not None:
-            assert calculate in [
-                n for n, d in registry._G.nodes(data=True) if "src" in d
-            ]
+            assert calculate in [n for n, d in registry._G.nodes(data=True) if "src" in d]
 
         # self.registry = registry
         # self.settings = settings
@@ -101,41 +123,5 @@ class FootingsModel(DaskComponents):
         for f in func_list:
             df = f(df)
 
-        self.frame = frame
+        self._frame = df
         self._G = G
-
-
-class MultiFModel(DaskComponents):
-    pass
-
-
-def model(frame, calculate, calc_set, asn_set, settings=None, scenario=None, **kwargs):
-    if isinstance(frame, dd.DataFrame):
-        pass
-    elif isinstance(frame, pd.DataFrame):
-        frame = dd.from_pandas(frame, **kwargs)
-    # consider adding special footings frame
-    else:
-        raise TypeError("frame must be a pandas or dask DataFrame")
-
-    # need to validate mapping
-
-    # return Model(frame, calculate, calc_set, asn_set, settings, scenario)
-    pass
-
-
-class ModelMethods:
-    def compute(self, *args, **kwargs):
-        return self._frame.compute(*args, **kwargs)
-
-    def persist(self, *args, **kwargs):
-        return self._frame.persist(*args, **kwargs)
-
-    def visualize_dask(self, *args, **kwargs):
-        return self._frame.visualize(*args, **kwargs)
-
-    def visualize_frame(self, *args, **kwargs):
-        return self
-
-    def audit(self, *args, **kwargs):
-        return self

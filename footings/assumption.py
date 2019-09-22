@@ -3,18 +3,18 @@ from functools import wraps, partial
 from .function import _BaseFunction
 
 
-class Assumption:
+class Assumption(_BaseFunction):
     """
     A class to identify assumptions specifically built for the footings framework.
     """
 
-    def __init__(self, function, edge_kws: dict = None, node_kws: dict = None):
-        if node_kws is None:
-            node_kws = {"src": "assumption"}
+    def __init__(self, function, output_attrs: dict = None):
+        if output_attrs is None:
+            output_attrs = {"ftype": Assumption}
         else:
-            assert "src" not in node_kws, "src not allowed as node_kws"
-            node_kws.update({"src": "assumption"})
-        super().__init__(function, edge_kws, node_kws)
+            assert "ftype" not in output_attrs, "ftype not allowed as output_attrs"
+            output_attrs.update({"ftype": Assumption})
+        super().__init__(function, output_attrs)
 
 
 # inspiration from
