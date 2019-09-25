@@ -3,7 +3,7 @@ import dask.dataframe as dd
 from dask.base import DaskMethodsMixin
 from networkx import topological_sort
 
-from .type import Setting
+from .annotation import Setting
 from .utils import _generate_message
 from .function import _BaseFunction
 
@@ -100,12 +100,12 @@ def _get_functions(G, calculate):
     return func_list
 
 
-class FootingsModel(DaskComponents):
+class Model(DaskComponents):
     """
     """
 
     def __init__(
-        self, frame=None, registry=None, settings=None, calculate=None, scenario=None
+        self, frame=None, registry=None, settings=None, calculate=None, **kwargs
     ):
 
         assert type(frame) is dd.DataFrame

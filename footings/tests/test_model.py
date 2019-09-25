@@ -5,7 +5,7 @@ import dask.dataframe as dd
 import unittest
 
 from footings import (
-    FootingsModel,
+    Model,
     Registry,
     Calculation,
     as_calculation,
@@ -13,7 +13,7 @@ from footings import (
     CReturn,
     Setting,
 )
-from footings.model import _build_model_graph, _get_functions, FootingsModel
+from footings.model import _build_model_graph, _get_functions, Model
 
 
 class TestModel(unittest.TestCase):
@@ -51,7 +51,7 @@ class TestModel(unittest.TestCase):
             return cumsum(disc_cash)
 
         reg = Registry(calc_v, calc_disc_factor, calc_disc_cash, calc_pv)
-        m = FootingsModel(ddf, reg)
+        m = Model(ddf, reg)
         test = df.assign(
             v=lambda x: calc_v(x["i"]),
             disc_factor=lambda x: calc_disc_factor(x["v"]),

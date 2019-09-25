@@ -2,7 +2,7 @@ import pandas as pd
 from inspect import getfullargspec
 from functools import wraps, partial
 
-from .type import Column, CReturn, Frame, FReturn, Setting
+from .annotation import Column, CReturn, Frame, FReturn, Setting
 
 from .utils import _generate_message
 

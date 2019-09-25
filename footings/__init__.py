@@ -1,5 +1,10 @@
-from footings.assumption import Assumption, as_assumption
+from footings.assumption import (
+    AssumptionDeterministic,
+    as_assumption_deterministic,
+    AssumptionStochastic,
+    as_assumption_stochastic,
+)
 from footings.calculation import Calculation, as_calculation
-from footings.type import Column, CReturn, Frame, FReturn, Setting
+from footings.annotation import Column, CReturn, Frame, FReturn, Setting
 from footings.registry import Registry
-from footings.model import FootingsModel
+from footings.model import Model
