@@ -13,7 +13,7 @@ from footings import (
     CReturn,
     Setting,
 )
-from footings.model import _build_model_graph, _get_functions, Model
+from footings.core.model import _build_model_graph, _get_functions, Model
 
 
 class TestModel(unittest.TestCase):

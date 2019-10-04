@@ -4,7 +4,7 @@ from pandas.util.testing import assert_frame_equal
 import unittest
 
 from footings import Column, CReturn, Frame, FReturn, Setting
-from footings.function import (
+from footings.core.function import (
     _BaseFunction,
     func_annotation_valid,
     to_ff_function,
