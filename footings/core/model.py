@@ -104,18 +104,24 @@ class Model(DaskComponents):
     """
     """
 
-    def __init__(
-        self, frame=None, registry=None, settings=None, calculate=None, **kwargs
-    ):
+    def __init__(self, frame=None, registry=None, settings=None, **kwargs):
 
         assert type(frame) is dd.DataFrame
-        if calculate is not None:
-            assert calculate in [n for n, d in registry._G.nodes(data=True) if "src" in d]
 
-        # self.registry = registry
-        # self.settings = settings
-        # self.calculate = calculate
-        # self.scenario = scenario
+        # kwargs > calculate
+        if "calculate" in kwargs:
+            calculate = kwargs["calculate"]
+            assert calculate in [n for n, d in registry._G.nodes(data=True) if "src" in d]
+        else:
+            calculate = None
+
+        # kwargs > scenario
+        if "scenario" in kwargs:
+            self.scenario = kwargs["scenario"]
+
+        # kwargs > stochastic
+        if "stochastic" in kwargs:
+            pass
 
         G = _build_model_graph(frame, registry, settings)
         func_list = _get_functions(G, calculate)
@@ -123,5 +129,7 @@ class Model(DaskComponents):
         for f in func_list:
             df = f(df)
 
+        self.settings = settings
+        self.directions = func_list
         self._frame = df
         self._G = G
