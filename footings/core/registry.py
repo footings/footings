@@ -1,5 +1,6 @@
 from networkx import DiGraph, ancestors, descendants
 from .function import _BaseFunction
+from .annotation import Setting
 
 
 class Registry:
@@ -48,6 +49,9 @@ class Registry:
 
     def descendants(self, column: str):
         return list(descendants(self._G, column))
+
+    def settings(self):
+        return [(k, v) for k, v in self._G.nodes(data=True) if v["class"] == Setting]
 
     def __len__(self):
         return len(self._G)

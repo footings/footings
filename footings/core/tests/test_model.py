@@ -3,6 +3,7 @@ from pandas.util.testing import assert_frame_equal
 import pandas as pd
 import dask.dataframe as dd
 import unittest
+import pytest
 
 from footings import (
     Model,
@@ -13,7 +14,11 @@ from footings import (
     CReturn,
     Setting,
 )
-from footings.core.model import _build_model_graph, _get_functions, Model
+from footings.core.model import _build_model_graph, _get_instructions, _to_ff_function
+
+
+class TestFFFunction:
+    pass
 
 
 class TestModel(unittest.TestCase):
@@ -50,12 +55,47 @@ class TestModel(unittest.TestCase):
         def calc_pv(disc_cash: Column(float)) -> CReturn({"pv": float}):
             return cumsum(disc_cash)
 
-        reg = Registry(calc_v, calc_disc_factor, calc_disc_cash, calc_pv)
-        m = Model(ddf, reg)
+        reg1 = Registry(calc_v, calc_disc_factor, calc_disc_cash, calc_pv)
+        m1 = Model(ddf, reg1)
         test = df.assign(
             v=lambda x: calc_v(x["i"]),
             disc_factor=lambda x: calc_disc_factor(x["v"]),
             disc_cash=lambda x: calc_disc_cash(x["cash"], x["disc_factor"]),
             pv=lambda x: calc_pv(x["disc_cash"]),
         )
-        assert_frame_equal(m.compute(), test)
+        assert_frame_equal(m1.compute(), test)
+
+        # test model with settings
+        @as_calculation
+        def calc_v_mode(
+            i: Column(float), mode: Setting(dtype="category", allowed=["A", "M"])
+        ) -> CReturn({"v": float}):
+            if mode == "A":
+                return 1 / (1 + i)
+            elif mode == "M":
+                return 1 / (1 + i / 12)
+
+        reg2 = Registry(calc_v_mode, calc_disc_factor, calc_disc_cash, calc_pv)
+
+        # test mode A
+        m2_a = Model(ddf, reg2, settings={"mode": "A"})
+        test2_a = df.assign(
+            v=lambda x: calc_v_mode(x["i"], "A"),
+            disc_factor=lambda x: calc_disc_factor(x["v"]),
+            disc_cash=lambda x: calc_disc_cash(x["cash"], x["disc_factor"]),
+            pv=lambda x: calc_pv(x["disc_cash"]),
+        )
+        assert_frame_equal(m2_a.compute(), test2_a)
+
+        # test mode M
+        m2_m = Model(ddf, reg2, settings={"mode": "M"})
+        test2_m = df.assign(
+            v=lambda x: calc_v_mode(x["i"], "M"),
+            disc_factor=lambda x: calc_disc_factor(x["v"]),
+            disc_cash=lambda x: calc_disc_cash(x["cash"], x["disc_factor"]),
+            pv=lambda x: calc_pv(x["disc_cash"]),
+        )
+        assert_frame_equal(m2_m.compute(), test2_m)
+
+        # test missing setting throws error
+        pytest.raises(AssertionError, _build_model_graph, ddf, reg2, {"mode1": "M"})

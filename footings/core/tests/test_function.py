@@ -7,9 +7,6 @@ from footings import Column, CReturn, Frame, FReturn, Setting
 from footings.core.function import (
     _BaseFunction,
     func_annotation_valid,
-    to_ff_function,
-    to_df_function,
-    _get_params,
     _get_column_inputs,
     _get_column_ouputs,
     _get_setting_inputs,
@@ -138,33 +135,6 @@ class TestValidateAnnotations:
             return None
 
         pytest.raises(AssertionError, func_annotation_valid, func5)
-
-
-class TestDFFunction(unittest.TestCase):
-    def test(self):
-        def func(
-            i: Column(float), period: Setting(allowed=["A", "M"], default="A")
-        ) -> CReturn({"v": float}):
-            if period == "A":
-                return 1 / (1 + i)
-            elif period == "M":
-                return 1 / (1 + i / 12)
-
-        params = _get_params(func)
-        assert all([k in ["Settings", "Columns"] for k in params.keys()])
-
-        df_func = to_df_function(func, params, ["v"])
-        df = pd.DataFrame({"i": [0, 0.1, 0.1]})
-
-        df_a = df.assign(v=func(df["i"], period="A"))
-        assert_frame_equal(df_func(df, period="A"), df_a)
-
-        df_m = df.assign(v=func(df["i"], period="M"))
-        assert_frame_equal(df_func(df, period="M"), df_m)
-
-
-class TestFFFunction:
-    pass
 
 
 class Test_BaseFunction:

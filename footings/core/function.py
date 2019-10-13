@@ -74,80 +74,6 @@ def func_annotation_valid(function):
     return True
 
 
-# def create_edges(function, edge_kws):
-#     anno = function.__annotations__
-#     if type(anno['return']) == CReturn:
-#         # dict key names can be used when using only Columns and Settings
-#         inp = [k for k in anno.keys() if k != 'return']
-#     else:
-#         inp = []
-#         for k, v in anno.items():
-#             if k != 'return':
-#                 if type(v) == Setting:
-#                     inp.append(k)
-#                 elif type(v) == Frame:
-#                     inp.extend(v.nodes)
-#                 else:
-#                     raise TypeError("Unknown type passed to create_edges")
-#     return [(i, r, edge_kws) for r in anno['return'].nodes for i in inp]
-#
-# def create_nodes(function, node_kws):
-#     ret = function.__annotations__['return'].nodes
-#     l = [(n, {'src': function,
-#               'class': Column,
-#               'dtype': function.__annotations__['return'].col_dict[n],
-#               **node_kws})
-#               for n in ret]
-#     for k, v in function.__annotations__.items():
-#         if type(v) == Setting:
-#             l.extend((k, {'src': function,
-#                           'class': Setting,
-#                           'allowed': v.allowed,
-#                           'default': v.default,
-#                           'dtype': v.dtype,
-#                           **node_kws}))
-#     return l
-
-
-def _get_params(function):
-    anno = function.__annotations__
-    if type(anno["return"]) == CReturn:
-        # dict key names can be used when using only Columns and Settings
-        params = {
-            "Columns": {k: v.dtype for k, v in anno.items() if type(v) == Column},
-            "Settings": {k: v for k, v in anno.items() if type(v) == Setting},
-        }
-    else:
-        cols = {}
-        for k, v in anno.items():
-            if type(v) == Frame:
-                cols.update(v.columns)
-        params = {
-            "Columns": cols,
-            "Settings": {k: v for k, v in anno.items() if type(v) == Setting},
-        }
-    return params
-
-
-def to_df_function(function, params, ret):
-    def wrapper(_df, **kwargs):
-        exp = lambda x: function(**{k: x[k] for k in params["Columns"].keys()}, **kwargs)
-        _df = _df.assign(**{ret[0]: exp})
-        return _df
-
-    wrapper.__doc__ = function.__doc__
-    return wrapper
-
-
-def to_ff_function(function):
-    if type(function.__annotations__["return"]) == CReturn:
-        params = _get_params(function)
-        ret = function.__annotations__["return"].nodes
-        return to_df_function(function, params, ret)
-    else:
-        return function
-
-
 def _get_column_inputs(function):
     l = []
     for k, v in function.__annotations__.items():
@@ -177,16 +103,16 @@ def _get_setting_inputs(function):
     return l
 
 
-def _get_column_ouputs(function, ff_function, output_attrs=None):
+def _get_column_ouputs(function, output_attrs=None):
     l = []
     for k, v in function.__annotations__.items():
         if k == "return" and output_attrs is None:
             for c, t in v.columns.items():
-                l.append((c, {"src": ff_function, "class": Column, "dtype": t}))
+                l.append((c, {"src": function, "class": Column, "dtype": t}))
         elif k == "return" and output_attrs is not None:
             for c, t in v.columns.items():
                 l.append(
-                    (c, {"src": ff_function, "class": Column, "dtype": t, **output_attrs})
+                    (c, {"src": function, "class": Column, "dtype": t, **output_attrs})
                 )
     return l
 
@@ -200,14 +126,14 @@ class _BaseFunction:
 
         func_annotation_valid(function)
 
-        ff_function = to_ff_function(function)
+        # ff_function = to_ff_function(function)
         self.annotations = function.__annotations__
         self.function = function
-        self.ff_function = ff_function
+        # self.ff_function = ff_function
         self.name = function.__name__
         self.columns_input = _get_column_inputs(function)
         self.setting_input = _get_setting_inputs(function)
-        self.columns_output = _get_column_ouputs(function, ff_function, output_attrs)
+        self.columns_output = _get_column_ouputs(function, output_attrs)
 
     def __call__(self, *args, **kwargs):
         return self.function(*args, **kwargs)
