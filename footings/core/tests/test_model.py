@@ -4,8 +4,11 @@ import pandas as pd
 import dask.dataframe as dd
 import unittest
 import pytest
+from pyarrow import Schema
 
 from footings import (
+    ModelTemplate,
+    ModelFromTemplate,
     Model,
     Registry,
     Calculation,
@@ -98,4 +101,46 @@ class TestModel(unittest.TestCase):
         assert_frame_equal(m2_m.compute(), test2_m)
 
         # test missing setting throws error
-        pytest.raises(AssertionError, _build_model_graph, ddf, reg2, {"mode1": "M"})
+        schema = Schema.from_pandas(ddf._meta)
+        pytest.raises(AssertionError, _build_model_graph, schema, reg2, {"mode1": "M"})
+
+    def test_model_function(self):
+
+        df = pd.DataFrame(
+            {
+                "t": [0, 1, 2, 3],
+                "i": [0, 0.1, 0.09, 0.08],
+                "cash": [1000, -350, -350, -350],
+            }
+        )
+        df.set_index("t", inplace=True)
+        ddf = dd.from_pandas(df, npartitions=1)
+
+        @as_calculation
+        def calc_v(i: Column(float)) -> CReturn({"v": float}):
+            return 1 / (1 + i)
+
+        @as_calculation
+        def calc_disc_factor(v: Column(float)) -> CReturn({"disc_factor": float}):
+            return cumprod(v)
+
+        @as_calculation
+        def calc_disc_cash(
+            cash: Column(float), disc_factor: Column(float)
+        ) -> CReturn({"disc_cash": float}):
+            return cash * disc_factor
+
+        @as_calculation
+        def calc_pv(disc_cash: Column(float)) -> CReturn({"pv": float}):
+            return cumsum(disc_cash)
+
+        reg1 = Registry(calc_v, calc_disc_factor, calc_disc_cash, calc_pv)
+        template = ModelTemplate(ddf._meta, reg1)
+        model = ModelFromTemplate(ddf, template)
+        test = df.assign(
+            v=lambda x: calc_v(x["i"]),
+            disc_factor=lambda x: calc_disc_factor(x["v"]),
+            disc_cash=lambda x: calc_disc_cash(x["cash"], x["disc_factor"]),
+            pv=lambda x: calc_pv(x["disc_cash"]),
+        )
+        assert_frame_equal(model.compute(), test)

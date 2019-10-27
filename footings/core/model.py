@@ -1,5 +1,6 @@
 import pandas as pd
 import dask.dataframe as dd
+from pyarrow import Schema
 from dask.base import DaskMethodsMixin
 from networkx import topological_sort
 from functools import partial
@@ -51,7 +52,7 @@ class FootingsModelMethods:
         pass
 
 
-def _build_model_graph(frame, registry, settings):
+def _build_model_graph(schema, registry, settings):
     G = registry._G.copy()
 
     # get nodes that do not have a src as they will be either -
@@ -67,14 +68,14 @@ def _build_model_graph(frame, registry, settings):
 
     missing_nodes = []
     for n in nodes_check_frame:
-        if n not in frame.columns:
+        if n not in schema.names:
             missing_nodes.append(n)
     if len(missing_nodes) > 0:
         msg = """The following columns are expected in the input frame but are 
         missing - 
         """
         raise AssertionError(_generate_message(msg, missing_nodes))
-    G.nodes[n]["src"] = frame
+    G.nodes[n]["src"] = "frame"
 
     if len(nodes_check_settings) > 0 and settings == {}:
         msg = """The following items are identified as Settings in the Registry, 
@@ -191,7 +192,7 @@ def _combine_functions(instructions):
 
 
 def _build_meta(frame, instructions):
-    f = {i: str(v) for i, v in frame._meta.dtypes.iteritems()}
+    f = {i: str(v) for i, v in frame.dtypes.iteritems()}
     i = {c: d for k, v in instructions.items() for c, d in v["output_columns"].items()}
     return {**f, **i}
 
@@ -202,6 +203,8 @@ class Model(DaskComponents):
     """
 
     def __init__(self, frame=None, registry=None, settings=None, **kwargs):
+
+        kw_list = ["calculate", "scenario", "stochastic", "simulate", "step", "schema"]
 
         assert type(frame) is dd.DataFrame
 
@@ -220,16 +223,102 @@ class Model(DaskComponents):
         if "stochastic" in kwargs:
             pass
 
-        G = _build_model_graph(frame, registry, settings)
+        schema = Schema.from_pandas(frame._meta)
+        G = _build_model_graph(schema, registry, settings)
+        instr = _get_instructions(G, settings, calculate)
+        func_combined = _combine_functions(instr)
+        meta = _build_meta(frame._meta, instr)
+
+        # run model
+        ddf = frame.copy()
+
+        # consider how step is done
+        ddf = ddf.map_partitions(func_combined, meta=meta)
+
+        self.description = settings
+        self.directions = instr
+        self._frame = ddf
+        self._G = G
+
+    def sub(self, x, y):
+        pass
+
+    def audit(self):
+        pass
+
+    def reduce_func(self):
+        pass
+
+
+class ModelTemplate:
+    """
+    
+    """
+
+    def __init__(
+        self,
+        frame=None,
+        registry=None,
+        settings=None,
+        calculate=None,
+        scenario=None,
+        stochastic=None,
+        simulate=None,
+        step=None,
+    ):
+
+        if calculate is not None:
+            pass
+
+        if scenario is not None:
+            pass
+
+        if stochastic is not None:
+            pass
+
+        if simulate is not None:
+            pass
+
+        if step is not None:
+            pass
+
+        G = _build_model_graph(Schema.from_pandas(frame), registry, settings)
         instr = _get_instructions(G, settings, calculate)
         func_combined = _combine_functions(instr)
         meta = _build_meta(frame, instr)
 
+        self.functions = func_combined
+        self.directions = instr
+        self.description = None
+        self.meta = meta
+
+
+class ModelFromTemplate(DaskComponents):
+    """
+    
+    """
+
+    def __init__(self, frame, template):
         # run model
         ddf = frame.copy()
-        ddf = ddf.map_partitions(func_combined, meta=meta)
 
-        self.settings = settings
-        self.directions = instr
+        # consider how step is done
+        ddf = ddf.map_partitions(template.functions, meta=template.meta)
+
+        self.description = template.description
+        self.directions = template.directions
         self._frame = ddf
-        self._G = G
+
+
+# class ModelGraph2:
+#     """
+#
+#     """
+#
+#     def __init__(self, layers, dependencies, mtype, scenario, simulate):
+#         self.layers = layers
+#         self.dependencies = dependencies
+#         self.mtype = mtype
+#         self.scenario = scenario
+#         self.simulate = simulate
+#
