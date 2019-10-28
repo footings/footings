@@ -10,6 +10,7 @@ from footings import (
     ModelTemplate,
     ModelFromTemplate,
     Model,
+    as_model_template,
     Registry,
     Calculation,
     as_calculation,
@@ -144,3 +145,44 @@ class TestModel(unittest.TestCase):
             pv=lambda x: calc_pv(x["disc_cash"]),
         )
         assert_frame_equal(model.compute(), test)
+
+    def test_as_model(self):
+
+        df = pd.DataFrame(
+            {
+                "t": [0, 1, 2, 3],
+                "i": [0, 0.1, 0.09, 0.08],
+                "cash": [1000, -350, -350, -350],
+            }
+        )
+        df.set_index("t", inplace=True)
+        ddf = dd.from_pandas(df, npartitions=1)
+
+        @as_calculation
+        def calc_v_mode(
+            i: Column(float), mode: Setting(dtype="category", allowed=["A", "M"])
+        ) -> CReturn({"v": float}):
+            if mode == "A":
+                return 1 / (1 + i)
+            elif mode == "M":
+                return 1 / (1 + i / 12)
+
+        @as_calculation
+        def calc_disc_factor(v: Column(float)) -> CReturn({"disc_factor": float}):
+            return cumprod(v)
+
+        @as_calculation
+        def calc_disc_cash(
+            cash: Column(float), disc_factor: Column(float)
+        ) -> CReturn({"disc_cash": float}):
+            return cash * disc_factor
+
+        @as_calculation
+        def calc_pv(disc_cash: Column(float)) -> CReturn({"pv": float}):
+            return cumsum(disc_cash)
+
+        reg1 = Registry(calc_v_mode, calc_disc_factor, calc_disc_cash, calc_pv)
+
+        # @as_model_template(frame=ddf._meta, registry=reg1)
+        # def test_model(frame, mode):
+        #     return ModelFromTemplate(frame, mode)

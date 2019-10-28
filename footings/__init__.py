@@ -7,4 +7,4 @@ from footings.core.assumption import (
 from footings.core.calculation import Calculation, as_calculation
 from footings.core.annotation import Column, CReturn, Frame, FReturn, Setting
 from footings.core.registry import Registry
-from footings.core.model import Model, ModelTemplate, ModelFromTemplate
+from footings.core.model import Model, ModelTemplate, ModelFromTemplate, as_model_template

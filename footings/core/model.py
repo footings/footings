@@ -197,59 +197,6 @@ def _build_meta(frame, instructions):
     return {**f, **i}
 
 
-class Model(DaskComponents):
-    """
-
-    """
-
-    def __init__(self, frame=None, registry=None, settings=None, **kwargs):
-
-        kw_list = ["calculate", "scenario", "stochastic", "simulate", "step", "schema"]
-
-        assert type(frame) is dd.DataFrame
-
-        # kwargs -> calculate
-        if "calculate" in kwargs:
-            calculate = kwargs["calculate"]
-            assert calculate in [n for n, d in registry._G.nodes(data=True) if "src" in d]
-        else:
-            calculate = None
-
-        # kwargs -> scenario
-        if "scenario" in kwargs:
-            self.scenario = kwargs["scenario"]
-
-        # kwargs -> stochastic
-        if "stochastic" in kwargs:
-            pass
-
-        schema = Schema.from_pandas(frame._meta)
-        G = _build_model_graph(schema, registry, settings)
-        instr = _get_instructions(G, settings, calculate)
-        func_combined = _combine_functions(instr)
-        meta = _build_meta(frame._meta, instr)
-
-        # run model
-        ddf = frame.copy()
-
-        # consider how step is done
-        ddf = ddf.map_partitions(func_combined, meta=meta)
-
-        self.description = settings
-        self.directions = instr
-        self._frame = ddf
-        self._G = G
-
-    def sub(self, x, y):
-        pass
-
-    def audit(self):
-        pass
-
-    def reduce_func(self):
-        pass
-
-
 class ModelTemplate:
     """
     
@@ -298,7 +245,7 @@ class ModelFromTemplate(DaskComponents):
     
     """
 
-    def __init__(self, frame, template):
+    def __init__(self, frame, template, **kwargs):
         # run model
         ddf = frame.copy()
 
@@ -309,16 +256,54 @@ class ModelFromTemplate(DaskComponents):
         self.directions = template.directions
         self._frame = ddf
 
+    def sub(self, x, y):
+        pass
 
-# class ModelGraph2:
-#     """
+    def audit(self):
+        pass
+
+    def reduce_func(self):
+        pass
+
+
+class Model(ModelFromTemplate):
+    """
+
+    """
+
+    def __init__(
+        self,
+        frame=None,
+        registry=None,
+        settings=None,
+        calculate=None,
+        scenario=None,
+        stochastic=None,
+        simulate=None,
+        step=None,
+        **kwargs,
+    ):
+        template = ModelTemplate(
+            frame._meta, registry, settings, calculate, scenario, stochastic, step
+        )
+        self.template = template
+        super().__init__(frame, template, **kwargs)
+
+
+def as_model_template(**kwargs):
+    template = ModelTemplate(kwargs)
+
+    def wrapper(*args, **kwargs):
+        return Model(args, kwargs, template=template)
+
+    return wrapper
+
+
+#     if not function:
+#         return partial(AssumptionDeterministic, **kwargs)
 #
-#     """
+#     @wraps(function)
+#     def wrapper(function):
+#         return AssumptionDeterministic(function, **kwargs)
 #
-#     def __init__(self, layers, dependencies, mtype, scenario, simulate):
-#         self.layers = layers
-#         self.dependencies = dependencies
-#         self.mtype = mtype
-#         self.scenario = scenario
-#         self.simulate = simulate
-#
+#     return wrapper(function)
