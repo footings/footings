@@ -42,3 +42,26 @@ class Setting:
         self.dtype = dtype
         self.allowed = allowed
         self.default = default
+
+    def validate(self, value):
+        pass
+
+
+def _parse_annotation_settings(x):
+    return {k: v for k, v in x.__annotations__.items() if type(v) == Setting}
+
+
+def _parse_annotation_input(x):
+    if type(x.__annotations__["return"]) == CReturn:
+        return {k: v.dtype for k, v in x.__annotations__.items() if type(v) == Column}
+    elif type(x.__annotations__["return"]) == FReturn:
+        l = []
+        for k, v in x.__annotations__.items():
+            if type(v) == Frame:
+                l.append(v.columns)
+        assert len(l) == 1, "check frame"
+        return l[0]
+
+
+def _parse_annotation_output(x):
+    return x.__annotations__["return"].columns

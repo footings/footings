@@ -97,6 +97,7 @@ def _get_setting_inputs(function):
                         "dtype": v.dtype,
                         "default": v.default,
                         "allowed": v.allowed,
+                        "object": v,
                     },
                 )
             )
