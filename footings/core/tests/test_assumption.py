@@ -10,7 +10,7 @@ class TestAssumptionDeterministic(unittest.TestCase):
     """
 
     def test_AssumptionDeterministic(self):
-        def get_i(df: Frame({"t": int})) -> FReturn({"i": float}):
+        def get_i(df: Frame({"t": "int"})) -> FReturn({"i": "float"}):
             asn = pd.DataFrame({"t": [0, 1, 2, 3], "i": [0, 0.1, 0.09, 0.08]})
             return df.merge(asn, on="t")
 

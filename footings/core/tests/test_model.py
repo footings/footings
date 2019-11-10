@@ -42,30 +42,30 @@ class TestModelGraph:
         ddf = dd.from_pandas(df, npartitions=1)
 
         @as_calculation
-        def calc_v(i: Column(float)) -> CReturn({"v": float}):
+        def calc_v(i: Column("float")) -> CReturn({"v": "float"}):
             return 1 / (1 + i)
 
         @as_calculation
         def calc_v_mode(
-            i: Column(float), mode: Setting(dtype="category", allowed=["A", "M"])
-        ) -> CReturn({"v": float}):
+            i: Column("float"), mode: Setting(dtype="category", allowed=["A", "M"])
+        ) -> CReturn({"v": "float"}):
             if mode == "A":
                 return 1 / (1 + i)
             elif mode == "M":
                 return 1 / (1 + i / 12)
 
         @as_calculation
-        def calc_disc_factor(v: Column(float)) -> CReturn({"disc_factor": float}):
+        def calc_disc_factor(v: Column("float")) -> CReturn({"disc_factor": "float"}):
             return cumprod(v)
 
         @as_calculation
         def calc_disc_cash(
-            cash: Column(float), disc_factor: Column(float)
-        ) -> CReturn({"disc_cash": float}):
+            cash: Column("float"), disc_factor: Column("float")
+        ) -> CReturn({"disc_cash": "float"}):
             return cash * disc_factor
 
         @as_calculation
-        def calc_pv(disc_cash: Column(float)) -> CReturn({"pv": float}):
+        def calc_pv(disc_cash: Column("float")) -> CReturn({"pv": "float"}):
             return cumsum(disc_cash)
 
         reg1 = Registry(calc_v, calc_disc_factor, calc_disc_cash, calc_pv)
@@ -96,21 +96,21 @@ class TestModel(unittest.TestCase):
         ddf = dd.from_pandas(df, npartitions=1)
 
         @as_calculation
-        def calc_v(i: Column(float)) -> CReturn({"v": float}):
+        def calc_v(i: Column("float")) -> CReturn({"v": "float"}):
             return 1 / (1 + i)
 
         @as_calculation
-        def calc_disc_factor(v: Column(float)) -> CReturn({"disc_factor": float}):
+        def calc_disc_factor(v: Column("float")) -> CReturn({"disc_factor": "float"}):
             return cumprod(v)
 
         @as_calculation
         def calc_disc_cash(
-            cash: Column(float), disc_factor: Column(float)
-        ) -> CReturn({"disc_cash": float}):
+            cash: Column("float"), disc_factor: Column("float")
+        ) -> CReturn({"disc_cash": "float"}):
             return cash * disc_factor
 
         @as_calculation
-        def calc_pv(disc_cash: Column(float)) -> CReturn({"pv": float}):
+        def calc_pv(disc_cash: Column("float")) -> CReturn({"pv": "float"}):
             return cumsum(disc_cash)
 
         reg1 = Registry(calc_v, calc_disc_factor, calc_disc_cash, calc_pv)
@@ -130,8 +130,8 @@ class TestModel(unittest.TestCase):
         # test model with settings a passed in settings
         @as_calculation
         def calc_v_mode(
-            i: Column(float), mode: Setting(dtype="category", allowed=["A", "M"])
-        ) -> CReturn({"v": float}):
+            i: Column("float"), mode: Setting(dtype="category", allowed=["A", "M"])
+        ) -> CReturn({"v": "float"}):
             if mode == "A":
                 return 1 / (1 + i)
             elif mode == "M":
@@ -166,21 +166,21 @@ class TestModel(unittest.TestCase):
         ddf = dd.from_pandas(df, npartitions=1)
 
         @as_calculation
-        def calc_v(i: Column(float)) -> CReturn({"v": float}):
+        def calc_v(i: Column("float")) -> CReturn({"v": "float"}):
             return 1 / (1 + i)
 
         @as_calculation
-        def calc_disc_factor(v: Column(float)) -> CReturn({"disc_factor": float}):
+        def calc_disc_factor(v: Column("float")) -> CReturn({"disc_factor": "float"}):
             return cumprod(v)
 
         @as_calculation
         def calc_disc_cash(
-            cash: Column(float), disc_factor: Column(float)
-        ) -> CReturn({"disc_cash": float}):
+            cash: Column("float"), disc_factor: Column("float")
+        ) -> CReturn({"disc_cash": "float"}):
             return cash * disc_factor
 
         @as_calculation
-        def calc_pv(disc_cash: Column(float)) -> CReturn({"pv": float}):
+        def calc_pv(disc_cash: Column("float")) -> CReturn({"pv": "float"}):
             return cumsum(disc_cash)
 
         reg1 = Registry(calc_v, calc_disc_factor, calc_disc_cash, calc_pv)

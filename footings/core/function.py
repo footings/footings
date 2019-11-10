@@ -127,10 +127,8 @@ class _BaseFunction:
 
         func_annotation_valid(function)
 
-        # ff_function = to_ff_function(function)
         self.annotations = function.__annotations__
         self.function = function
-        # self.ff_function = ff_function
         self.name = function.__name__
         self.columns_input = _get_column_inputs(function)
         self.setting_input = _get_setting_inputs(function)
