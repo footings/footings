@@ -44,6 +44,14 @@ class DaskComponents:
         )
 
 
+class ModelDescription:
+    """
+    """
+
+    def __init__(self, frame, tempalte):
+        pass
+
+
 class ModelGraph:
     """
     """
@@ -97,11 +105,10 @@ class ModelTemplate:
         **kwargs,
     ):
         self.frame_meta = frame_meta
-        self.registry = registry
-        self.model_graph = ModelGraph(frame_meta, registry)
+        self._model_graph = ModelGraph(frame_meta, registry)
         self.runtime_settings = self._get_runtime_settings(runtime_settings)
-        self.defined_settings = self._get_defined_settings(**kwargs)
         self._runtime_checks = self._create_runtime_check()
+        self.defined_settings = self._get_defined_settings(**kwargs)
         self.scenario = self._validate_scenario(scenario)
         self.step = step
         self.instructions = self._build_instructions()
@@ -112,12 +119,12 @@ class ModelTemplate:
         if l is None:
             return None
         else:
-            settings = self.model_graph.settings
+            settings = self._model_graph.settings
             return {k: v for k, v in settings.items() if k in l}
 
     def _get_defined_settings(self, **kwargs):
         # still need to consider kwargs
-        settings = self.model_graph.settings
+        settings = self._model_graph.settings
         runtime = self.runtime_settings
         if settings is not None and runtime is not None:
             defined = {k: v for k, v in settings.items() if k not in runtime.keys()}
@@ -137,9 +144,9 @@ class ModelTemplate:
         return scenario
 
     def _build_instructions(self):
-        instr = {"starting_frame": {"columns": self.model_graph.frame_meta.columns}}
+        instr = {"frame": {"columns": self._model_graph.frame_meta.columns}}
         output_list = []
-        for k, v in self.model_graph.functions.items():
+        for k, v in self._model_graph.functions.items():
             output = _parse_annotation_output(v["src"])
             output_list.append(output)
             settings = _parse_annotation_settings(v["src"])
@@ -168,10 +175,10 @@ class ModelTemplate:
                         "defined_settings": defined,
                         "input_columns": _parse_annotation_input(v["src"]),
                         "output_columns": output,
+                        "drop_columns": [],
                     }
                 }
             )
-        instr.update({"ending_frame": {"columns": output_list}})
         return instr
 
     def _build_dask_function(self):
@@ -274,12 +281,8 @@ class ModelTemplate:
         return ModelFromTemplate(frame=frame, template=self, **kwargs)
 
 
-class ModelDescription:
-    """
-    """
-
-    def __init__(self, frame, tempalte):
-        pass
+def as_model_template():
+    pass
 
 
 class ModelFromTemplate(DaskComponents):
@@ -289,8 +292,13 @@ class ModelFromTemplate(DaskComponents):
 
     def __init__(self, frame, template, **kwargs):
         self.template = template
+        self._run_runtime_checks()
         self._frame = self._run_model(frame, **kwargs)
         self.description = ModelDescription(frame, template)
+
+    def _run_runtime_checks(self):
+        if self.template._runtime_checks is not None:
+            pass
 
     def _run_model(self, frame, **kwargs):
         meta = self.template._dask_meta
