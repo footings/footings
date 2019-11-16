@@ -19,7 +19,7 @@ from footings import (
     Setting,
 )
 
-from footings.core.model import ModelGraph, ModelDescription, ModelFromTemplate
+from footings.core.model import ModelDescription, ModelFromTemplate
 
 
 @pytest.fixture(scope="module")
@@ -70,13 +70,14 @@ def calcs():
 
 
 @pytest.fixture(scope="module")
-def registry(calcs):
+def registry(ddf, calcs):
 
     registry_base = Registry(
         as_calculation(calcs["calc_v"]),
         as_calculation(calcs["calc_disc_factor"]),
         as_calculation(calcs["calc_disc_cash"]),
         as_calculation(calcs["calc_pv"]),
+        frame=ddf._meta,
     )
 
     registry_mode = Registry(
@@ -84,46 +85,33 @@ def registry(calcs):
         as_calculation(calcs["calc_disc_factor"]),
         as_calculation(calcs["calc_disc_cash"]),
         as_calculation(calcs["calc_pv"]),
+        frame=ddf._meta,
     )
 
     registry_error = Registry(
         as_calculation(calcs["calc_v"]),
         as_calculation(calcs["calc_disc_factor"]),
         as_calculation(calcs["calc_pv"]),
+        frame=ddf._meta,
     )
 
     return {"base": registry_base, "mode": registry_mode, "error": registry_error}
 
 
-def test_model_graph(ddf, registry):
-    model_graph_base = ModelGraph(ddf._meta, registry["base"])
-    model_graph_mode = ModelGraph(ddf._meta, registry["mode"])
-
-    # test _get_settings
-    # assert model_graph_base.settings == {}
-    # assert model_graph_mode.settings == ""
-
-    # test_get_functions
-    # assert model_graph_base.functions ==
-    # assert model_graph_mode.functions ==
-
-    # test error
-    # pytest.raises(AssertionError, ModelGraph, ddf._meta, registry["registry_error"])
-
-
 def test_model_template(ddf, registry):
-    model_temp_base = ModelTemplate(ddf._meta, registry["base"])
-    model_temp_runtime = ModelTemplate(
-        ddf._meta, registry["mode"], runtime_settings=["mode"]
-    )
-    model_temp_defined = ModelTemplate(ddf._meta, registry["mode"], mode="M")
+    model_temp_base = ModelTemplate(registry["base"])
+    model_temp_runtime = ModelTemplate(registry["mode"], runtime_settings=["mode"])
+    model_temp_defined = ModelTemplate(registry["mode"], mode="M")
+
+    # validate _frame
+    assert_frame_equal(model_temp_base._frame, ddf._meta)
+    assert_frame_equal(model_temp_runtime._frame, ddf._meta)
+    assert_frame_equal(model_temp_defined._frame, ddf._meta)
 
     # test_runtime_settings
     assert model_temp_base.runtime_settings is None
-    # assert model_temp_runtime.runtime_settings is None
+    assert type(model_temp_runtime.runtime_settings["mode"]) is Setting
     assert model_temp_defined.runtime_settings is None
-
-    # test_runtime_checks
 
     # test_defined_settings
 
@@ -133,39 +121,42 @@ def test_model_template(ddf, registry):
 
     # test_instructions
 
+    # test_runtime_checks
+
     # test_dask_functions
 
     # test_dask_meta
 
 
-def test_model(df, ddf, registry, calcs):
-
-    m1_t = ModelTemplate(frame_meta=ddf._meta, registry=registry["base"])
-    m1_a = m1_t(frame=ddf)
-    m1_b = Model(frame=ddf, registry=registry["base"])
-
-    test1 = df.assign(
-        v=lambda x: calcs["calc_v"](x["i"]),
-        disc_factor=lambda x: calcs["calc_disc_factor"](x["v"]),
-        disc_cash=lambda x: calcs["calc_disc_cash"](x["cash"], x["disc_factor"]),
-        pv=lambda x: calcs["calc_pv"](x["disc_cash"]),
-    )
-
-    assert_frame_equal(m1_a.compute(), test1)
-    assert_frame_equal(m1_b.compute(), test1)
-
-    m2_t = ModelTemplate(
-        frame_meta=ddf._meta, registry=registry["mode"], runtime_settings=["mode"]
-    )
-    m2_a = m2_t(frame=ddf, mode="M")
-    m2_b = Model(frame=ddf, registry=registry["mode"], mode="M")
-
-    test2 = df.assign(
-        v=lambda x: calcs["calc_v_mode"](x["i"], mode="M"),
-        disc_factor=lambda x: calcs["calc_disc_factor"](x["v"]),
-        disc_cash=lambda x: calcs["calc_disc_cash"](x["cash"], x["disc_factor"]),
-        pv=lambda x: calcs["calc_pv"](x["disc_cash"]),
-    )
-
-    assert_frame_equal(m2_a.compute(), test2)
-    assert_frame_equal(m2_b.compute(), test2)
+# def test_model(df, ddf, registry, calcs):
+#
+#     m1_t = ModelTemplate(frame_meta=ddf._meta, registry=registry["base"])
+#     m1_a = m1_t(frame=ddf)
+#     m1_b = Model(frame=ddf, registry=registry["base"])
+#
+#     test1 = df.assign(
+#         v=lambda x: calcs["calc_v"](x["i"]),
+#         disc_factor=lambda x: calcs["calc_disc_factor"](x["v"]),
+#         disc_cash=lambda x: calcs["calc_disc_cash"](x["cash"], x["disc_factor"]),
+#         pv=lambda x: calcs["calc_pv"](x["disc_cash"]),
+#     )
+#
+#     assert_frame_equal(m1_a.compute(), test1)
+#     assert_frame_equal(m1_b.compute(), test1)
+#
+#     m2_t = ModelTemplate(
+#         frame_meta=ddf._meta, registry=registry["mode"], runtime_settings=["mode"]
+#     )
+#     m2_a = m2_t(frame=ddf, mode="M")
+#     m2_b = Model(frame=ddf, registry=registry["mode"], mode="M")
+#
+#     test2 = df.assign(
+#         v=lambda x: calcs["calc_v_mode"](x["i"], mode="M"),
+#         disc_factor=lambda x: calcs["calc_disc_factor"](x["v"]),
+#         disc_cash=lambda x: calcs["calc_disc_cash"](x["cash"], x["disc_factor"]),
+#         pv=lambda x: calcs["calc_pv"](x["disc_cash"]),
+#     )
+#
+#     assert_frame_equal(m2_a.compute(), test2)
+#     assert_frame_equal(m2_b.compute(), test2)
+#

@@ -74,48 +74,24 @@ def func_annotation_valid(function):
     return True
 
 
-def _get_column_inputs(function):
-    l = []
-    for k, v in function.__annotations__.items():
-        if k != "return" and type(v) == Column:
-            l.append((k, {"class": Column, "dtype": v.dtype}))
-        elif k != "return" and type(v) == Frame:
-            for c, t in v.columns.items():
-                l.append((c, {"class": Column, "dtype": t}))
-    return l
+def df_function(function, input_columns, output_columns, settings):
+    assert len(output_columns) == 1, "output_columns can only be length 1"
+    ret = list(output_columns.keys())[0]
+
+    def wrapper(_df, **settings):
+        exp = lambda x: function(**{k: x[k] for k in input_columns.keys()}, **settings)
+        _df = _df.assign(**{ret: exp})
+        return _df
+
+    wrapper.__doc__ = function.__doc__
+    return wrapper
 
 
-def _get_setting_inputs(function):
-    l = []
-    for k, v in function.__annotations__.items():
-        if k != "return" and type(v) == Setting:
-            l.append(
-                (
-                    k,
-                    {
-                        "class": Setting,
-                        "dtype": v.dtype,
-                        "default": v.default,
-                        "allowed": v.allowed,
-                        "object": v,
-                    },
-                )
-            )
-    return l
-
-
-def _get_column_ouputs(function, output_attrs=None):
-    l = []
-    for k, v in function.__annotations__.items():
-        if k == "return" and output_attrs is None:
-            for c, t in v.columns.items():
-                l.append((c, {"src": function, "class": Column, "dtype": t}))
-        elif k == "return" and output_attrs is not None:
-            for c, t in v.columns.items():
-                l.append(
-                    (c, {"src": function, "class": Column, "dtype": t, **output_attrs})
-                )
-    return l
+def ff_function(function, input_columns, output_columns, settings):
+    if type(function.__annotations__["return"]) == CReturn:
+        return df_function(function, input_columns, output_columns, settings)
+    else:
+        return function
 
 
 class _BaseFunction:
@@ -123,16 +99,44 @@ class _BaseFunction:
     A class to identify functions specifically built for the footings framework.
     """
 
-    def __init__(self, function, output_attrs=None):
+    def __init__(self, function, output_attrs={}):
 
         func_annotation_valid(function)
 
-        self.annotations = function.__annotations__
         self.function = function
         self.name = function.__name__
-        self.columns_input = _get_column_inputs(function)
-        self.setting_input = _get_setting_inputs(function)
-        self.columns_output = _get_column_ouputs(function, output_attrs)
+        self.input_columns = self._get_input_columns(function)
+        self.settings = self._get_setting(function)
+        self.output_columns = self._get_output_columns(function, **output_attrs)
+        self._ff_function = ff_function(
+            function, self.input_columns, self.output_columns, self.settings
+        )
+
+    @staticmethod
+    def _get_input_columns(function):
+        d = {}
+        for k, v in function.__annotations__.items():
+            if k != "return" and type(v) == Column:
+                d.update({k: v.dtype})
+            elif k != "return" and type(v) == Frame:
+                for c, t in v.columns.items():
+                    d.update({c: t})
+        return d
+
+    @staticmethod
+    def _get_setting(function):
+        d = {}
+        for k, v in function.__annotations__.items():
+            if k != "return" and type(v) == Setting:
+                d.update({k: v})
+        return d
+
+    @staticmethod
+    def _get_output_columns(function):
+        d = {}
+        for k, v in function.__annotations__["return"].columns.items():
+            d.update({k: v})
+        return d
 
     def __call__(self, *args, **kwargs):
         return self.function(*args, **kwargs)

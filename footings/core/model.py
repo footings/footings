@@ -5,16 +5,8 @@ from dask.base import DaskMethodsMixin
 from networkx import topological_sort
 from functools import partial
 
-from .annotation import (
-    Setting,
-    Column,
-    CReturn,
-    Frame,
-    FReturn,
-    _parse_annotation_input,
-    _parse_annotation_output,
-    _parse_annotation_settings,
-)
+from .annotation import Setting, Column, CReturn, Frame, FReturn
+
 from .utils import _generate_message
 from .function import _BaseFunction
 
@@ -52,75 +44,42 @@ class ModelDescription:
         pass
 
 
-class ModelGraph:
-    """
-    """
-
-    def __init__(self, frame_meta, registry):
-        self._G = registry._G
-        self.settings = self._get_settings()
-        self.frame_meta = frame_meta
-        self.functions = self._get_functions()
-        self._validate()
-
-    def _get_settings(self):
-        settings = {}
-        for n, d in self._G.nodes(data=True):
-            if "src" not in d and d["class"] == Setting:
-                settings.update({n: d})
-        return settings
-
-    def _get_functions(self):
-        sorted_nodes = topological_sort(self._G)
-        return {
-            self._G.nodes[n]["src"].__name__: self._G.nodes[n]
-            for n in sorted_nodes
-            if "src" in self._G.nodes[n] and callable(self._G.nodes[n]["src"])
-        }
-
-    def _validate(self):
-        check = [n for n, d in self._G.nodes(data=True) if "src" not in d]
-        settings = None if self.settings is None else list(self.settings.keys())
-        frame = list(self.frame_meta.columns)
-        if settings == {}:
-            missing = [c for c in check if c not in frame]
-        else:
-            missing = [c for c in check if c not in (settings + frame)]
-        if len(missing) > 0:
-            msg = "The following items are listed as nodes in the model but do not appear in the frame or as a setting - "
-            _generate_message(msg, missing)
-
-
 class ModelTemplate:
     """
     """
 
     def __init__(
-        self,
-        frame_meta,
-        registry,
-        runtime_settings=None,
-        scenario=None,
-        step=True,
-        **kwargs,
+        self, registry, runtime_settings=None, scenario=None, step=True, **kwargs
     ):
-        self.frame_meta = frame_meta
-        self._model_graph = ModelGraph(frame_meta, registry)
+        self.registry = registry
+        self._frame = self.registry.get_primary_frame()
         self.runtime_settings = self._get_runtime_settings(runtime_settings)
-        self._runtime_checks = self._create_runtime_check()
-        self.defined_settings = self._get_defined_settings(**kwargs)
+        # self.defined_settings = self._get_defined_settings(**kwargs)
         self.scenario = self._validate_scenario(scenario)
         self.step = step
-        self.instructions = self._build_instructions()
-        self._dask_functions = self._build_dask_function()
-        self._dask_meta = self._build_dask_meta()
+        # self.instructions = self._build_instructions()
+        self._runtime_checks = self._create_runtime_check()
+        # self._dask_functions = self._build_dask_function()
+        # self._dask_meta = self._build_dask_meta()
 
-    def _get_runtime_settings(self, l):
-        if l is None:
+    def _get_runtime_settings(self, runtime_settings):
+        """[summary]
+        
+        Parameters
+        ----------
+        runtime_settings : [type]
+            [description]
+        
+        Returns
+        -------
+        [type]
+            [description]
+        """
+        if runtime_settings is None:
             return None
         else:
-            settings = self._model_graph.settings
-            return {k: v for k, v in settings.items() if k in l}
+            settings = self.registry.get_settings()
+            return {k: v["setting"] for k, v in settings.items() if k in runtime_settings}
 
     def _get_defined_settings(self, **kwargs):
         # still need to consider kwargs
@@ -136,9 +95,6 @@ class ModelTemplate:
             return kwargs
         else:
             return None
-
-    def _create_runtime_check(self):
-        pass
 
     def _validate_scenario(self, scenario):
         return scenario
@@ -182,49 +138,6 @@ class ModelTemplate:
         return instr
 
     def _build_dask_function(self):
-        def df_function(
-            function, runtime_settings, defined_settings, input_columns, output_columns
-        ):
-            assert len(output_columns) == 1, "output_columns can only be length 1"
-            ret = list(output_columns.keys())[0]
-            defined = {} if defined_settings is None else defined_settings
-            if runtime_settings is not None:
-
-                def wrapper(_df, **runtime_settings):
-                    exp = lambda x: function(
-                        **{k: x[k] for k in input_columns.keys()},
-                        **runtime_settings,
-                        **defined,
-                    )
-                    _df = _df.assign(**{ret: exp})
-                    return _df
-
-            else:
-
-                def wrapper(_df):
-                    exp = lambda x: function(
-                        **{k: x[k] for k in input_columns.keys()}, **defined
-                    )
-                    _df = _df.assign(**{ret: exp})
-                    return _df
-
-            wrapper.__doc__ = function.__doc__
-            return wrapper
-
-        def ff_function(
-            function, runtime_settings, defined_settings, input_columns, output_columns
-        ):
-            if type(function.__annotations__["return"]) == CReturn:
-                return df_function(
-                    function,
-                    runtime_settings,
-                    defined_settings,
-                    input_columns,
-                    output_columns,
-                )
-            else:
-                return partial(function, **runtime_settings, **defined_settings)
-
         func_list = [
             (
                 ff_function(
@@ -251,6 +164,9 @@ class ModelTemplate:
             #        return _df
             #    return func_model
             return None  # _combine_functions(func_list)
+
+    def _create_runtime_check(self):
+        pass
 
     def _build_dask_meta(self):
         frame = {i: str(v) for i, v in self.frame_meta.dtypes.iteritems()}
@@ -294,7 +210,7 @@ class ModelFromTemplate(DaskComponents):
         self.template = template
         self._run_runtime_checks()
         self._frame = self._run_model(frame, **kwargs)
-        self.description = ModelDescription(frame, template)
+        # self.description = ModelDescription(frame, template)
 
     def _run_runtime_checks(self):
         if self.template._runtime_checks is not None:
@@ -327,10 +243,7 @@ class Model(ModelFromTemplate):
     """
     """
 
-    def __init__(self, frame, **kwargs):
-        assert "frame_meta" not in kwargs, "frame_meta cannot be in kwargs"
+    def __init__(self, **kwargs):
         temp_kws = ""
         non_temp_kws = ""
-        super().__init__(
-            frame=frame, template=ModelTemplate(frame_meta=frame._meta, **kwargs)
-        )
+        super().__init__(template=ModelTemplate(**kwargs))
