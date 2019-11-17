@@ -49,18 +49,27 @@ class ModelTemplate:
     """
 
     def __init__(
-        self, registry, runtime_settings=None, scenario=None, step=True, **kwargs
+        self, registry, runtime_settings=None, scenarios=None, step=True, **kwargs
     ):
-        self.registry = registry
-        self._frame = self.registry.get_primary_frame()
-        self.runtime_settings = self._get_runtime_settings(runtime_settings)
-        # self.defined_settings = self._get_defined_settings(**kwargs)
-        self.scenario = self._validate_scenario(scenario)
-        self.step = step
-        # self.instructions = self._build_instructions()
+        self._registry = registry
+        if self._registry.frame_metas is not {}:
+            for k, v in self._registry.frame_metas.items():
+                assert hasattr(self, "_{0}".format(k)) == False
+                setattr(self, "_{0}".format(k), v)
+                self._primary = k
+        self._settings = self._registry.get_settings()
+        self._runtime_settings = self._get_runtime_settings(runtime_settings)
+        self._defined_settings = self._get_defined_settings(**kwargs)
+        self._scenarios = self._validate_scenarios(scenarios)
+        self._instructions = self._build_instructions()
         self._runtime_checks = self._create_runtime_check()
-        # self._dask_functions = self._build_dask_function()
-        # self._dask_meta = self._build_dask_meta()
+        self._step = step
+        self._dask_functions = self._build_dask_function()
+        self._dask_meta = self._build_dask_meta()
+
+    @property
+    def registry(self):
+        return self._registry
 
     def _get_runtime_settings(self, runtime_settings):
         """[summary]
@@ -77,102 +86,157 @@ class ModelTemplate:
         """
         if runtime_settings is None:
             return None
+        elif self._settings == {}:
+            raise (
+                AssertionError,
+                "There are no settings in the registry yet a runtime setting is set.",
+            )
         else:
-            settings = self.registry.get_settings()
-            return {k: v["setting"] for k, v in settings.items() if k in runtime_settings}
+            assert all(
+                [s in self._settings.keys() for s in runtime_settings]
+            ), "Not all runtime_settings are present in settings"
+            return {
+                k: v["setting"]
+                for k, v in self._settings.items()
+                if k in runtime_settings
+            }
+
+    @property
+    def runtime_settings(self):
+        return self._runtime_settings
 
     def _get_defined_settings(self, **kwargs):
-        # still need to consider kwargs
-        settings = self._model_graph.settings
-        runtime = self.runtime_settings
-        if settings is not None and runtime is not None:
-            defined = {k: v for k, v in settings.items() if k not in runtime.keys()}
-        elif settings is not None and runtime is None:
-            defined = settings
-        else:
-            defined = None
-        if defined is not None and kwargs is not None:
-            return kwargs
-        else:
-            return None
+        """[summary]
+        
+        Parameters
+        ----------
+        kwargs : [type]
+            [description]
 
-    def _validate_scenario(self, scenario):
-        return scenario
+        Returns
+        -------
+        [type]
+            [description]
+        """
+        if self._settings is None:
+            return None
+        else:
+            if self._runtime_settings is None:
+                settings = self._settings.copy()
+            else:
+                settings = {
+                    k: v
+                    for k, v in self._settings.items()
+                    if k not in self._runtime_settings
+                }
+
+            defined = {}
+            # 1. get settings defined in kwargs and validate
+            for k, v in kwargs.items():
+                if k in settings:
+                    assert settings[k]["setting"].valid(
+                        v
+                    ), "{0} is not a valid value for the setting {1}".format(v, k)
+                    defined.update({k: v})
+                    del settings[k]
+
+            # 2. any left over from 1 need to check to see if default exist
+            for k, v in settings.items():
+                if v["setting"].default is not None:
+                    defined.update({k: v})
+                    del settings[k]
+
+            # 3. any left over from 2 needs to raise an error
+            if len(settings) > 0:
+                msg = "The following settings are not set at runtime or defined in kwargs and do not have a default "
+                raise (AssertionError, _generate_message(msg, settings.keys()))
+
+            return defined
+
+    @property
+    def defined_settings(self):
+        return self._defined_settings
+
+    def _validate_scenarios(self, scenarios):
+        return scenarios
+
+    @property
+    def scenarios(self):
+        return self._scenarios
 
     def _build_instructions(self):
-        instr = {"frame": {"columns": self._model_graph.frame_meta.columns}}
-        output_list = []
-        for k, v in self._model_graph.functions.items():
-            output = _parse_annotation_output(v["src"])
-            output_list.append(output)
-            settings = _parse_annotation_settings(v["src"])
-            if settings != {}:
-                if self.runtime_settings is not None:
-                    runtime = {
-                        k: None for k, v in self.runtime_settings.items() if k in settings
-                    }
-                else:
-                    runtime = None
-                if self.defined_settings is not None:
-                    defined = {
-                        k: v for k, v in self.defined_settings.items() if k in settings
-                    }
-                else:
-                    defined = None
-            else:
-                runtime = None
-                defined = None
-            instr.update(
+        """[summary]
+        
+        Returns
+        -------
+        [type]
+            [description]
+        """
+        functions = self._registry.get_ordered_functions()
+        instr = {
+            "frames": {
+                self._primary: (
+                    self._registry._frame_metas[self._primary]
+                    .reset_index()
+                    .dtypes.to_dict()
+                )
+            },
+            "functions": {},
+        }
+
+        for f in functions:
+            runtime = None
+            defined = None
+            if f.settings != {}:
+                if self._runtime_settings is not None:
+                    runtime = [
+                        k for k in f.settings.keys() if k in self._runtime_settings
+                    ]
+                if self._defined_settings is not None:
+                    l = [k for k in f.settings.keys() if k in self._defined_settings]
+                    defined = {k: v for k, v in self._defined_settings if k in l}
+            instr["functions"].update(
                 {
-                    k: {
-                        "ftype": v["ftype"],
-                        "src": v["src"],
-                        "runtime_settings": runtime,
-                        "defined_settings": defined,
-                        "input_columns": _parse_annotation_input(v["src"]),
-                        "output_columns": output,
+                    f.name: {
+                        "ftype": type(f),
+                        "src": f,
+                        "runtime_settings": runtime if runtime != [] else None,
+                        "defined_settings": defined if defined != {} else None,
+                        "input_columns": f.input_columns,
+                        "output_columns": f.output_columns,
                         "drop_columns": [],
                     }
                 }
             )
+
         return instr
+
+    @property
+    def instructions(self):
+        return self._instructions
 
     def _build_dask_function(self):
         func_list = [
-            (
-                ff_function(
-                    v["src"],
-                    v["runtime_settings"],
-                    v["defined_settings"],
-                    v["input_columns"],
-                    v["output_columns"],
-                ),
-                v["runtime_settings"],
-            )
-            for k, v in self.instructions.items()
+            (v["src"]._ff_function, v["defined_settings"], v["runtime_settings"])
+            for k, v in self._instructions["functions"].items()
             if "src" in v
         ]
-
-        if self.step is True:
+        if self._step is True:
             return func_list
+        elif self._step is False:
+            # need to develop logic to bundle function calls to assist dask
+            raise (AssertionError, "Not implemented")
         else:
-            # def _combine_functions(func_list):
-            #    def func_model(_df):
-            #        # need to incorporate to_ff_function
-            #        for f in func_list:
-            #            _df = f(_df)
-            #        return _df
-            #    return func_model
-            return None  # _combine_functions(func_list)
+            raise (AssertionError, "step needs to be True or False")
 
     def _create_runtime_check(self):
         pass
 
     def _build_dask_meta(self):
-        frame = {i: str(v) for i, v in self.frame_meta.dtypes.iteritems()}
+        frame = self._instructions["frames"][self._primary]
         change = {
             c: d
-            for k, v in self.instructions.items()
+            for k, v in self._instructions["functions"].items()
             if "output_columns" in v
             for c, d in v["output_columns"].items()
         }
@@ -206,24 +270,29 @@ class ModelFromTemplate(DaskComponents):
     
     """
 
-    def __init__(self, frame, template, **kwargs):
-        self.template = template
+    def __init__(self, template, **kwargs):
+        self._template = template
         self._run_runtime_checks()
-        self._frame = self._run_model(frame, **kwargs)
+        self._frame = self._run_model(**kwargs)
         # self.description = ModelDescription(frame, template)
 
     def _run_runtime_checks(self):
-        if self.template._runtime_checks is not None:
+        if self._template._runtime_checks is not None:
             pass
 
-    def _run_model(self, frame, **kwargs):
-        meta = self.template._dask_meta
-        functions = self.template._dask_functions
-        ddf = frame.copy()
+    def _run_model(self, **kwargs):
+        meta = self._template._dask_meta
+        functions = self._template._dask_functions
+        assert self._template._primary in kwargs, "primary frame not in kwargs"
+        ddf = kwargs[self._template._primary].copy()
 
         for f, m in zip(functions, meta):
+            kws = {}
             if f[1] is not None:
-                kws = {k: v for k, v in kwargs.items() if k in f[1]}
+                kws.update(f[1])
+            if f[2] is not None:
+                kws.update({k: v for k, v in kwargs.items() if k in f[2]})
+            if kws != {}:
                 ddf = ddf.map_partitions(f[0], meta=m, **kws)
             else:
                 ddf = ddf.map_partitions(f[0], meta=m)

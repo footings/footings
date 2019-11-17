@@ -179,8 +179,10 @@ class Setting:
         self.dtype = dtype
         self.allowed = allowed
         self.default = default
+        if default is not None:
+            self.valid(default)
 
-    def validate(self, value):
+    def valid(self, value):
         if self.dtype is not None:
             assert type(value) == self.dtype, _generate_message(
                 "value type is not ", self.dtype
@@ -189,3 +191,4 @@ class Setting:
             assert value in self.allowed, _generate_message(
                 "value assigned is not one of ", self.allowed
             )
+        return True

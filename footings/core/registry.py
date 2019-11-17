@@ -1,4 +1,10 @@
-from networkx import DiGraph, ancestors, descendants, topological_sort
+from networkx import (
+    DiGraph,
+    ancestors,
+    descendants,
+    topological_sort,
+    get_node_attributes,
+)
 from .function import _BaseFunction
 from .annotation import Setting, Column
 from .utils import is_meta_like
@@ -13,6 +19,8 @@ class Registry:
 
     def __init__(self, *functions, **frame_metas):
         assert len(frame_metas) <= 1, "cannot pass in more than 1 frame_meta"
+        self._functions = None  # updated when register is called
+        self._frame_metas = None  # updated when register is called
         self._G = DiGraph()
         self.register(*functions, **frame_metas)
 
@@ -34,6 +42,7 @@ class Registry:
 
         for k, v in frame_metas.items():
             inner_meta(k, v)
+            self._add_frame_meta(**frame_metas)
 
         def inner_func(f):
             assert issubclass(type(f), _BaseFunction)
@@ -60,8 +69,29 @@ class Registry:
 
         for f in functions:
             inner_func(f)
+            self._add_function(f)
 
         return self
+
+    @property
+    def functions(self):
+        return self._functions
+
+    def _add_function(self, *function):
+        if self._functions is None:
+            self._functions = function
+        else:
+            self._functions += function
+
+    @property
+    def frame_metas(self):
+        return self._frame_metas
+
+    def _add_frame_meta(self, **frame_metas):
+        if self._frame_metas is None:
+            self._frame_metas = frame_metas
+        else:
+            self._frame_metas.update(frame_metas)
 
     def remove(self, *items):
         for i in items:
@@ -125,6 +155,16 @@ class Registry:
             for k, v in self._G.nodes(data=True)
             if issubclass(v["src_type"], _BaseFunction) == False
         }
+
+    def get_ordered_functions(self):
+        sorted_nodes = topological_sort(self._G)
+        func_list = []
+        for n in sorted_nodes:
+            n_data = self._G.nodes(data=True)[n]
+            if issubclass(n_data["src_type"], _BaseFunction):
+                if n_data["src"] not in func_list:
+                    func_list.append(n_data["src"])
+        return func_list
 
     def valid(self):
         pass

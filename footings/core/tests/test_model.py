@@ -42,7 +42,7 @@ def calcs():
         return 1 / (1 + i)
 
     def calc_v_mode(
-        i: Column("float"), mode: Setting(dtype="category", allowed=["A", "M"])
+        i: Column("float"), mode: Setting(dtype=str, allowed=["A", "M"])
     ) -> CReturn({"v": "float"}):
         if mode == "A":
             return 1 / (1 + i)
@@ -114,6 +114,9 @@ def test_model_template(ddf, registry):
     assert model_temp_defined.runtime_settings is None
 
     # test_defined_settings
+    assert model_temp_base.runtime_settings is None
+    assert type(model_temp_runtime.runtime_settings["mode"]) is Setting
+    assert model_temp_defined.runtime_settings is None
 
     # test_scenario
 
@@ -128,35 +131,27 @@ def test_model_template(ddf, registry):
     # test_dask_meta
 
 
-# def test_model(df, ddf, registry, calcs):
-#
-#     m1_t = ModelTemplate(frame_meta=ddf._meta, registry=registry["base"])
-#     m1_a = m1_t(frame=ddf)
-#     m1_b = Model(frame=ddf, registry=registry["base"])
-#
-#     test1 = df.assign(
-#         v=lambda x: calcs["calc_v"](x["i"]),
-#         disc_factor=lambda x: calcs["calc_disc_factor"](x["v"]),
-#         disc_cash=lambda x: calcs["calc_disc_cash"](x["cash"], x["disc_factor"]),
-#         pv=lambda x: calcs["calc_pv"](x["disc_cash"]),
-#     )
-#
-#     assert_frame_equal(m1_a.compute(), test1)
-#     assert_frame_equal(m1_b.compute(), test1)
-#
-#     m2_t = ModelTemplate(
-#         frame_meta=ddf._meta, registry=registry["mode"], runtime_settings=["mode"]
-#     )
-#     m2_a = m2_t(frame=ddf, mode="M")
-#     m2_b = Model(frame=ddf, registry=registry["mode"], mode="M")
-#
-#     test2 = df.assign(
-#         v=lambda x: calcs["calc_v_mode"](x["i"], mode="M"),
-#         disc_factor=lambda x: calcs["calc_disc_factor"](x["v"]),
-#         disc_cash=lambda x: calcs["calc_disc_cash"](x["cash"], x["disc_factor"]),
-#         pv=lambda x: calcs["calc_pv"](x["disc_cash"]),
-#     )
-#
-#     assert_frame_equal(m2_a.compute(), test2)
-#     assert_frame_equal(m2_b.compute(), test2)
-#
+def test_model(df, ddf, registry, calcs):
+    m1_t = ModelTemplate(registry=registry["base"])
+    m1_a = m1_t(frame=ddf)
+    m1_b = Model(frame=ddf, registry=registry["base"])
+    test1 = df.assign(
+        v=lambda x: calcs["calc_v"](x["i"]),
+        disc_factor=lambda x: calcs["calc_disc_factor"](x["v"]),
+        disc_cash=lambda x: calcs["calc_disc_cash"](x["cash"], x["disc_factor"]),
+        pv=lambda x: calcs["calc_pv"](x["disc_cash"]),
+    )
+    assert_frame_equal(m1_a.compute(), test1)
+    assert_frame_equal(m1_b.compute(), test1)
+
+    m2_t = ModelTemplate(registry=registry["mode"], runtime_settings=["mode"])
+    m2_a = m2_t(frame=ddf, mode="M")
+    m2_b = Model(frame=ddf, registry=registry["mode"], mode="M")
+    test2 = df.assign(
+        v=lambda x: calcs["calc_v_mode"](x["i"], mode="M"),
+        disc_factor=lambda x: calcs["calc_disc_factor"](x["v"]),
+        disc_cash=lambda x: calcs["calc_disc_cash"](x["cash"], x["disc_factor"]),
+        pv=lambda x: calcs["calc_pv"](x["disc_cash"]),
+    )
+    assert_frame_equal(m2_a.compute(), test2)
+    assert_frame_equal(m2_b.compute(), test2)

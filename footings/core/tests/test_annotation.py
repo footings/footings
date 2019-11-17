@@ -6,7 +6,7 @@ from footings.core.annotation import _allowed_dtypes
 from footings.core.function import func_annotation_valid
 
 
-class TestValidateAssignedAnnotations:
+class TestvalidAssignedAnnotations:
     def test_assigned_column(self):
         Column("int")
         pytest.raises(AssertionError, Column, "x")
@@ -31,11 +31,11 @@ class TestValidateAssignedAnnotations:
     def test_assigned_setting(self):
         s1 = Setting(allowed=["A", "M"])
         s2 = Setting(dtype=str, allowed=["A", "M"])
-        pytest.raises(AssertionError, s1.validate, "z")
-        pytest.raises(AssertionError, s2.validate, "z")
+        pytest.raises(AssertionError, s1.valid, "z")
+        pytest.raises(AssertionError, s2.valid, "z")
 
 
-class TestValidateFunctionAnnotations:
+class TestvalidFunctionAnnotations:
     def test_valid_column_usage(self):
         # passes: valid combination Column -> CReturn
         def func1(i: Column("float")) -> CReturn({"v": "float"}):
@@ -163,7 +163,7 @@ class TestValidateFunctionAnnotations:
         pytest.raises(AssertionError, func_annotation_valid, func5)
 
 
-class TestValidateAllowedTypes:
+class TestvalidAllowedTypes:
     def test_allowe_dtypes(self):
         df = pd.DataFrame(
             {"x": [1, 2, 3], "dt": ["2018-12-31", "2019-12-31", "2020-12-31"]}
