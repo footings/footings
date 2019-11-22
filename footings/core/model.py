@@ -262,10 +262,6 @@ class ModelTemplate:
         return ModelFromTemplate(starting_frame=starting_frame, template=self, **kwargs)
 
 
-def as_model_template():
-    pass
-
-
 class ModelFromTemplate(DaskComponents):
     """
     
