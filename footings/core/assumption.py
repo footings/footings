@@ -13,7 +13,7 @@ class AssumptionDeterministic(_BaseFunction):
         self.ftype = "AssumptionDeterministic"
 
 
-def as_assumption_deterministic(function=None):
+def as_assumption_deterministic(function):
     @wraps(function)
     def wrapper(function):
         return AssumptionDeterministic(function)
@@ -33,7 +33,7 @@ class AssumptionStochastic(_BaseFunction):
 
 # inspiration from
 # https://stackoverflow.com/questions/10294014/python-decorator-best-practice-using-a-class-vs-a-function
-def as_assumption_stochastic(function=None):
+def as_assumption_stochastic(function):
     @wraps(function)
     def wrapper(function):
         return AssumptionStochastic(function)
