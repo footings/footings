@@ -17,32 +17,35 @@ class Registry:
     
     """
 
-    def __init__(self, *functions, **frame_metas):
-        assert len(frame_metas) <= 1, "cannot pass in more than 1 frame_meta"
+    def __init__(self, *functions, **frames):
         self._functions = None  # updated when register is called
-        self._frame_metas = None  # updated when register is called
+        self._starting_frame_meta = None  # updated when register is called
         self._G = DiGraph()
-        self.register(*functions, **frame_metas)
+        self.register(*functions, **frames)
 
-    def register(self, *functions, **frame_metas):
-        def inner_meta(k, v):
-            assert is_meta_like(v)
-            d = v.copy().reset_index().dtypes.to_dict()
-            for c, d in d.items():
-                self._G.add_node(
-                    c,
-                    value="Column",
-                    dtype=d,
-                    src=v,
-                    src_name=k,
-                    src_type=type(v),
-                    primary=True,
-                )
-            return self
+    def register(self, *functions, **frames):
+        assert (
+            len(frames) < 2
+        ), "frames can only be passed a single key word of starting_frame_meta"
+        if "starting_frame_meta" in frames:
+            assert is_meta_like(frames.get("starting_frame_meta"))
 
-        for k, v in frame_metas.items():
-            inner_meta(k, v)
-            self._add_frame_meta(**frame_metas)
+            def inner_meta(df):
+                d = df.copy().reset_index().dtypes.to_dict()
+                for c, d in d.items():
+                    self._G.add_node(
+                        c,
+                        value="Column",
+                        dtype=d,
+                        src=df,
+                        src_name="starting_frame_meta",
+                        src_type=type(df),
+                        primary=True,
+                    )
+                return self
+
+            inner_meta(frames.get("starting_frame_meta"))
+            self._add_starting_frame_meta(frames.get("starting_frame_meta"))
 
         def inner_func(f):
             assert issubclass(type(f), _BaseFunction)
@@ -84,14 +87,12 @@ class Registry:
             self._functions += function
 
     @property
-    def frame_metas(self):
-        return self._frame_metas
+    def starting_frame_meta(self):
+        return self._starting_frame_meta
 
-    def _add_frame_meta(self, **frame_metas):
-        if self._frame_metas is None:
-            self._frame_metas = frame_metas
-        else:
-            self._frame_metas.update(frame_metas)
+    def _add_starting_frame_meta(self, starting_frame_meta):
+        assert self._starting_frame_meta is None, "a value already set for starting frame"
+        self._starting_frame_meta = starting_frame_meta.dtypes.to_dict()
 
     def remove(self, *items):
         for i in items:
@@ -137,23 +138,6 @@ class Registry:
             k: v
             for k, v in self._G.nodes(data=True)
             if v["src_type"] == AssumptionStochastic
-        }
-
-    def get_primary_frame(self):
-        df = None
-        for k, v in self._G.nodes(data=True):
-            if "primary" in v and df is None:
-                if v["primary"]:
-                    df = v["src"]
-                    break
-
-        return df
-
-    def get_columns_from_frames(self):
-        return {
-            k: v
-            for k, v in self._G.nodes(data=True)
-            if issubclass(v["src_type"], _BaseFunction) == False
         }
 
     def get_ordered_functions(self):

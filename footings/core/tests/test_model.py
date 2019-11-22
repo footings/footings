@@ -77,7 +77,7 @@ def registry(ddf, calcs):
         as_calculation(calcs["calc_disc_factor"]),
         as_calculation(calcs["calc_disc_cash"]),
         as_calculation(calcs["calc_pv"]),
-        frame=ddf._meta,
+        starting_frame_meta=ddf._meta,
     )
 
     registry_mode = Registry(
@@ -85,28 +85,32 @@ def registry(ddf, calcs):
         as_calculation(calcs["calc_disc_factor"]),
         as_calculation(calcs["calc_disc_cash"]),
         as_calculation(calcs["calc_pv"]),
-        frame=ddf._meta,
+        starting_frame_meta=ddf._meta,
     )
 
     registry_error = Registry(
         as_calculation(calcs["calc_v"]),
         as_calculation(calcs["calc_disc_factor"]),
         as_calculation(calcs["calc_pv"]),
-        frame=ddf._meta,
+        starting_frame_meta=ddf._meta,
     )
 
     return {"base": registry_base, "mode": registry_mode, "error": registry_error}
 
 
 def test_model_template(ddf, registry):
-    model_temp_base = ModelTemplate(registry["base"])
-    model_temp_runtime = ModelTemplate(registry["mode"], runtime_settings=["mode"])
-    model_temp_defined = ModelTemplate(registry["mode"], mode="M")
+    model_temp_base = ModelTemplate(registry=registry["base"])
+    model_temp_runtime = ModelTemplate(
+        registry=registry["mode"], runtime_settings=["mode"]
+    )
+    model_temp_defined = ModelTemplate(
+        registry=registry["mode"], defined_settings={"mode": "M"}
+    )
 
     # validate _frame
-    assert_frame_equal(model_temp_base._frame, ddf._meta)
-    assert_frame_equal(model_temp_runtime._frame, ddf._meta)
-    assert_frame_equal(model_temp_defined._frame, ddf._meta)
+    # assert_frame_equal(model_temp_base._modeled_frame, ddf._meta)
+    # assert_frame_equal(model_temp_runtime._modeled_frame, ddf._meta)
+    # assert_frame_equal(model_temp_defined._modeled_frame, ddf._meta)
 
     # test_runtime_settings
     assert model_temp_base.runtime_settings is None
@@ -133,8 +137,8 @@ def test_model_template(ddf, registry):
 
 def test_model(df, ddf, registry, calcs):
     m1_t = ModelTemplate(registry=registry["base"])
-    m1_a = m1_t(frame=ddf)
-    m1_b = Model(frame=ddf, registry=registry["base"])
+    m1_a = m1_t(starting_frame=ddf)
+    m1_b = Model(starting_frame=ddf, registry=registry["base"])
     test1 = df.assign(
         v=lambda x: calcs["calc_v"](x["i"]),
         disc_factor=lambda x: calcs["calc_disc_factor"](x["v"]),
@@ -145,8 +149,10 @@ def test_model(df, ddf, registry, calcs):
     assert_frame_equal(m1_b.compute(), test1)
 
     m2_t = ModelTemplate(registry=registry["mode"], runtime_settings=["mode"])
-    m2_a = m2_t(frame=ddf, mode="M")
-    m2_b = Model(frame=ddf, registry=registry["mode"], mode="M")
+    m2_a = m2_t(starting_frame=ddf, mode="M")
+    m2_b = Model(
+        starting_frame=ddf, registry=registry["mode"], defined_settings={"mode": "M"}
+    )
     test2 = df.assign(
         v=lambda x: calcs["calc_v_mode"](x["i"], mode="M"),
         disc_factor=lambda x: calcs["calc_disc_factor"](x["v"]),

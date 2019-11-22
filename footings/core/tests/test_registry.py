@@ -52,7 +52,7 @@ def registry():
         as_calculation(calc_disc_factor),
         as_calculation(calc_disc_cash),
         as_calculation(calc_pv),
-        frame=ddf._meta,
+        starting_frame_meta=ddf._meta,
     )
 
     registry_repositioned = Registry(
@@ -60,7 +60,7 @@ def registry():
         as_calculation(calc_v),
         as_calculation(calc_disc_cash),
         as_calculation(calc_pv),
-        frame=ddf._meta,
+        starting_frame_meta=ddf._meta,
     )
 
     registry_mode = Registry()
@@ -69,14 +69,14 @@ def registry():
         as_calculation(calc_disc_factor),
         as_calculation(calc_disc_cash),
         as_calculation(calc_pv),
-        frame=ddf._meta,
+        starting_frame_meta=ddf._meta,
     )
 
     registry_error = Registry(
         as_calculation(calc_v),
         as_calculation(calc_disc_factor),
         as_calculation(calc_pv),
-        frame=ddf._meta,
+        starting_frame_meta=ddf._meta,
     )
 
     return {
@@ -139,14 +139,6 @@ def test_get_deterministic_assumptions(registry):
 
 
 def test_get_stochastic_assumptions(registry):
-    pass
-
-
-def test_get_primary_frame(registry):
-    pass
-
-
-def test_get_columns_from_frames(registry):
     pass
 
 
