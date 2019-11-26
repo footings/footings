@@ -48,34 +48,34 @@ def registry():
     #####################################################################################
 
     registry_base = Registry(
-        as_calculation(calc_v),
-        as_calculation(calc_disc_factor),
-        as_calculation(calc_disc_cash),
-        as_calculation(calc_pv),
+        as_calculation(calc_v, method="A"),
+        as_calculation(calc_disc_factor, method="A"),
+        as_calculation(calc_disc_cash, method="A"),
+        as_calculation(calc_pv, method="A"),
         starting_frame_meta=ddf._meta,
     )
 
     registry_repositioned = Registry(
-        as_calculation(calc_disc_factor),
-        as_calculation(calc_v),
-        as_calculation(calc_disc_cash),
-        as_calculation(calc_pv),
+        as_calculation(calc_disc_factor, method="A"),
+        as_calculation(calc_v, method="A"),
+        as_calculation(calc_disc_cash, method="A"),
+        as_calculation(calc_pv, method="A"),
         starting_frame_meta=ddf._meta,
     )
 
     registry_mode = Registry()
     registry_mode.register(
-        as_calculation(calc_v_mode),
-        as_calculation(calc_disc_factor),
-        as_calculation(calc_disc_cash),
-        as_calculation(calc_pv),
+        as_calculation(calc_v_mode, method="A"),
+        as_calculation(calc_disc_factor, method="A"),
+        as_calculation(calc_disc_cash, method="A"),
+        as_calculation(calc_pv, method="A"),
         starting_frame_meta=ddf._meta,
     )
 
     registry_error = Registry(
-        as_calculation(calc_v),
-        as_calculation(calc_disc_factor),
-        as_calculation(calc_pv),
+        as_calculation(calc_v, method="A"),
+        as_calculation(calc_disc_factor, method="A"),
+        as_calculation(calc_pv, method="A"),
         starting_frame_meta=ddf._meta,
     )
 

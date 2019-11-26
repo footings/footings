@@ -1,4 +1,5 @@
 from functools import wraps, partial
+from toolz import curry
 
 from .function import _BaseFunction
 
@@ -8,17 +9,14 @@ class AssumptionDeterministic(_BaseFunction):
     A class to identify assumptions specifically built for the footings framework.
     """
 
-    def __init__(self, function):
-        super().__init__(function)
+    def __init__(self, function, method):
+        super().__init__(function, method)
         self.ftype = "AssumptionDeterministic"
 
 
-def as_assumption_deterministic(function):
-    @wraps(function)
-    def wrapper(function):
-        return AssumptionDeterministic(function)
-
-    return wrapper(function)
+@curry
+def as_assumption_deterministic(function, method):
+    return AssumptionDeterministic(function, method)
 
 
 class AssumptionStochastic(_BaseFunction):
@@ -26,16 +24,11 @@ class AssumptionStochastic(_BaseFunction):
     A class to identify assumptions specifically built for the footings framework.
     """
 
-    def __init__(self, function):
-        super().__init__(function)
+    def __init__(self, function, method):
+        super().__init__(function, method)
         self.ftype = "AssumptionStochastic"
 
 
-# inspiration from
-# https://stackoverflow.com/questions/10294014/python-decorator-best-practice-using-a-class-vs-a-function
-def as_assumption_stochastic(function):
-    @wraps(function)
-    def wrapper(function):
-        return AssumptionStochastic(function)
-
-    return wrapper(function)
+@curry
+def as_assumption_stochastic(function, method):
+    return AssumptionStochastic(function, method)

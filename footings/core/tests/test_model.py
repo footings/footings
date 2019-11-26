@@ -73,25 +73,25 @@ def calcs():
 def registry(ddf, calcs):
 
     registry_base = Registry(
-        as_calculation(calcs["calc_v"]),
-        as_calculation(calcs["calc_disc_factor"]),
-        as_calculation(calcs["calc_disc_cash"]),
-        as_calculation(calcs["calc_pv"]),
+        as_calculation(calcs["calc_v"], method="A"),
+        as_calculation(calcs["calc_disc_factor"], method="A"),
+        as_calculation(calcs["calc_disc_cash"], method="A"),
+        as_calculation(calcs["calc_pv"], method="A"),
         starting_frame_meta=ddf._meta,
     )
 
     registry_mode = Registry(
-        as_calculation(calcs["calc_v_mode"]),
-        as_calculation(calcs["calc_disc_factor"]),
-        as_calculation(calcs["calc_disc_cash"]),
-        as_calculation(calcs["calc_pv"]),
+        as_calculation(calcs["calc_v_mode"], method="A"),
+        as_calculation(calcs["calc_disc_factor"], method="A"),
+        as_calculation(calcs["calc_disc_cash"], method="A"),
+        as_calculation(calcs["calc_pv"], method="A"),
         starting_frame_meta=ddf._meta,
     )
 
     registry_error = Registry(
-        as_calculation(calcs["calc_v"]),
-        as_calculation(calcs["calc_disc_factor"]),
-        as_calculation(calcs["calc_pv"]),
+        as_calculation(calcs["calc_v"], method="A"),
+        as_calculation(calcs["calc_disc_factor"], method="A"),
+        as_calculation(calcs["calc_pv"], method="A"),
         starting_frame_meta=ddf._meta,
     )
 
