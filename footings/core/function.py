@@ -1,74 +1,9 @@
 import pandas as pd
+from collections import namedtuple
+from toolz import curry
 
 from .annotation import Column, CReturn, Frame, FReturn, Setting, parse_annotation
 from .utils import _generate_message
-
-
-def func_annotation_valid(function):
-    # validate all args annotated
-    args = set(getfullargspec(function).args)
-    anno = set(function.__annotations__.keys())
-    diff_args = args.difference(anno)
-    if len(diff_args) > 0:
-        msg1 = "The following function parameters need to be annotated - "
-        raise AssertionError(_generate_message(msg1, diff_args))
-
-    # validate input annotated types
-    unk_types = []
-    not_inste = []
-    for k, v in function.__annotations__.items():
-        if k != "return":
-            if (
-                v is not Column
-                and v is not Frame
-                and v is not Setting
-                and isinstance(v, type)
-            ):
-                unk_types.append(k)
-            if (
-                isinstance(v, Column) == False
-                and isinstance(v, Frame) == False
-                and isinstance(v, Setting) == False
-            ):
-                not_inste.append(k)
-
-    if len(unk_types) > 0:
-        msg2 = "The following function parameters are assigned invalid input types - "
-        raise AssertionError(_generate_message(msg2, unk_types))
-
-    if len(not_inste) > 0:
-        msg3 = "The following function parameters are assigned non instantiated types - "
-        raise AssertionError(_generate_message(msg3, not_inste))
-
-    # validate input combinations
-    items = function.__annotations__.items()
-    c = [v for k, v in items if k != "return" and isinstance(v, Column)]
-    f = [v for k, v in items if k != "return" and isinstance(v, Frame)]
-    assert (
-        len(c) > 0 and len(f) > 0
-    ) == False, "Column and Frame types cannot be used together as annotation inputs."
-
-    # assert len(f) < 2, "Mutiple Frames cannot be used as input"
-
-    # validate function return is annotated
-    assert "return" in function.__annotations__, "Function return needs to be annotated"
-
-    # validate input/return combinations
-    if len(c) > 0 and isinstance(function.__annotations__["return"], CReturn) == False:
-        msg4 = (
-            "If using Columns as input, return needs to be annotated with "
-            "an instance of CReturn."
-        )
-        raise AssertionError(msg4)
-
-    if len(f) > 0 and isinstance(function.__annotations__["return"], FReturn) == False:
-        msg5 = (
-            "If using a Frame as input, return needs to be annotated with "
-            "an instance of FReturn."
-        )
-        raise AssertionError(msg5)
-
-    return True
 
 
 def ff_function(function, input_columns, output_columns, settings):
@@ -111,20 +46,21 @@ def ff_function(function, input_columns, output_columns, settings):
         return function
 
 
-class _BaseFunction:
+class BaseFunction:
     """
     A class to identify functions specifically built for the footings framework.
     """
 
     def __init__(self, function, method, output_attrs={}):
 
-        x = parse_annotation(function, method)
+        annotations = parse_annotation(function, method)
 
         self._function = function
         self._name = function.__name__
-        self._input_columns = x["input_columns"]
-        self._settings = x["settings"]
-        self._output_columns = x["output_columns"]
+        self._input_columns = annotations.get("input_columns")
+        self._settings = annotations.get("settings")
+        self._output_columns = annotations.get("output_columns")
+        self._drop_columns = annotations.get("drop_columns")
         self._ff_function = ff_function(
             function, self.input_columns, self.output_columns, self.settings
         )
@@ -146,11 +82,65 @@ class _BaseFunction:
         return self._settings
 
     @property
+    def drop_columns(self):
+        return self._drop_columns
+
+    @property
     def output_columns(self):
         return self._output_columns
+
+    def generate_step(self):
+        nms = [
+            "cls",
+            "name",
+            "input_columns",
+            "settings",
+            "output_columns",
+            "drop_columns",
+            "function",
+        ]
+
+        Step = namedtuple("Step", nms)
+        return Step(
+            cls=self.__class__.__name__,
+            name=self.name,
+            input_columns=self.input_columns,
+            settings=self.settings,
+            output_columns=self.output_columns,
+            drop_columns=self.drop_columns,
+            function=self._ff_function,
+        )
 
     def __call__(self, *args, **kwargs):
         return self._function(*args, **kwargs)
 
     # def __repr__(self):
     #     pass
+
+
+class Assumption(BaseFunction):
+    """
+    A class to identify assumptions specifically built for the footings framework.
+    """
+
+    def __init__(self, function, method):
+        super().__init__(function, method)
+
+
+@curry
+def as_assumption(function, method):
+    return Assumption(function, method)
+
+
+class Calculation(BaseFunction):
+    """
+    A class to identify calculations specifically built for the footings framework.
+    """
+
+    def __init__(self, function, method):
+        super().__init__(function, method)
+
+
+@curry
+def as_calculation(function, method):
+    return Calculation(function, method)

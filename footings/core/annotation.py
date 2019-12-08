@@ -213,10 +213,11 @@ def parse_annotation(function, method):
     
     Returns
     -------
-    Dict["input_columns", "settings", "output_columns"]
+    Dict["input_columns", "settings", "drop_columns", "output_columns"]
         A dict with keys for - 
         - the input columns into a function
         - the settings for a function
+        - the columns that are being dropped
         - the return columns of a function (i.e., the output columns)
     
     Examples
@@ -226,11 +227,9 @@ def parse_annotation(function, method):
         def calc_v(df: Frame({"i": "float"})) -> FReturn({"v": "float"}):
             return df.assign(v=1 / (1 + df.i))
     >>> parse_annotation(calc_v, method="A")
-
     See Also
     --------
     https://numpydoc.readthedocs.io/en/latest/format.html
-
     """
     # parse docstring or annotation based on method
     args = set(getfullargspec(function).args)
@@ -311,10 +310,12 @@ def parse_annotation(function, method):
                 input_columns.update({c: t})
 
     settings = {k: v for k, v in d_in.items() if type(v) == Setting}
+    drop_columns = []
     output_columns = {k: v for k, v in d_out.columns.items()}
 
     return {
         "input_columns": input_columns,
         "settings": settings,
+        "drop_columns": drop_columns,
         "output_columns": output_columns,
     }

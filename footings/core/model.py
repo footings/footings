@@ -1,14 +1,12 @@
 import pandas as pd
 import dask.dataframe as dd
-from pyarrow import Schema
 from dask.base import DaskMethodsMixin
-from networkx import topological_sort
-from functools import partial
+from toolz import curry
 
 from .annotation import Setting, Column, CReturn, Frame, FReturn
-from .registry import Registry
+from .schema import Schema
 from .utils import _generate_message
-from .function import _BaseFunction
+from .function import BaseFunction
 
 
 class DaskComponents:
@@ -40,45 +38,57 @@ class ModelDescription:
     """
     """
 
-    def __init__(self, frame, tempalte):
-        pass
+    pass
 
 
-class ModelTemplate:
+class ModelGraph:
+    """[summary]
+    """
+
+    pass
+
+
+@curry
+def set_runtime_arguments(s):
+    pass
+
+
+class Model:
     """
     """
 
     def __init__(
         self,
-        registry: Registry,
-        runtime_settings: list = None,
+        named_schemas: dict,
+        steps: list,
+        runtime_settings: dict = None,
         defined_settings: dict = None,
-        scenarios: list = None,
-        step: bool = True,
         model_meta: dict = None,
+        dask_settings: dict = None,
     ):
-        self._model_meta = model_meta
-        self._registry = registry
-        self._settings = self._registry.get_settings()
-        self._runtime_settings = self._get_runtime_settings(runtime_settings)
-        self._defined_settings = self._get_defined_settings(defined_settings)
-        self._scenarios = self._validate_scenarios(scenarios)
-        self._instructions = self._build_instructions()
-        self._runtime_checks = self._create_runtime_check()
-        self._step = step
-        self._dask_instructions = self._build_dask_instructions()
+        self._named_schemas = self._validate_schemas(**named_schemas)
+        # self._steps = self._generate_steps(steps)
+        # self._settings = self._get_settings()
+        # self._runtime_settings = self._get_runtime_settings(runtime_settings)
+        # self._defined_settings = self._get_defined_settings(defined_settings)
+        # self._validate() # step to validate combination of frames, steps, and asettings
+        # self._runtime_checks = self._create_runtime_checks()
+        # self._scenarios = self._get_scenarios()
+        # self._model_meta = model_meta
+        # self._dask_settings = dask_settings
+        # self._dask_instructions = self._build_dask_instructions()
 
     @property
-    def model_meta(self):
-        return self._model_meta
+    def named_schemas(self):
+        return self._named_schemas
 
     @property
-    def registry(self):
-        return self._registry
+    def steps(self):
+        return self._steps
 
     @property
-    def starting_frame_meta(self):
-        return self._registry._starting_frame_meta
+    def settings(self):
+        return self._settings
 
     @property
     def runtime_settings(self):
@@ -93,8 +103,27 @@ class ModelTemplate:
         return self._scenarios
 
     @property
-    def instructions(self):
-        return self._instructions
+    def model_meta(self):
+        return self._model_meta
+
+    @property
+    def dask_instructions(self):
+        return self._dask_instructions
+
+    def _validate_schemas(self, **named_schemas):
+        for k, v in named_schemas.items():
+            assert isinstance(type(v), Schema)
+
+    def _generate_steps(self, steps):
+        d = {}
+        for s in steps:
+            assert issubclass(
+                type(s), BaseFunction
+            ), "{0} is not recognized as a BaseFunction".format(s)
+            d.update({s.name: s.g})
+
+    def _get_settings(self):
+        pass
 
     def _get_runtime_settings(self, runtime_settings):
         """[summary]
@@ -181,10 +210,13 @@ class ModelTemplate:
 
             return defined
 
-    def _validate_scenarios(self, scenarios):
+    def _validate(self):
+        pass
+
+    def _get_scenarios(self, scenarios):
         return scenarios
 
-    def _build_instructions(self):
+    def _build_dask_instructions(self):
         """[summary]
         
         Returns
@@ -222,7 +254,7 @@ class ModelTemplate:
 
         return instr
 
-    def _create_runtime_check(self):
+    def _create_runtime_checks(self):
         pass
 
     def _build_dask_instructions(self):
@@ -249,67 +281,25 @@ class ModelTemplate:
         else:
             raise (AssertionError, "step needs to be True or False")
 
-    def visualize_graph(self):
-        pass
-
-    def visualize_frame(self):
-        pass
-
-    def sub(self):
-        pass
-
-    def __call__(self, starting_frame, **kwargs):
-        return ModelFromTemplate(starting_frame=starting_frame, template=self, **kwargs)
+    @set_runtime_arguments
+    def __call__(self):
+        return self
 
 
-class ModelFromTemplate(DaskComponents):
-    """
-    
-    """
-
-    def __init__(self, starting_frame: dd.DataFrame, template: ModelTemplate, **kwargs):
-        self._template = template
-        self._run_runtime_checks(starting_frame, **kwargs)
-        self._modeled_frame = self._run_model(starting_frame, **kwargs)
-        # self.description = ModelDescription(frame, template)
-
-    def _run_runtime_checks(self, starting_frame, **kwargs):
-        pass
-        # if self._template._runtime_checks is not None:
-        #     pass
-
-    def _run_model(self, starting_frame, **kwargs):
-        ddf = starting_frame.copy()
-        for f in self._template._dask_instructions:
-            print(f)
-            kws = {}
-            if f["defined_settings"] is not None:
-                kws.update(f["defined_settings"])
-            if f["runtime_settings"] is not None:
-                kws.update(
-                    {k: v for k, v in kwargs.items() if k in f["runtime_settings"]}
-                )
-            if kws != {}:
-                ddf = ddf.map_partitions(f["function"], meta=f["meta"], **kws)
-            else:
-                ddf = ddf.map_partitions(f["function"], meta=f["meta"])
-        return ddf
-
-    def sub(self, x, y):
-        pass
-
-    def audit(self):
-        pass
-
-    def reduce_func(self):
-        pass
-
-
-class Model(ModelFromTemplate):
-    """
-    """
-
-    def __init__(self, starting_frame, **kwargs):
-        temp_kws = ""
-        non_temp_kws = ""
-        super().__init__(starting_frame=starting_frame, template=ModelTemplate(**kwargs))
+# def _run_model(self, starting_frame, **kwargs):
+#     ddf = starting_frame.copy()
+#     for f in self._template._dask_instructions:
+#         print(f)
+#         kws = {}
+#         if f["defined_settings"] is not None:
+#             kws.update(f["defined_settings"])
+#         if f["runtime_settings"] is not None:
+#             kws.update(
+#                 {k: v for k, v in kwargs.items() if k in f["runtime_settings"]}
+#             )
+#         if kws != {}:
+#             ddf = ddf.map_partitions(f["function"], meta=f["meta"], **kws)
+#         else:
+#             ddf = ddf.map_partitions(f["function"], meta=f["meta"])
+#     return ddf
+#
