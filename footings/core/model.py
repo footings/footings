@@ -1,12 +1,12 @@
 import pandas as pd
+from pyarrow import Schema
 import dask.dataframe as dd
 from dask.base import DaskMethodsMixin
 from toolz import curry
 
 from .annotation import Setting, Column, CReturn, Frame, FReturn
-from .schema import Schema
 from .utils import _generate_message
-from .function import BaseFunction
+from .function import FFunction
 
 
 class DaskComponents:
@@ -34,25 +34,6 @@ class DaskComponents:
         )
 
 
-class ModelDescription:
-    """
-    """
-
-    pass
-
-
-class ModelGraph:
-    """[summary]
-    """
-
-    pass
-
-
-@curry
-def set_runtime_arguments(s):
-    pass
-
-
 class Model:
     """
     """
@@ -67,7 +48,7 @@ class Model:
         dask_settings: dict = None,
     ):
         self._named_schemas = self._validate_schemas(**named_schemas)
-        # self._steps = self._generate_steps(steps)
+        self._steps = self._generate_steps(steps)
         # self._settings = self._get_settings()
         # self._runtime_settings = self._get_runtime_settings(runtime_settings)
         # self._defined_settings = self._get_defined_settings(defined_settings)
@@ -112,14 +93,17 @@ class Model:
 
     def _validate_schemas(self, **named_schemas):
         for k, v in named_schemas.items():
-            assert isinstance(type(v), Schema)
+            assert isinstance(
+                type(v), Schema
+            ), "The value for {0} is not Schema object".format(k)
+        return named_schemas
 
     def _generate_steps(self, steps):
         d = {}
         for s in steps:
             assert issubclass(
-                type(s), BaseFunction
-            ), "{0} is not recognized as a BaseFunction".format(s)
+                type(s), FFunction
+            ), "{0} is not recognized as a FFunction".format(s)
             d.update({s.name: s.g})
 
     def _get_settings(self):
@@ -281,7 +265,6 @@ class Model:
         else:
             raise (AssertionError, "step needs to be True or False")
 
-    @set_runtime_arguments
     def __call__(self):
         return self
 

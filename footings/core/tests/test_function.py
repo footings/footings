@@ -1,93 +1,137 @@
 import pytest
+import pandas as pd
+import pyarrow as pa
+from pandas.util.testing import assert_frame_equal
 
-from footings import Column, CReturn, Frame, FReturn, Setting
-from footings.core.function import (
-    BaseFunction,
-    Assumption,
-    as_assumption,
-    Calculation,
-    as_calculation,
-)
+from footings import Setting, FFunction, ffunction, column_ffunction, dataframe_ffunction
 
 
-def testBase_function():
-    # using (Column) -> CReturn
-    def func1(i: Column("float")) -> CReturn({"v": "float"}):
-        return 1 / (1 + i)
-
-    base1 = BaseFunction(func1, method="A")
-    assert isinstance(base1, BaseFunction)
-
-    # using (Column, Setting) -> CReturn
-    def func2(
-        i: Column("float"), period: Setting(allowed=["A", "M"], default="A")
-    ) -> CReturn({"v": "float"}):
-        if period == "A":
-            return 1 / (1 + i)
-        elif period == "M":
-            return 1 / (1 + i / 12)
-
-    base2 = BaseFunction(func2, method="A")
-    assert isinstance(base2, BaseFunction)
-
-    # using (Frame) -> FReturn
-    def func3(df: Frame({"i": "float"})) -> FReturn({"v": "float"}):
-        df["v"] = 1 / (1 + df["i"])
-        return df
-
-    base3 = BaseFunction(func3, method="A")
-    assert isinstance(base3, BaseFunction)
-
-    # using (Frame, Setting) -> FReturn
-    def func4(
-        df: Frame({"i": "float"}), period: Setting(allowed=["A", "M"], default="A")
-    ) -> FReturn({"v": "float"}):
-        if period == "A":
-            df["v"] = 1 / (1 + df["i"])
-            return df
-        elif period == "M":
-            df["v"] = 1 / (1 + df["i"] / 12)
-            return df
-
-    base4 = BaseFunction(func4, method="A")
-    assert isinstance(base4, BaseFunction)
+def test_ffunction_raise_errors():
+    pass
 
 
-def test_calculation():
-    def calc_v(i: Column("float")) -> CReturn({"v": "float"}):
-        return 1 / (1 + i)
+def test_ffunction_series_parse_true():
+    df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
 
-    v = Calculation(calc_v, method="A")
-    assert isinstance(v, Calculation)
-    assert v(1) == 0.5
+    def add1(a: pa.int16(), b: pa.int16()):
+        return a + b
 
+    f = FFunction(
+        add1, return_type=pd.Series, parse_args=True, output_columns={"c": pa.int16()}
+    )
+    assert_frame_equal(f(df), df.assign(c=df.a + df.b))
 
-def test_as_calculation():
-    @as_calculation(method="A")
-    def calc_v(i: Column("float")) -> CReturn({"v": "float"}):
-        return 1 / (1 + i)
+    @ffunction(return_type=pd.Series, parse_args=True, output_columns={"c": pa.int16()})
+    def add2(a: pa.int16(), b: pa.int16()):
+        return a + b
 
-    assert isinstance(calc_v, Calculation)
-    assert calc_v(1) == 0.5
+    assert_frame_equal(add2(df), df.assign(c=df.a + df.b))
 
+    @column_ffunction(output_columns={"c": pa.int16()})
+    def add3(a: pa.int16(), b: pa.int16()):
+        return a + b
 
-def test_assumption():
-    def get_i(df: Frame({"t": "int"})) -> FReturn({"i": "float"}):
-        asn = pd.DataFrame({"t": [0, 1, 2, 3], "i": [0, 0.1, 0.09, 0.08]})
-        return df.merge(asn, on="t")
-
-    i = Assumption(get_i, method="A")
-    assert isinstance(i, Assumption)
-    test_df = pd.DataFrame({"t": [0, 1, 2, 3], "cash": [1000, -350, -350, -350]})
-    assert_frame_equal(test_df.assign(i=[0, 0.1, 0.09, 0.08]), i(test_df))
+    assert_frame_equal(add3(df), df.assign(c=df.a + df.b))
 
 
-def test_as_assumption():
-    @as_assumption(method="A")
-    def get_i(df: Frame({"t": "int"})) -> FReturn({"i": "float"}):
-        asn = pd.DataFrame({"t": [0, 1, 2, 3], "i": [0, 0.1, 0.09, 0.08]})
-        return df.merge(asn, on="t")
+def test_ffunction_series_parse_false():
+    df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
 
-    assert isinstance(get_i, Assumption)
-    test_df = pd.DataFrame({"t": [0, 1, 2, 3], "cash": [1000, -350, -350, -350]})
-    assert_frame_equal(test_df.assign(i=[0, 0.1, 0.09, 0.08]), get_i(test_df))
+    def add1(a, b):
+        return a + b
+
+    f = FFunction(
+        add1,
+        return_type=pd.Series,
+        parse_args=False,
+        input_columns={"a": pa.int16(), "b": pa.int16()},
+        output_columns={"c": pa.int16()},
+    )
+    assert_frame_equal(f(df), df.assign(c=df.a + df.b))
+
+    @ffunction(
+        return_type=pd.Series,
+        parse_args=False,
+        input_columns={"a": pa.int16(), "b": pa.int16()},
+        output_columns={"c": pa.int16()},
+    )
+    def add2(a, b):
+        return a + b
+
+    assert_frame_equal(add2(df), df.assign(c=df.a + df.b))
+
+
+def test_ffunction_properties_series():
+    df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
+
+    def func(a: pa.int16(), b: pa.int16(), s: Setting(allowed=["leave", "divide"])):
+        if s == "leave":
+            return a + b
+        else:
+            return (a + b) / 2
+
+    ffunc = column_ffunction(func, output_columns={"c": pa.float64()})
+
+    assert ffunc.function == func
+    assert ffunc.name == func.__name__
+    assert list(ffunc.settings.keys()) == ["s"]
+    assert ffunc.drop_columns == None
+    assert ffunc.output_columns == {"c": pa.float64()}
+
+    assert_frame_equal(ffunc(df, s="leave"), df.assign(c=df.a + df.b))
+    assert_frame_equal(ffunc(df, s="divide"), df.assign(c=(df.a + df.b) / 2))
+
+
+def test_ffunction_dataframe():
+    df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
+
+    def add1(df):
+        return df.assign(c=df.a + df.b)
+
+    f = FFunction(
+        add1,
+        return_type=pd.DataFrame,
+        parse_args=False,
+        input_columns={"a": pa.int16(), "b": pa.int16()},
+        output_columns={"c": pa.int16()},
+    )
+    assert_frame_equal(f(df), df.assign(c=df.a + df.b))
+
+    @ffunction(
+        parse_args=False,
+        return_type=pd.DataFrame,
+        input_columns={"a": pa.int16(), "b": pa.int16()},
+        output_columns={"c": pa.int16()},
+    )
+    def add2(df):
+        return df.assign(c=df.a + df.b)
+
+    assert_frame_equal(add2(df), df.assign(c=df.a + df.b))
+
+
+def test_ffunction_properties_dataframe():
+    df = pd.DataFrame({"a": [1, 2], "b": [3, 4], "b2": [3, 4]})
+
+    def func(df, s: Setting(allowed=["leave", "divide"])):
+        if s == "leave":
+            return df.assign(c=df.a + df.b).drop(columns="b2")
+        else:
+            return df.assign(c=(df.a + df.b) / 2).drop(columns="b2")
+
+    ffunc = dataframe_ffunction(
+        func,
+        input_columns={"a": pa.int16(), "b": pa.int16(), "b2": pa.int16()},
+        output_columns={"c": pa.float64()},
+        drop_columns=["b2"],
+    )
+
+    assert ffunc.function == func
+    assert ffunc.name == func.__name__
+    assert list(ffunc.settings.keys()) == ["s"]
+    assert ffunc.drop_columns == ["b2"]
+    assert ffunc.output_columns == {"c": pa.float64()}
+
+    assert_frame_equal(ffunc(df, s="leave"), df.assign(c=df.a + df.b).drop(columns="b2"))
+    assert_frame_equal(
+        ffunc(df, s="divide"), df.assign(c=(df.a + df.b) / 2).drop(columns="b2")
+    )

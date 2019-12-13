@@ -1,12 +1,21 @@
 import pandas as pd
+from pyarrow import DataType
 from collections import namedtuple
 from toolz import curry
+from typing import Optional, Dict, Union, List
 
-from .annotation import Column, CReturn, Frame, FReturn, Setting, parse_annotation
+from .annotation import Setting
 from .utils import _generate_message
 
 
-def ff_function(function, input_columns, output_columns, settings):
+def ff_function(
+    function: callable,
+    return_type: type,
+    input_columns: Optional[Union[Dict[str, str], Dict[str, DataType]]] = None,
+    settings: Optional[Dict[str, Setting]] = None,
+    output_columns: Optional[Union[Dict[str, str], Dict[str, DataType]]] = None,
+    name_mapping: Optional[Union[str, Dict[str, str]]] = None,
+) -> callable:
     """[summary]
     
     Parameters
@@ -40,29 +49,79 @@ def ff_function(function, input_columns, output_columns, settings):
         wrapper.__doc__ = function.__doc__
         return wrapper
 
-    if type(function.__annotations__["return"]) == CReturn:
+    if return_type == pd.Series:
         return df_function(function, input_columns, output_columns, settings)
-    else:
+    elif return_type == pd.DataFrame:
         return function
+    else:
+        raise ValueError(
+            "The value for return_type must be {0} or {1}".format(pd.Series, pd.DataFrame)
+        )
 
 
-class BaseFunction:
+class FFunction:
     """
     A class to identify functions specifically built for the footings framework.
     """
 
-    def __init__(self, function, method, output_attrs={}):
+    def __init__(
+        self,
+        function: callable,
+        return_type: type,
+        parse_args: bool = True,
+        input_columns: Optional[Union[Dict[str, str], Dict[str, DataType]]] = None,
+        settings: Optional[Dict[str, Setting]] = None,
+        drop_columns: Optional[List[str]] = None,
+        output_columns: Optional[Union[Dict[str, str], Dict[str, DataType]]] = None,
+        name_mapping: Optional[Union[str, Dict[str, str]]] = None,
+    ):
 
-        annotations = parse_annotation(function, method)
+        assert (
+            drop_columns is not None or output_columns is not None
+        ), "Both drop_columns and output_columns cannot be None when building a FFunction."
 
         self._function = function
-        self._name = function.__name__
-        self._input_columns = annotations.get("input_columns")
-        self._settings = annotations.get("settings")
-        self._output_columns = annotations.get("output_columns")
-        self._drop_columns = annotations.get("drop_columns")
-        self._ff_function = ff_function(
-            function, self.input_columns, self.output_columns, self.settings
+        self._output_columns = output_columns
+        self._drop_columns = drop_columns
+
+        if parse_args:
+            if return_type == pd.Series:
+                if input_columns is not None and settings is not None:
+                    raise ValueError(
+                        "Both input_columns and settings have to be None when parse_args \
+                        is True."
+                    )
+                self._input_columns = {
+                    k: v
+                    for k, v in function.__annotations__.items()
+                    if type(v) == DataType
+                }
+            if return_type == pd.DataFrame:
+                if input_columns is None:
+                    raise ValueError(
+                        "When parse_args is True and the return_type is pd.DataFrame the \
+                        value for input_columns cannot be None."
+                    )
+                self._input_columns = input_columns
+            self._settings = {
+                k: v for k, v in function.__annotations__.items() if type(v) == Setting
+            }
+        else:
+            if input_columns is None and settings is None:
+                raise ValueError(
+                    "Both input_columns and settings cannot be None when parse_args is \
+                    False."
+                )
+            self._input_columns = input_columns
+            self._settings = settings
+
+        self._ffunction = ff_function(
+            function,
+            return_type,
+            self._input_columns,
+            self._settings,
+            self._output_columns,
+            name_mapping,
         )
 
     @property
@@ -71,7 +130,7 @@ class BaseFunction:
 
     @property
     def name(self):
-        return self._name
+        return self._function.__name__
 
     @property
     def input_columns(self):
@@ -111,36 +170,68 @@ class BaseFunction:
             function=self._ff_function,
         )
 
+    # need name mapper
     def __call__(self, *args, **kwargs):
-        return self._function(*args, **kwargs)
+        return self._ffunction(*args, **kwargs)
 
     # def __repr__(self):
     #     pass
 
 
-class Assumption(BaseFunction):
-    """
-    A class to identify assumptions specifically built for the footings framework.
-    """
-
-    def __init__(self, function, method):
-        super().__init__(function, method)
+@curry
+def ffunction(
+    function: callable,
+    return_type: type,
+    parse_args: bool,
+    input_columns=None,
+    settings=None,
+    drop_columns=None,
+    output_columns=None,
+    name_mapping=None,
+):
+    return FFunction(
+        function,
+        return_type,
+        parse_args,
+        input_columns,
+        settings,
+        drop_columns,
+        output_columns,
+        name_mapping,
+    )
 
 
 @curry
-def as_assumption(function, method):
-    return Assumption(function, method)
-
-
-class Calculation(BaseFunction):
-    """
-    A class to identify calculations specifically built for the footings framework.
-    """
-
-    def __init__(self, function, method):
-        super().__init__(function, method)
+def column_ffunction(
+    function: callable, drop_columns=None, output_columns=None, name_mapping=None
+):
+    return FFunction(
+        function=function,
+        return_type=pd.Series,
+        parse_args=True,
+        input_columns=None,
+        settings=None,
+        drop_columns=drop_columns,
+        output_columns=output_columns,
+        name_mapping=name_mapping,
+    )
 
 
 @curry
-def as_calculation(function, method):
-    return Calculation(function, method)
+def dataframe_ffunction(
+    function: callable,
+    input_columns: Optional[Union[Dict[str, str], Dict[str, DataType]]] = None,
+    drop_columns=None,
+    output_columns=None,
+    name_mapping=None,
+):
+    return FFunction(
+        function=function,
+        return_type=pd.DataFrame,
+        parse_args=True,
+        input_columns=input_columns,
+        settings=None,
+        drop_columns=drop_columns,
+        output_columns=output_columns,
+        name_mapping=name_mapping,
+    )

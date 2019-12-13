@@ -8,12 +8,18 @@ from footings.core.annotation import (
 )
 
 from footings.core.function import (
-    BaseFunction,
-    Assumption,
-    as_assumption,
-    Calculation,
-    as_calculation,
+    FFunction,
+    ffunction,
+    column_ffunction,
+    dataframe_ffunction,
 )
 
+#     Assumption,
+#     assumption,
+#     Calculation,
+#     calculation,
+# )
+
 from footings.core.schema import schema_from_yaml
-from footings.core.model import Model, ModelContainer
+from footings.core.model import Model
+from footings.core.model_container import ModelContainer

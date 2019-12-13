@@ -1,3 +1,4 @@
+from pyarrow import DataType
 from numpydoc.docscrape import FunctionDoc
 from inspect import getfullargspec
 from functools import wraps, partial
