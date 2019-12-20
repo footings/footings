@@ -6,7 +6,7 @@ from toolz import curry
 
 from .annotation import Setting, Column, CReturn, Frame, FReturn
 from .utils import _generate_message
-from .function import FFunction
+from .ffunction import FFunction
 
 
 class DaskComponents:
