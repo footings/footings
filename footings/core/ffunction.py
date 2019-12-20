@@ -4,7 +4,7 @@ from collections import namedtuple
 from typing import Optional, Dict, Union, List
 from functools import wraps
 
-from .annotation import Parameter
+from .parameter import Parameter
 from .utils import _generate_message
 
 
@@ -68,7 +68,6 @@ def to_dataframe_function(
         parameters = {}
 
     # need to test input_columns and output_columns
-    @wraps(function)
     def df_function(function, input_columns, output_columns, parameters):
 
         ret = list(output_columns.keys())
@@ -380,7 +379,6 @@ def ffunction(
     """
 
     def inner(function):
-        @wraps(function)
         def wrapped_func():
             return FFunction(
                 function=function,
@@ -451,7 +449,6 @@ def series_ffunction(
     """
 
     def inner(function):
-        @wraps(function)
         def wrapped_func():
             return FFunction(
                 function=function,
@@ -522,7 +519,6 @@ def dataframe_ffunction(
     """
 
     def inner(function):
-        @wraps(function)
         def wrapped_func():
             return FFunction(
                 function=function,

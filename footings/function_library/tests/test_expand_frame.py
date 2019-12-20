@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 
-from footings.helpers import expand_frame_by_dates
+from footings.function_library import expand_frame_by_dates
 
 
 @pytest.fixture

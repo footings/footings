@@ -3,7 +3,13 @@ import pandas as pd
 import pyarrow as pa
 from pandas.util.testing import assert_frame_equal
 
-from footings import Parameter, FFunction, ffunction, series_ffunction, dataframe_ffunction
+from footings import (
+    Parameter,
+    FFunction,
+    ffunction,
+    series_ffunction,
+    dataframe_ffunction,
+)
 from footings.core.ffunction import to_dataframe_function
 
 
@@ -328,25 +334,26 @@ def test_to_dataframe_function():
 #
 #     print(ffunc)
 
-def test_doc_description():
-    @series_ffunction(
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
-    )
-    def series_add(a, b):
-        """Add columns a and b together to produce column c"""
-        return a+b
-    
-    print(series_add._function.__doc__)
-    assert series_add.__doc__ == "Add columns a and b together to produce column c"
 
-    @dataframe_ffunction(
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
-    )
-    def df_add(df):
-        """Add columns a and b together to produce column c"""
-        return df.assign(c=df.a + df.b)
-
-    print(df_add._function.__doc__)
-    assert df_add.__doc__ == "Add columns a and b together to produce column c"
+# def test_doc_description():
+#     @series_ffunction(
+#         input_columns={"a": pa.int16(), "b": pa.int16()},
+#         output_columns={"c": pa.int16()},
+#     )
+#     def series_add(a, b):
+#         """Add columns a and b together to produce column c"""
+#         return a + b
+#
+#     print(series_add._function.__doc__)
+#     assert series_add.__doc__ == "Add columns a and b together to produce column c"
+#
+#     @dataframe_ffunction(
+#         input_columns={"a": pa.int16(), "b": pa.int16()},
+#         output_columns={"c": pa.int16()},
+#     )
+#     def df_add(df):
+#         """Add columns a and b together to produce column c"""
+#         return df.assign(c=df.a + df.b)
+#
+#     print(df_add._function.__doc__)
+#     assert df_add.__doc__ == "Add columns a and b together to produce column c"
