@@ -2,17 +2,15 @@ from .utils import _generate_message
 
 
 class Parameter:
-    """ The class used to represent a model setting in the task graph that is built under 
+    """ The class used to represent a model setting in the task graph that is built under
     the footings framework. It is used to annotate Settings in functions.
 
     Parameters
     ----------
-    dtype: 
+    dtype:
         Optional. The data type of the setting. Not limited to Pandas dtypes.
-
-    allowed: 
+    allowed:
         Optional. A list of allowed values.
-
     default:
         Optional. A default value.
 
@@ -21,11 +19,11 @@ class Parameter:
     >>> from footings import Column, CReturn, Setting, as_calculation
     >>> @as_calculation
         def calc_v(
-            i: Column("float"), 
+            i: Column("float"),
             mode: Setting(dtype=str, allowed=["M", "A"])
         ) -> CReturn({"v": "float"}):
             return 1 / (1 + i)
-    
+
     See Also
     --------
 

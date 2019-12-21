@@ -92,8 +92,6 @@ def test_ffunction_fail_output_columns():
 
 
 def test_ffunction_fail_parameters():
-    df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
-
     def func(df, s):
         if s == "leave":
             return df.assign(c=(df.a + df.b))
@@ -204,7 +202,7 @@ def test_ffunction_series_properties():
     assert ffunc._return_type == pd.Series
     assert ffunc.name == func.__name__
     assert list(ffunc.parameters.keys()) == ["s"]
-    assert ffunc.drop_columns == None
+    assert ffunc.drop_columns is None
     assert ffunc.output_columns == [pa.field("c", pa.float64())]
 
     assert_frame_equal(ffunc(df, s="leave"), df.assign(c=df.a + df.b))

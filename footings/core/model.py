@@ -52,7 +52,8 @@
 #         # self._settings = self._get_settings()
 #         # self._runtime_settings = self._get_runtime_settings(runtime_settings)
 #         # self._defined_settings = self._get_defined_settings(defined_settings)
-#         # self._validate() # step to validate combination of frames, steps, and asettings
+#         # self._validate() # step to validate combination of frames, steps, and
+# asettings
 #         # self._runtime_checks = self._create_runtime_checks()
 #         # self._scenarios = self._get_scenarios()
 #         # self._model_meta = model_meta
@@ -157,7 +158,8 @@
 #         elif self._settings == {} and defined_settings is not None:
 #             raise (
 #                 AssertionError,
-#                 "No settings defined in registry, but defined settings passed to template.",
+#                 "No settings defined in registry, but defined settings passed to \
+# template.",
 #             )
 #         elif self._settings != {} and defined_settings is None:
 #             return None
@@ -189,7 +191,8 @@
 
 #             # 3. any left over from 2 needs to raise an error
 #             if len(settings) > 0:
-#                 msg = "The following settings are not set at runtime or defined in kwargs and do not have a default "
+#                 msg = "The following settings are not set at runtime or defined in \
+# kwargs and do not have a default "
 #                 raise (AssertionError, _generate_message(msg, settings.keys()))
 
 #             return defined
@@ -221,7 +224,9 @@
 #                     ]
 #                 if self._defined_settings is not None:
 #                     l = [k for k in f.settings.keys() if k in self._defined_settings]
-#                     defined = {k: v for k, v in self._defined_settings.items() if k in l}
+#                     defined = {
+# k: v for k, v in self._defined_settings.items() if k in l
+# }
 #             instr["functions"].update(
 #                 {
 #                     f.name: {

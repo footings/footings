@@ -21,8 +21,8 @@ def frame():
 def test_expand_year(frame):
     # test base
     df1 = expand_frame_by_dates(frame, freq="Y")
-    df2 = expand_frame_by_dates(frame, freq="Y", calendar_year="cal_yr")
-    df3 = expand_frame_by_dates(frame, freq="Y", duration_year="dur_yr")
+    # df2 = expand_frame_by_dates(frame, freq="Y", calendar_year="cal_yr")
+    # df3 = expand_frame_by_dates(frame, freq="Y", duration_year="dur_yr")
     assert type(df1) is pd.DataFrame
 
     # test calendar

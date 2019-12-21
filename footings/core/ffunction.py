@@ -1,11 +1,9 @@
 import pandas as pd
-from pyarrow import DataType, Field
+from pyarrow import Field
 from collections import namedtuple
-from typing import Optional, Dict, Union, List
-from functools import wraps
+from typing import Optional, Dict, List
 
 from .parameter import Parameter
-from .utils import _generate_message
 
 
 def to_dataframe_function(
@@ -16,18 +14,18 @@ def to_dataframe_function(
 ) -> callable:
     """A function that transforms a function that returns a pandas series to return a \
     panda dataframe.
-    
+
     Parameters
     ----------
     function : callable
         The function to transform.
     input_columns : list
-        The names of the columns used in the function. 
+        The names of the columns used in the function.
     output_columns : list
         A list of fields returned from the function.
     parameters : dict, optional
         The parameters defined within the function.
-    
+
     Returns
     -------
     callable
@@ -38,7 +36,7 @@ def to_dataframe_function(
     >>> import pandas as pd
     >>> import pyarrow as pa
     >>> from footings import Parameter
-    
+
     >>> df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
 
     >>> def add(a, b):
@@ -52,15 +50,17 @@ def to_dataframe_function(
             input_columns=["a", "b"],
             output_columns=[pa.field("add", pa.int16())],
         )
-    
+
     >>> add_df_func(df)
 
     >>> add_subtract_df_func = to_dataframe_function(
             add_subtract,
             input_columns=["a", "b"],
-            output_columns=[pa.field("add", pa.int16()), pa.field("subtract", pa.int16())],
+            output_columns=[
+                pa.field("add", pa.int16()), pa.field("subtract", pa.int16())
+            ],
         )
-    
+
     >>> add_subtract_df_func(df)
 
     """
@@ -73,7 +73,9 @@ def to_dataframe_function(
         ret = [f.name for f in output_columns]
 
         def wrapper(_df, **parameters):
-            exp = lambda x: function(**{k: x[k] for k in input_columns}, **parameters)
+            def exp(x):
+                return function(**{k: x[k] for k in input_columns}, **parameters)
+
             if len(ret) == 1:
                 _df = _df.assign(**{ret[0]: exp(_df)})
             else:
@@ -95,9 +97,9 @@ class FFunction:
     return_type : {pd.Series, pd.DataFrame}
         The return type of the function. Can be either pd.Series or pd.DataFrame.
     input_columns : list
-        The names of the columns used in the function. 
+        The names of the columns used in the function.
     output_columns : list
-        A list of fields returned from the function.   
+        A list of fields returned from the function.
     parameters : dict, optional
         A dict with {"function argument": Parameter(..), ..} of the parameters used in \
         the function. Allows also passing an empty dict (i.e., {}).
@@ -131,7 +133,7 @@ class FFunction:
             parameters={"s": Parameter(allowed=["leave", "divide"])},
             output_columns={"c": pa.float64()},
         )
-    
+
     >>> print(s_func)
 
     >>> def df_add(df):
@@ -143,7 +145,7 @@ class FFunction:
             input_columns=["a", "b"],
             output_columns=[pa.field("c", pa.int16())],
         )
-    
+
     >>> print(df_func)
     """
 
@@ -241,12 +243,12 @@ class FFunction:
 
     @staticmethod
     def _validate_dict(d, value_type, allow_empty_dict=True, allow_none=False):
-        if allow_none == True and d == None:
+        if allow_none is True and d is None:
             pass
         else:
             if isinstance(d, dict) is False:
                 raise TypeError("{0} must be a dict".format(d))
-            if allow_empty_dict == False:
+            if allow_empty_dict is False:
                 if d == {}:
                     raise ValueError("{0} cannot be an empty dict".format(d))
             if d != {}:
@@ -261,7 +263,7 @@ class FFunction:
 
     @staticmethod
     def _validate_input_columns(input_columns):
-        if isinstance(input_columns, list) == False:
+        if isinstance(input_columns, list) is False:
             raise TypeError("input_columns must be a list")
         return input_columns
 
@@ -270,7 +272,7 @@ class FFunction:
 
     @staticmethod
     def _validate_output_columns(output_columns):
-        if isinstance(output_columns, list) == False:
+        if isinstance(output_columns, list) is False:
             raise TypeError("output_columns must be a list")
         if any([type(f) != Field for f in output_columns]):
             raise TypeError(
@@ -339,9 +341,9 @@ def ffunction(
     return_type : {pd.Series, pd.DataFrame}
         The return type of the function. Can be either pd.Series or pd.DataFrame.
     input_columns : list
-        The names of the columns used in the function. 
+        The names of the columns used in the function.
     output_columns : list
-        A list of fields returned from the function.  
+        A list of fields returned from the function.
     parameters : dict, optional
         A dict with {"function argument": Parameter(..), ..} of the parameters used in \
         the function. Allows also passing an empty dict (i.e., {}).
@@ -375,7 +377,7 @@ def ffunction(
             return a + b
 
     >>> add(df)
-    
+
     """
 
     def inner(function):
@@ -409,7 +411,7 @@ def series_ffunction(
     function : callable
         The function to transform to a FFunction.
     input_columns : list
-        The names of the columns used in the function. 
+        The names of the columns used in the function.
     output_columns : list
         A list of fields returned from the function.
     parameters : dict, optional
@@ -478,7 +480,7 @@ def dataframe_ffunction(
     function : callable
         The function to transform to a FFunction.
     input_columns : list
-        The names of the columns used in the function. 
+        The names of the columns used in the function.
     output_columns : list
         A list of fields returned from the function.
     parameters : dict, optional
@@ -513,7 +515,7 @@ def dataframe_ffunction(
             return df.assign(c=df.a + df.b)
 
     >>> add(df)
-    
+
     """
 
     def inner(function):

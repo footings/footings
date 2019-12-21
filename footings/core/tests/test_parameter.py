@@ -1,5 +1,4 @@
 import pytest
-import pandas as pd
 
 from footings import Parameter
 

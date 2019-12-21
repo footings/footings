@@ -5,10 +5,10 @@ import pandas as pd
 def expand_frame_by_dates(
     df, freq, col_nm="date", start_dt="start_dt", end_dt="end_dt", weekday=None, **kwargs
 ):
-    """Expands every row of a DataFrame to have a row for every date specified by the 
-    date range created by the combination of a start date, end date and frequency of 
+    """Expands every row of a DataFrame to have a row for every date specified by the
+    date range created by the combination of a start date, end date and frequency of
     date intervals.
-    
+
     Parameters
     ----------
     df : pandas.DataFrame
@@ -48,8 +48,9 @@ def expand_frame_by_dates(
     Returns
     -------
     pandas.DataFrame
-        A dataframe that is expanded by the start date to end date for each row with an additional column specified as col_nm and any included **kwargs.
-    
+        A dataframe that is expanded by the start date to end date for each row with an \
+        additional column specified as col_nm and any included **kwargs.
+
     Examples
     --------
     >>> import pandas as pd
@@ -62,7 +63,7 @@ def expand_frame_by_dates(
         )
         df["start_dt"] = pd.to_datetime(df["start_dt"])
         df["end_dt"] = pd.to_datetime(df["end_dt"])
-        
+
     >>> print(df)
        id   start_dt     end_dt
     0   1 2015-11-01 2016-01-15

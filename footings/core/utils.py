@@ -1,6 +1,4 @@
 import pandas as pd
-import numpy as np
-from operator import attrgetter
 
 
 def _generate_message(msg, params):
