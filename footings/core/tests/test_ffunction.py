@@ -23,8 +23,8 @@ def test_ffunction_fail_return_type():
         FFunction,
         add,
         return_type=None,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
+        input_columns=["a", "b"],
+        output_columns=[pa.field("c", pa.int16())],
     )
 
     # fails > return_type is not pd.Series or pd.DataFrame
@@ -33,8 +33,8 @@ def test_ffunction_fail_return_type():
         FFunction,
         add,
         return_type=pa.int16(),
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
+        input_columns=["a", "b"],
+        output_columns=[pa.field("c", pa.int16())],
     )
 
 
@@ -49,7 +49,7 @@ def test_ffunction_fail_input_columns():
         add,
         return_type=pd.Series,
         input_columns=None,
-        output_columns={"c": pa.int16()},
+        output_columns=[pa.field("c", pa.int16())],
     )
 
     # fails > the values for input_columns are not a pyarrow DataType
@@ -59,7 +59,7 @@ def test_ffunction_fail_input_columns():
         add,
         return_type=pd.Series,
         input_columns={"a": pd.Series, "b": pd.Series},
-        output_columns={"c": pa.int16()},
+        output_columns=[pa.field("c", pa.int16())],
     )
 
 
@@ -76,7 +76,7 @@ def test_ffunction_fail_output_columns():
         FFunction,
         add,
         return_type=pd.Series,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
+        input_columns=["a", "b"],
         output_columns=None,
     )
 
@@ -86,18 +86,8 @@ def test_ffunction_fail_output_columns():
         FFunction,
         add,
         return_type=pd.Series,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pd.Series},
-    )
-
-    # fails > when return_type is pd.Series, mulitple columns cannot be returned as output
-    pytest.raises(
-        NotImplementedError,
-        FFunction,
-        func,
-        return_type=pd.Series,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"add": pa.int16(), "subtract": pa.int16()},
+        input_columns=["a", "b"],
+        output_columns={"c": pa.int16()},
     )
 
 
@@ -116,7 +106,7 @@ def test_ffunction_fail_parameters():
         FFunction,
         func,
         return_type=pd.Series,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
+        input_columns=["a", "b"],
         output_columns={"c": pd.Series},
         parameters={"s": str},
     )
@@ -132,8 +122,8 @@ def test_ffunction_fail_drop_columns():
         FFunction,
         add,
         return_type=pd.Series,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
+        input_columns=["a", "b"],
+        output_columns=[pa.field("c", pa.int16())],
         drop_columns="b",
     )
 
@@ -143,8 +133,8 @@ def test_ffunction_fail_drop_columns():
         FFunction,
         add,
         return_type=pd.Series,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
+        input_columns=["a", "b"],
+        output_columns=[pa.field("c", pa.int16())],
         drop_columns=["b"],
     )
 
@@ -154,8 +144,8 @@ def test_ffunction_fail_drop_columns():
         FFunction,
         add,
         return_type=pd.DataFrame,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
+        input_columns=["a", "b"],
+        output_columns=[pa.field("c", pa.int16())],
         drop_columns=["d"],
     )
 
@@ -169,15 +159,15 @@ def test_ffunction_series_pass():
     f = FFunction(
         add1,
         return_type=pd.Series,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
+        input_columns=["a", "b"],
+        output_columns=[pa.field("c", pa.int16())],
     )
     assert_frame_equal(f(df), df.assign(c=df.a + df.b))
 
     @ffunction(
         return_type=pd.Series,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
+        input_columns=["a", "b"],
+        output_columns=[pa.field("c", pa.int16())],
     )
     def add2(a, b):
         return a + b
@@ -185,8 +175,7 @@ def test_ffunction_series_pass():
     assert_frame_equal(add2(df), df.assign(c=df.a + df.b))
 
     @series_ffunction(
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
+        input_columns=["a", "b"], output_columns=[pa.field("c", pa.int16())],
     )
     def add3(a, b):
         return a + b
@@ -206,9 +195,9 @@ def test_ffunction_series_properties():
     ffunc = FFunction(
         func,
         return_type=pd.Series,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
+        input_columns=["a", "b"],
         parameters={"s": Parameter(allowed=["leave", "divide"])},
-        output_columns={"c": pa.float64()},
+        output_columns=[pa.field("c", pa.float64())],
     )
 
     assert ffunc.function == func
@@ -216,7 +205,7 @@ def test_ffunction_series_properties():
     assert ffunc.name == func.__name__
     assert list(ffunc.parameters.keys()) == ["s"]
     assert ffunc.drop_columns == None
-    assert ffunc.output_columns == {"c": pa.float64()}
+    assert ffunc.output_columns == [pa.field("c", pa.float64())]
 
     assert_frame_equal(ffunc(df, s="leave"), df.assign(c=df.a + df.b))
     assert_frame_equal(ffunc(df, s="divide"), df.assign(c=(df.a + df.b) / 2))
@@ -231,15 +220,15 @@ def test_ffunction_dataframe_pass():
     f = FFunction(
         add1,
         return_type=pd.DataFrame,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
+        input_columns=["a", "b"],
+        output_columns=[pa.field("c", pa.int16())],
     )
     assert_frame_equal(f(df), df.assign(c=df.a + df.b))
 
     @ffunction(
         return_type=pd.DataFrame,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
+        input_columns=["a", "b"],
+        output_columns=[pa.field("c", pa.int16())],
     )
     def add2(df):
         return df.assign(c=df.a + df.b)
@@ -247,8 +236,7 @@ def test_ffunction_dataframe_pass():
     assert_frame_equal(add2(df), df.assign(c=df.a + df.b))
 
     @dataframe_ffunction(
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"c": pa.int16()},
+        input_columns=["a", "b"], output_columns=[pa.field("c", pa.int16())],
     )
     def add3(df):
         return df.assign(c=df.a + df.b)
@@ -268,9 +256,9 @@ def test_ffunction_dataframe_properties():
     ffunc = FFunction(
         func,
         return_type=pd.DataFrame,
-        input_columns={"a": pa.int16(), "b": pa.int16(), "b2": pa.int16()},
+        input_columns=["a", "b", "b2"],
         parameters={"s": Parameter(allowed=["leave", "divide"])},
-        output_columns={"c": pa.float64()},
+        output_columns=[pa.field("c", pa.float64())],
         drop_columns=["b2"],
     )
 
@@ -279,7 +267,7 @@ def test_ffunction_dataframe_properties():
     assert ffunc.name == func.__name__
     assert list(ffunc.parameters.keys()) == ["s"]
     assert ffunc.drop_columns == ["b2"]
-    assert ffunc.output_columns == {"c": pa.float64()}
+    assert ffunc.output_columns == [pa.field("c", pa.float64())]
 
     assert_frame_equal(ffunc(df, s="leave"), df.assign(c=df.a + df.b).drop(columns="b2"))
     assert_frame_equal(
@@ -295,9 +283,7 @@ def test_to_dataframe_function():
         return a + b
 
     add_df_func = to_dataframe_function(
-        add,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"add": pa.int16()},
+        add, input_columns=["a", "b"], output_columns=[pa.field("add", pa.int16())],
     )
 
     assert_frame_equal(add_df_func(df), df.assign(add=df.a + df.b))
@@ -307,8 +293,8 @@ def test_to_dataframe_function():
 
     add_subtract_df_func = to_dataframe_function(
         add_subtract,
-        input_columns={"a": pa.int16(), "b": pa.int16()},
-        output_columns={"add": pa.int16(), "subtract": pa.int16()},
+        input_columns=["a", "b"],
+        output_columns=[pa.field("add", pa.int16()), pa.field("subtract", pa.int16())],
     )
 
     assert_frame_equal(
@@ -328,7 +314,7 @@ def test_to_dataframe_function():
 #         return_type=pd.DataFrame,
 #         input_columns={"a": pa.int16(), "b": pa.int16(), "b2": pa.int16()},
 #         parameters={"s": Parameter(allowed=["leave", "divide"])},
-#         output_columns={"c": pa.float64()},
+#         output_columns=[pa.field("c", pa.float64())],
 #         drop_columns=["b2"],
 #     )
 #
@@ -337,8 +323,8 @@ def test_to_dataframe_function():
 
 # def test_doc_description():
 #     @series_ffunction(
-#         input_columns={"a": pa.int16(), "b": pa.int16()},
-#         output_columns={"c": pa.int16()},
+#         input_columns=["a", "b"],
+#         output_columns=[pa.field("c", pa.int16())],
 #     )
 #     def series_add(a, b):
 #         """Add columns a and b together to produce column c"""
@@ -348,8 +334,8 @@ def test_to_dataframe_function():
 #     assert series_add.__doc__ == "Add columns a and b together to produce column c"
 #
 #     @dataframe_ffunction(
-#         input_columns={"a": pa.int16(), "b": pa.int16()},
-#         output_columns={"c": pa.int16()},
+#         input_columns=["a", "b"],
+#         output_columns=[pa.field("c", pa.int16())],
 #     )
 #     def df_add(df):
 #         """Add columns a and b together to produce column c"""

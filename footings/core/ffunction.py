@@ -1,5 +1,5 @@
 import pandas as pd
-from pyarrow import DataType
+from pyarrow import DataType, Field
 from collections import namedtuple
 from typing import Optional, Dict, Union, List
 from functools import wraps
@@ -10,8 +10,8 @@ from .utils import _generate_message
 
 def to_dataframe_function(
     function: callable,
-    input_columns: Dict[str, DataType],
-    output_columns: Dict[str, DataType],
+    input_columns: List[str],
+    output_columns: List[Field],
     parameters: Optional[Dict[str, Parameter]] = None,
 ) -> callable:
     """A function that transforms a function that returns a pandas series to return a \
@@ -21,10 +21,10 @@ def to_dataframe_function(
     ----------
     function : callable
         The function to transform.
-    input_columns : dict
-        The name and type of the columns used in the function. 
-    output_columns : dict
-        The name and type of columns returned from the function.
+    input_columns : list
+        The names of the columns used in the function. 
+    output_columns : list
+        A list of fields returned from the function.
     parameters : dict, optional
         The parameters defined within the function.
     
@@ -49,16 +49,16 @@ def to_dataframe_function(
 
     >>> add_df_func = to_dataframe_function(
             add,
-            input_columns={"a": pa.int16(), "b": pa.int16()},
-            output_columns={"add": pa.int16()},
+            input_columns=["a", "b"],
+            output_columns=[pa.field("add", pa.int16())],
         )
     
     >>> add_df_func(df)
 
     >>> add_subtract_df_func = to_dataframe_function(
             add_subtract,
-            input_columns={"a": pa.int16(), "b": pa.int16()},
-            output_columns={"add": pa.int16(), "subtract": pa.int16()},
+            input_columns=["a", "b"],
+            output_columns=[pa.field("add", pa.int16()), pa.field("subtract", pa.int16())],
         )
     
     >>> add_subtract_df_func(df)
@@ -70,12 +70,10 @@ def to_dataframe_function(
     # need to test input_columns and output_columns
     def df_function(function, input_columns, output_columns, parameters):
 
-        ret = list(output_columns.keys())
+        ret = [f.name for f in output_columns]
 
         def wrapper(_df, **parameters):
-            exp = lambda x: function(
-                **{k: x[k] for k in input_columns.keys()}, **parameters
-            )
+            exp = lambda x: function(**{k: x[k] for k in input_columns}, **parameters)
             if len(ret) == 1:
                 _df = _df.assign(**{ret[0]: exp(_df)})
             else:
@@ -96,11 +94,10 @@ class FFunction:
         The function to transform to a FFunction.
     return_type : {pd.Series, pd.DataFrame}
         The return type of the function. Can be either pd.Series or pd.DataFrame.
-    input_columns : dict
-        A dict with {"column name": DataType, ..} of the columns used in the function. \
-        Allows also passing an empty dict (i.e., {}), but does not allow None. 
-    output_columns : dict
-        The name and type of the columns returned by the function.    
+    input_columns : list
+        The names of the columns used in the function. 
+    output_columns : list
+        A list of fields returned from the function.   
     parameters : dict, optional
         A dict with {"function argument": Parameter(..), ..} of the parameters used in \
         the function. Allows also passing an empty dict (i.e., {}).
@@ -130,7 +127,7 @@ class FFunction:
     >>> s_func = FFunction(
             func,
             return_type=pd.Series,
-            input_columns={"a": pa.int16(), "b": pa.int16()},
+            input_columns=["a", "b"],
             parameters={"s": Parameter(allowed=["leave", "divide"])},
             output_columns={"c": pa.float64()},
         )
@@ -143,8 +140,8 @@ class FFunction:
     >>> df_func = FFunction(
             add1,
             return_type=pd.DataFrame,
-            input_columns={"a": pa.int16(), "b": pa.int16()},
-            output_columns={"c": pa.int16()},
+            input_columns=["a", "b"],
+            output_columns=[pa.field("c", pa.int16())],
         )
     
     >>> print(df_func)
@@ -154,7 +151,7 @@ class FFunction:
         self,
         function: callable,
         return_type: type,
-        input_columns: Dict[str, DataType],
+        input_columns: List[str],
         output_columns: Dict[str, DataType],
         parameters: Optional[Dict[str, Parameter]] = None,
         drop_columns: Optional[List[str]] = None,
@@ -163,7 +160,7 @@ class FFunction:
         self._function = function
         self._return_type = self._validate_return_type(return_type)
         self._input_columns = self._validate_input_columns(input_columns)
-        self._output_columns = self._validate_output_columns(output_columns, return_type)
+        self._output_columns = self._validate_output_columns(output_columns)
         self._parameters = self._validate_parameters(parameters)
         self._drop_columns = self._validate_drop_columns(
             drop_columns, return_type, input_columns
@@ -262,20 +259,24 @@ class FFunction:
                         )
         return d
 
-    def _validate_input_columns(self, input_columns):
-        return self._validate_dict(input_columns, DataType)
+    @staticmethod
+    def _validate_input_columns(input_columns):
+        if isinstance(input_columns, list) == False:
+            raise TypeError("input_columns must be a list")
+        return input_columns
 
     def _validate_parameters(self, parameters):
         return self._validate_dict(parameters, Parameter, allow_none=True)
 
-    def _validate_output_columns(self, output_columns, return_type):
-        d = self._validate_dict(output_columns, DataType)
-        if return_type == pd.Series and len(d) != 1:
-            raise NotImplementedError(
-                """The ability to return multiple output_columns or no output_columns \
-                is not yet implemented when return_type == pd.Series"""
+    @staticmethod
+    def _validate_output_columns(output_columns):
+        if isinstance(output_columns, list) == False:
+            raise TypeError("output_columns must be a list")
+        if any([type(f) != Field for f in output_columns]):
+            raise TypeError(
+                f"All values passed to output_columns must be of type {Field}"
             )
-        return d
+        return output_columns
 
     @staticmethod
     def _validate_drop_columns(drop_columns, return_type, input_columns):
@@ -324,7 +325,7 @@ class FFunction:
 def ffunction(
     *,
     return_type: type,
-    input_columns: Dict[str, DataType],
+    input_columns: List[str],
     output_columns: Dict[str, DataType],
     parameters: Optional[Dict[str, Parameter]] = None,
     drop_columns: Optional[List[str]] = None,
@@ -337,11 +338,10 @@ def ffunction(
         The function to transform to a FFunction.
     return_type : {pd.Series, pd.DataFrame}
         The return type of the function. Can be either pd.Series or pd.DataFrame.
-    input_columns : dict
-        A dict with {"column name": DataType, ..} of the columns used in the function. \
-        Allows also passing an empty dict (i.e., {}), but does not allow None. 
-    output_columns : dict
-        The name and type of the columns returned by the function.    
+    input_columns : list
+        The names of the columns used in the function. 
+    output_columns : list
+        A list of fields returned from the function.  
     parameters : dict, optional
         A dict with {"function argument": Parameter(..), ..} of the parameters used in \
         the function. Allows also passing an empty dict (i.e., {}).
@@ -368,8 +368,8 @@ def ffunction(
 
     >>> @ffunction(
             return_type=pd.Series,
-            input_columns={"a": pa.int16(), "b": pa.int16()},
-            output_columns={"c": pa.int16()},
+            input_columns=["a", "b"],
+            output_columns=[pa.field("c", pa.int16())],
         )
         def add(a, b):
             return a + b
@@ -396,7 +396,7 @@ def ffunction(
 
 def series_ffunction(
     *,
-    input_columns: Dict[str, DataType],
+    input_columns: List[str],
     output_columns: Dict[str, DataType],
     parameters: Optional[Dict[str, Parameter]] = None,
     drop_columns: Optional[List[str]] = None,
@@ -408,11 +408,10 @@ def series_ffunction(
     ----------
     function : callable
         The function to transform to a FFunction.
-    input_columns : dict
-        A dict with {"column name": DataType, ..} of the columns used in the function. \
-        Allows also passing an empty dict (i.e., {}), but does not allow None. 
-    output_columns : dict
-        The name and type of the columns returned by the function.    
+    input_columns : list
+        The names of the columns used in the function. 
+    output_columns : list
+        A list of fields returned from the function.
     parameters : dict, optional
         A dict with {"function argument": Parameter(..), ..} of the parameters used in \
         the function. Allows also passing an empty dict (i.e., {}).
@@ -438,8 +437,8 @@ def series_ffunction(
     >>> df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
 
     >>> @series_ffunction(
-            input_columns={"a": pa.int16(), "b": pa.int16()},
-            output_columns={"c": pa.int16()},
+            input_columns=["a", "b"],
+            output_columns=[pa.field("c", pa.int16())],
         )
         def add(a, b):
             return a + b
@@ -466,7 +465,7 @@ def series_ffunction(
 
 def dataframe_ffunction(
     *,
-    input_columns: Dict[str, DataType],
+    input_columns: List[str],
     output_columns: Dict[str, DataType],
     parameters: Optional[Dict[str, Parameter]] = None,
     drop_columns: Optional[List[str]] = None,
@@ -478,11 +477,10 @@ def dataframe_ffunction(
     ----------
     function : callable
         The function to transform to a FFunction.
-    input_columns : dict
-        A dict with {"column name": DataType, ..} of the columns used in the function. \
-        Allows also passing an empty dict (i.e., {}), but does not allow None. 
-    output_columns : dict
-        The name and type of the columns returned by the function.    
+    input_columns : list
+        The names of the columns used in the function. 
+    output_columns : list
+        A list of fields returned from the function.
     parameters : dict, optional
         A dict with {"function argument": Parameter(..), ..} of the parameters used in \
         the function. Allows also passing an empty dict (i.e., {}).
@@ -508,8 +506,8 @@ def dataframe_ffunction(
     >>> df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
 
     >>> @dataframe_ffunction(
-            input_columns={"a": pa.int16(), "b": pa.int16()},
-            output_columns={"c": pa.int16()},
+            input_columns=["a", "b"],
+            output_columns=[pa.field("c", pa.int16())],
         )
         def add(df):
             return df.assign(c=df.a + df.b)
