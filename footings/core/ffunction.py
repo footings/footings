@@ -152,7 +152,7 @@ class FFunction:
         function: callable,
         return_type: type,
         input_columns: List[str],
-        output_columns: Dict[str, DataType],
+        output_columns: List[Field],
         parameters: Optional[Dict[str, Parameter]] = None,
         drop_columns: Optional[List[str]] = None,
     ):
@@ -326,7 +326,7 @@ def ffunction(
     *,
     return_type: type,
     input_columns: List[str],
-    output_columns: Dict[str, DataType],
+    output_columns: List[Field],
     parameters: Optional[Dict[str, Parameter]] = None,
     drop_columns: Optional[List[str]] = None,
 ):
@@ -397,7 +397,7 @@ def ffunction(
 def series_ffunction(
     *,
     input_columns: List[str],
-    output_columns: Dict[str, DataType],
+    output_columns: List[Field],
     parameters: Optional[Dict[str, Parameter]] = None,
     drop_columns: Optional[List[str]] = None,
 ):
@@ -466,7 +466,7 @@ def series_ffunction(
 def dataframe_ffunction(
     *,
     input_columns: List[str],
-    output_columns: Dict[str, DataType],
+    output_columns: List[Field],
     parameters: Optional[Dict[str, Parameter]] = None,
     drop_columns: Optional[List[str]] = None,
 ):
