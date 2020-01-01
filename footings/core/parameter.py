@@ -47,3 +47,16 @@ class Parameter:
                 "value assigned is not one of ", self.allowed
             )
         return True
+
+    def __eq__(self, other):
+        if (
+            self.dtype == other.dtype
+            and self.allowed == other.allowed
+            and self.default == other.default
+        ):
+            return True
+        else:
+            return False
+
+    def __repr__(self):
+        return f"Parameter(dtype = {self.dtype}, allowed = {self.allowed}, default = {self.default}"

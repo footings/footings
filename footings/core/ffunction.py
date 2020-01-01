@@ -2,8 +2,13 @@ import pandas as pd
 from pyarrow import Field
 from collections import namedtuple
 from typing import Optional, Dict, List
+from collections import namedtuple
 
 from .parameter import Parameter
+
+DFIn = namedtuple("DFIn", ["src_name", "input_columns"])
+
+DFOut = namedtuple("DFOut", ["src_name", "output_columns", "drop_columns", "meta"])
 
 
 def to_dataframe_function(
