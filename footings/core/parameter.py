@@ -30,7 +30,8 @@ class Parameter:
 
     """
 
-    def __init__(self, dtype=None, allowed=None, default=None):
+    def __init__(self, name, dtype=None, allowed=None, default=None):
+        self.name = name
         self.dtype = dtype
         self.allowed = allowed
         if default is not None:

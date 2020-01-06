@@ -3,20 +3,18 @@ from pyarrow import Field
 from collections import namedtuple
 from typing import Optional, Dict, List
 from collections import namedtuple
+from toolz import curry
 
 from .parameter import Parameter
+from .errors import InputsTypeError, InputsValueError, OutputsTypeError, OutputsValueError
 
-DFIn = namedtuple("DFIn", ["src_name", "input_columns"])
+DFIn = namedtuple("DFIn", ["name", "required_columns"])
+DFOut = namedtuple(
+    "DFOut", ["name", "added_columns", "dropped_columns"], defaults=[None, None, None]
+)
 
-DFOut = namedtuple("DFOut", ["src_name", "output_columns", "drop_columns", "meta"])
 
-
-def to_dataframe_function(
-    function: callable,
-    input_columns: List[str],
-    output_columns: List[Field],
-    parameters: Optional[Dict[str, Parameter]] = None,
-) -> callable:
+def to_dataframe_function(function: callable, inputs, outputs) -> callable:
     """A function that transforms a function that returns a pandas series to return a \
     panda dataframe.
 
@@ -69,24 +67,84 @@ def to_dataframe_function(
     >>> add_subtract_df_func(df)
 
     """
-    if parameters is None:
-        parameters = {}
+    if isinstance(inputs, list):
+        dfs_in = []
+        parameters = []
+        for i in inputs:
+            if type(i) == DFIn:
+                dfs_in.append(i)
+            elif type(i) == Parameter:
+                parameters.append(i)
+            else:
+                raise InputsTypeError(
+                    f"The object {i} passed to inputs has {type(i)} and is not \
+                        allowed."
+                )
+        if len(dfs_in) > 1:
+            InputsValueError(
+                "Cannot pass more than one DFIn object into inputs \
+                    when return_type == pd.Series."
+            )
+        elif len(dfs_in) == 0:
+            input_columns = []
+        else:
+            df = dfs_in[0].name
+            input_columns = dfs_in[0].required_columns
+    elif isinstance(inputs, DFIn):
+        df = inputs.name
+        input_columns = inputs.required_columns
+        parameters = []
+    elif isinstance(inputs, Parameter):
+        input_columns = []
+        parameters = [inputs]
+    else:
+        raise InputsTypeError(
+            f"The object passed to inputs has type {type(inputs)} \
+                and is not allowed."
+        )
 
-    # need to test input_columns and output_columns
+    if isinstance(outputs, list):
+        if isinstance(outputs, DFOut) and len(outputs) == 1:
+            output_columns = outputs[0].added_columns
+        elif isinstance(outputs, DFOut) and len(outputs) > 1:
+            raise OutputsValueError(
+                "Cannot pass more than one DFOut object into outputs \
+                    when return_type == pd.Series."
+            )
+        else:
+            raise OutputsTypeError(
+                f"The object passed to outputs has type {type(outputs)} \
+                    and is not allowed."
+            )
+    elif isinstance(outputs, DFOut):
+        output_columns = outputs.added_columns
+    else:
+        raise OutputsTypeError(
+            f"The object passed to outputs has type {type(outputs)} \
+                and is not allowed."
+        )
+
+    if parameters is [] or parameters is None:
+        parameters = {}
+    else:
+        parameters = (p.name for p in parameters)
+
     def df_function(function, input_columns, output_columns, parameters):
 
-        ret = [f.name for f in output_columns]
-
-        def wrapper(_df, **parameters):
+        ret = [f[0] for f in output_columns]
+        # replace_sig = (inputs.name, *parameters)
+        def wrapper(_df, *args, **kwargs):
             def exp(x):
-                return function(**{k: x[k] for k in input_columns}, **parameters)
+                return function(**{k: x[k].values for k in input_columns}, **kwargs)
 
             if len(ret) == 1:
-                _df = _df.assign(**{ret[0]: exp(_df)})
+                return _df.assign(**{ret[0]: exp(_df)})
             else:
-                _df = _df.assign(**dict(zip(ret, exp(_df))))
+                return _df.assign(**dict(zip(ret, exp(_df))))
             return _df
 
+        # sig = signature(wrapper)
+        # wrapper.__signature__ = sig.replace(parameters=tuple())
         return wrapper
 
     return df_function(function, input_columns, output_columns, parameters)
@@ -155,33 +213,40 @@ class FFunction:
     """
 
     def __init__(
-        self,
-        function: callable,
-        return_type: type,
-        input_columns: List[str],
-        output_columns: List[Field],
-        parameters: Optional[Dict[str, Parameter]] = None,
-        drop_columns: Optional[List[str]] = None,
+        self, function: callable, return_type: type, inputs, outputs,
     ):
 
         self._function = function
         self._return_type = self._validate_return_type(return_type)
-        self._input_columns = self._validate_input_columns(input_columns)
-        self._output_columns = self._validate_output_columns(output_columns)
-        self._parameters = self._validate_parameters(parameters)
-        self._drop_columns = self._validate_drop_columns(
-            drop_columns, return_type, input_columns
-        )
+        self._inputs = inputs
+        self._outputs = outputs
+        self._input_validator = self._create_validator(inputs)
+        self._output_validator = self._create_validator(outputs)
 
         if return_type == pd.Series:
+
             self._ffunction = to_dataframe_function(
-                function=function,
-                input_columns=self._input_columns,
-                output_columns=self._output_columns,
-                parameters=self._parameters,
+                function=function, inputs=inputs, outputs=outputs,
             )
         else:
             self._ffunction = function
+
+    @staticmethod
+    def parse_inputs(inputs):
+        input_columns = []
+        parameters = []
+        for i in inputs:
+            if type(i) == DFIn:
+                input_columns += i.input_columns
+            elif type(i) == Parameter:
+                parameters.append(i)
+            else:
+                raise
+        return input_columns, parameters
+
+    @staticmethod
+    def parse_outputs(outputs):
+        return outputs.output_columns, outputs.drop_columns
 
     @property
     def function(self):
@@ -196,45 +261,12 @@ class FFunction:
         return self._function.__name__
 
     @property
-    def input_columns(self):
-        return self._input_columns
+    def inputs(self):
+        return self._inputs
 
     @property
-    def parameters(self):
-        return self._parameters
-
-    @property
-    def drop_columns(self):
-        return self._drop_columns
-
-    @property
-    def output_columns(self):
-        return self._output_columns
-
-    def generate_step(self):
-        """Generates a Step (i.e., a namedtuple object) that has the neccessary \
-        information to be used within a model in the Footings framework.
-        """
-        nms = [
-            "cls",
-            "name",
-            "input_columns",
-            "parameters",
-            "output_columns",
-            "drop_columns",
-            "function",
-        ]
-
-        Step = namedtuple("Step", nms)
-        return Step(
-            cls=self.__class__.__name__,
-            name=self.name,
-            input_columns=self.input_columns,
-            parameters=self.parameters,
-            output_columns=self.output_columns,
-            drop_columns=self.drop_columns,
-            function=self._ffunction,
-        )
+    def outputs(self):
+        return self._outputs
 
     @staticmethod
     def _validate_return_type(return_type):
@@ -247,68 +279,15 @@ class FFunction:
         return return_type
 
     @staticmethod
-    def _validate_dict(d, value_type, allow_empty_dict=True, allow_none=False):
-        if allow_none is True and d is None:
-            pass
-        else:
-            if isinstance(d, dict) is False:
-                raise TypeError("{0} must be a dict".format(d))
-            if allow_empty_dict is False:
-                if d == {}:
-                    raise ValueError("{0} cannot be an empty dict".format(d))
-            if d != {}:
-                for k, v in d.items():
-                    if type(v) is not value_type:
-                        raise TypeError(
-                            "The value for {0} must be a {1} not {2}".format(
-                                k, value_type, type(v)
-                            )
-                        )
-        return d
+    def _create_validator(x, *args, **kwargs):
+        pass
 
-    @staticmethod
-    def _validate_input_columns(input_columns):
-        if isinstance(input_columns, list) is False:
-            raise TypeError("input_columns must be a list")
-        return input_columns
-
-    def _validate_parameters(self, parameters):
-        return self._validate_dict(parameters, Parameter, allow_none=True)
-
-    @staticmethod
-    def _validate_output_columns(output_columns):
-        if isinstance(output_columns, list) is False:
-            raise TypeError("output_columns must be a list")
-        if any([type(f) != Field for f in output_columns]):
-            raise TypeError(
-                f"All values passed to output_columns must be of type {Field}"
-            )
-        return output_columns
-
-    @staticmethod
-    def _validate_drop_columns(drop_columns, return_type, input_columns):
-        if drop_columns is None:
-            return None
-        else:
-            if type(drop_columns) != list:
-                raise TypeError("drop_columns must be passed as a list.")
-
-            if return_type == pd.Series and drop_columns is not None:
-                raise ValueError(
-                    """When return_type is pd.Series, drop_columns must be None."""
-                )
-
-            in_cols = set(input_columns)
-            dp_cols = set(drop_columns)
-            if len(dp_cols - in_cols) > 0:
-                raise ValueError(
-                    "All columns in drop_columns must be present in input_columns."
-                )
-            return drop_columns
-
-    # need name mapper
+    # need name mapper / need option to turn off validations
     def __call__(self, *args, **kwargs):
-        return self._ffunction(*args, **kwargs)
+        # self._input_validator(self.inputs, *arg, **kwargs)
+        out = self._ffunction(*args, **kwargs)
+        # self._output_validator(self.outputs, out)
+        return out
 
     def __repr__(self):
         s = """FFunction -
@@ -330,12 +309,7 @@ class FFunction:
 
 
 def ffunction(
-    *,
-    return_type: type,
-    input_columns: List[str],
-    output_columns: List[Field],
-    parameters: Optional[Dict[str, Parameter]] = None,
-    drop_columns: Optional[List[str]] = None,
+    *, return_type: type, inputs, outputs,
 ):
     """A decorator that can be used to create a FFunction object.
 
@@ -390,10 +364,8 @@ def ffunction(
             return FFunction(
                 function=function,
                 return_type=return_type,
-                input_columns=input_columns,
-                output_columns=output_columns,
-                parameters=parameters,
-                drop_columns=drop_columns,
+                inputs=inputs,
+                outputs=outputs,
             )
 
         return wrapped_func()
@@ -402,11 +374,7 @@ def ffunction(
 
 
 def series_ffunction(
-    *,
-    input_columns: List[str],
-    output_columns: List[Field],
-    parameters: Optional[Dict[str, Parameter]] = None,
-    drop_columns: Optional[List[str]] = None,
+    *, inputs, outputs,
 ):
     """A decorator that can be used to create a FFunction object where return_type \
     is pd.Series.
@@ -457,12 +425,7 @@ def series_ffunction(
     def inner(function):
         def wrapped_func():
             return FFunction(
-                function=function,
-                return_type=pd.Series,
-                input_columns=input_columns,
-                output_columns=output_columns,
-                parameters=parameters,
-                drop_columns=drop_columns,
+                function=function, return_type=pd.Series, inputs=inputs, outputs=outputs,
             )
 
         return wrapped_func()
@@ -471,11 +434,7 @@ def series_ffunction(
 
 
 def dataframe_ffunction(
-    *,
-    input_columns: List[str],
-    output_columns: List[Field],
-    parameters: Optional[Dict[str, Parameter]] = None,
-    drop_columns: Optional[List[str]] = None,
+    *, inputs, outputs,
 ):
     """A decorator that can be used to create a FFunction object where return_type \
     is pd.DataFrame.
@@ -528,10 +487,8 @@ def dataframe_ffunction(
             return FFunction(
                 function=function,
                 return_type=pd.DataFrame,
-                input_columns=input_columns,
-                output_columns=output_columns,
-                parameters=parameters,
-                drop_columns=drop_columns,
+                inputs=inputs,
+                outputs=outputs,
             )
 
         return wrapped_func()

@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple, Union, Optional
+from typing import List, Dict, Tuple, Union, Optional, Any
 
 import pandas as pd
 from pyarrow import Schema
@@ -12,11 +12,23 @@ from dask.context import globalmethod
 # from toolz import curry
 
 from .ffunction import FFunction
-from .errors import DuplicateParameterError
+from .errors import ParameterDuplicateError, ParameterNotKnownError
 
 # from .annotation import Setting, Column, CReturn, Frame, FReturn
-# from .utils import _generate_message
+from .utils import _generate_message
+
 # from .ffunction import FFunction
+
+
+class FootingsGraph:
+    def __init__(self, graph):
+        self.graph = graph
+        self.steps = None
+
+    def from_steps(
+        self, steps,
+    ):
+        pass
 
 
 class Model(DaskMethodsMixin):
@@ -26,7 +38,7 @@ class Model(DaskMethodsMixin):
     def __init__(
         self,
         schemas: Dict[str, Schema],
-        graph: Dict[str, Tuple],
+        instructions: Union[List[FFunction], Dict[str, Any]],
         key: Union[str, List[str]],
         fuse: bool = False,
         model_meta: Optional[Dict] = None,
@@ -34,12 +46,19 @@ class Model(DaskMethodsMixin):
     ):
         self._model_meta = model_meta
         self._schemas = self._validate_schemas(schemas)
-        self._graph = self._validate_graph(graph)
+        self._instructions = instructions
+        if isinstance(instructions, dict):
+            self._steps = self._get_steps(instructions)
+        else:
+            self._steps = self._validate_steps(instructions)
         self._parameters = self._get_parameters()
-        self._key = self._valaidate_key(key, graph)
-        self._dask_graph = create_dask_graph(
-            self._graph, self._schemas, self._parameters, **kwargs
-        )
+        self._key = self._valaidate_key(key)
+        if isinstance(instructions, dict):
+            self._dask = update_dask_graph(instructions, **kwargs)
+        else:
+            self._dask = create_dask_graph(
+                self._schemas, self._steps, self._parameters, **kwargs
+            )
 
     @property
     def model_meta(self):
@@ -50,8 +69,8 @@ class Model(DaskMethodsMixin):
         return self._schemas
 
     @property
-    def graph(self):
-        return self._graph
+    def steps(self):
+        return self._steps
 
     @property
     def parameters(self):
@@ -94,8 +113,8 @@ class Model(DaskMethodsMixin):
         return schemas
 
     @staticmethod
-    def _validate_graph(graph):
-        return graph
+    def _validate_steps(steps):
+        return steps  # [s.generate_step() for s in steps]
 
     @staticmethod
     def _valaidate_key(key, graph):
@@ -103,16 +122,16 @@ class Model(DaskMethodsMixin):
 
     def _get_parameters(self):
         d = {}
-        for s in self.graph:
+        for s in self.steps:
             if s.parameters is not None:
-                for k, v in s.parameters.items():
-                    if k in d:
-                        if v != d[k]:
+                for s in s.parameters:
+                    if s.name in d:
+                        if s != d[k]:
                             raise DuplicateParameterError(
                                 f"{k} has duplicate parameters listed that do not match."
                             )
                     else:
-                        d.update({k: v})
+                        d.update({s.name: s})
         return d
 
     def register_run(
@@ -135,22 +154,49 @@ class Model(DaskMethodsMixin):
         pass
 
     # need name mapper
-    def __call__(self, *args, **kwargs):
-        self._dask_graph = update_dask_graph(**kwargs)
+    def __call__(self, **kwargs):
+        self._dask = update_dask_graph(self._dask, **kwargs)
+        # validate all keys are not None
+        # ensure validation run against kwargs
         return self
 
 
-def create_dask_graph(steps, schemas=None, parameters=None, **kwargs):
-    if schemas is not None and parameters is not None:
-        d = {k: None for k in list(schemas.keys()) + list(parameters.keys())}
-    elif schemas is not None and parameters is None:
-        d = {k: None for k in list(schemas.keys())}
-    elif schemas is None and parameters is not None:
-        d = {k: None for k in list(parameters.keys())}
-    else:
-        raise ValueError("schemas and parameters cannot both be None")
-    return {**d, **kwargs, **graph}
+def create_dask_graph(schemas, steps, parameters, **kwargs):
+    def get_parameters(parameters, **kwargs):
+        par_names = set([p.name for p in parameters])
+        kwarg_names = set(kwargs.keys())
+        diff = kwarg_names.difference(par_names)
+
+        # if items in kwargs not in parameters raise error
+        if len(kwargs) > 0:
+            if len(diff) > 0:
+                msg = "The following parameters are present in kwargs but are not known"
+                raise ParameterNotKnownError(_generate_message(msg, diff))
+
+        # validate assigned parameter values
+
+        # parameters is kwargs + any value in parameters that is not in kwargs
+        return {**kwargs, **{k: None for k in par_names.difference(kwarg_names)}}
+
+    def steps_to_graph(steps):
+        d = {}
+        for i, s in enumerate(steps):
+            if i == 0:
+                in_ = s._inputs[0].src_name
+            else:
+                in_ = list(d.keys())[-1]
+            out = s._outputs.src_name
+            d.update({f"{s._outputs.src_name}-{s.name}": (s, in_)})
+        return d
+
+    parameters = get_parameters(parameters, **kwargs)
+    step_graph = steps_to_graph(steps)
+
+    return {**{k: None for k in schemas.keys()}, **parameters, **step_graph}
 
 
-def update_dask_graph(**kwargs):
-    pass
+def update_dask_graph(graph, **kwargs):
+    g = graph.copy()
+    for k, v in kwargs.items():
+        g[k] = v
+    return g

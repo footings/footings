@@ -10,7 +10,22 @@ from footings import (
     series_ffunction,
     dataframe_ffunction,
 )
-from footings.core.ffunction import to_dataframe_function
+from footings.core.ffunction import to_dataframe_function, DFIn, DFOut
+
+
+def test_new():
+    df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
+
+    def add(a, b):
+        return a + b
+
+    f = FFunction(
+        add,
+        return_type=pd.Series,
+        inputs=[DFIn("df", ["a", "b"])],
+        outputs=DFOut("df", [pa.field("add", pa.int16())], None, None),
+    )
+    assert_frame_equal(f(df), df.assign(add=df.a + df.b))
 
 
 def test_ffunction_fail_return_type():
