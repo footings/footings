@@ -6,7 +6,6 @@ from footings.core.ffunction import (
     dataframe_ffunction,
 )
 
-from footings.core.schema import schema_from_yaml
-from footings.core.model import Model
+from footings.core.model import build_model
 
 # from footings.core.model_container import ModelContainer

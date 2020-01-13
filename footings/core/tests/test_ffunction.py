@@ -188,7 +188,7 @@ def test_ffunction_series_pass():
     assert_frame_equal(add2(df), df.assign(c=df.a + df.b))
 
     @series_ffunction(
-        input_columns=["a", "b"], output_columns=[pa.field("c", pa.int16())],
+        input_columns=["a", "b"], output_columns=[pa.field("c", pa.int16())]
     )
     def add3(a, b):
         return a + b
@@ -249,7 +249,7 @@ def test_ffunction_dataframe_pass():
     assert_frame_equal(add2(df), df.assign(c=df.a + df.b))
 
     @dataframe_ffunction(
-        input_columns=["a", "b"], output_columns=[pa.field("c", pa.int16())],
+        input_columns=["a", "b"], output_columns=[pa.field("c", pa.int16())]
     )
     def add3(df):
         return df.assign(c=df.a + df.b)
@@ -296,7 +296,7 @@ def test_to_dataframe_function():
         return a + b
 
     add_df_func = to_dataframe_function(
-        add, input_columns=["a", "b"], output_columns=[pa.field("add", pa.int16())],
+        add, input_columns=["a", "b"], output_columns=[pa.field("add", pa.int16())]
     )
 
     assert_frame_equal(add_df_func(df), df.assign(add=df.a + df.b))

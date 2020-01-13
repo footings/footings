@@ -212,9 +212,7 @@ class FFunction:
     >>> print(df_func)
     """
 
-    def __init__(
-        self, function: callable, return_type: type, inputs, outputs,
-    ):
+    def __init__(self, function: callable, return_type: type, inputs, outputs):
 
         self._function = function
         self._return_type = self._validate_return_type(return_type)
@@ -226,7 +224,7 @@ class FFunction:
         if return_type == pd.Series:
 
             self._ffunction = to_dataframe_function(
-                function=function, inputs=inputs, outputs=outputs,
+                function=function, inputs=inputs, outputs=outputs
             )
         else:
             self._ffunction = function
@@ -308,9 +306,7 @@ class FFunction:
         return s
 
 
-def ffunction(
-    *, return_type: type, inputs, outputs,
-):
+def ffunction(*, return_type: type, inputs, outputs):
     """A decorator that can be used to create a FFunction object.
 
     Parameters
@@ -362,10 +358,7 @@ def ffunction(
     def inner(function):
         def wrapped_func():
             return FFunction(
-                function=function,
-                return_type=return_type,
-                inputs=inputs,
-                outputs=outputs,
+                function=function, return_type=return_type, inputs=inputs, outputs=outputs
             )
 
         return wrapped_func()
@@ -373,9 +366,7 @@ def ffunction(
     return inner
 
 
-def series_ffunction(
-    *, inputs, outputs,
-):
+def series_ffunction(*, inputs, outputs):
     """A decorator that can be used to create a FFunction object where return_type \
     is pd.Series.
 
@@ -425,7 +416,7 @@ def series_ffunction(
     def inner(function):
         def wrapped_func():
             return FFunction(
-                function=function, return_type=pd.Series, inputs=inputs, outputs=outputs,
+                function=function, return_type=pd.Series, inputs=inputs, outputs=outputs
             )
 
         return wrapped_func()
@@ -433,9 +424,7 @@ def series_ffunction(
     return inner
 
 
-def dataframe_ffunction(
-    *, inputs, outputs,
-):
+def dataframe_ffunction(*, inputs, outputs):
     """A decorator that can be used to create a FFunction object where return_type \
     is pd.DataFrame.
 
