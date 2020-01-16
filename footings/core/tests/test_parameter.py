@@ -42,7 +42,7 @@ def test_parameter():
         return x == 1
 
     param3 = Parameter(name="test", description="this is a test", custom=is_1)
-    pytest.raises(ParameterCustomError, param3, 2)
+    pytest.raises(ParameterCustomError, param3.valid, 2)
     assert param3.valid(1) == True
 
     # test default

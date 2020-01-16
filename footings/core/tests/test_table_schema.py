@@ -56,6 +56,7 @@ def test_column_schema_max_len():
 def test_column_schema_custom():
     def custom_func(column):
         return [v == "" for i, v in column.iteritems()]
+
     schema = ColumnSchema("test", dtype="object", custom=custom_func)
     test = pd.Series(["", "00", "01", "02"], dtype="object")
     pytest.raises(ColumnSchemaError, schema.valid, test)
@@ -64,18 +65,16 @@ def test_column_schema_custom():
 def test_table_schema_column():
     columns = [
         ColumnSchema("a", dtype=int, min_val=1),
-        ColumnSchema("b", dtype=int, max_val=3)
+        ColumnSchema("b", dtype=int, max_val=3),
     ]
     schema = TableSchema("test", columns)
     test = pd.DataFrame({"a": [0, 1, 2], "b": [2, 3, 4]})
     # schema.valid(test)
     pytest.raises(TableSchemaError, schema.valid, test)
 
+
 def test_table_schema_min_row():
-    columns = [
-        ColumnSchema("a", dtype=int),
-        ColumnSchema("b", dtype=int)
-    ]
+    columns = [ColumnSchema("a", dtype=int), ColumnSchema("b", dtype=int)]
     schema = TableSchema("test", columns, min_rows=4)
     test = pd.DataFrame({"a": [0, 1, 2], "b": [2, 3, 4]})
     # schema.valid(test)
@@ -83,10 +82,7 @@ def test_table_schema_min_row():
 
 
 def test_table_schema_max_row():
-    columns = [
-        ColumnSchema("a", dtype=int),
-        ColumnSchema("b", dtype=int)
-    ]
+    columns = [ColumnSchema("a", dtype=int), ColumnSchema("b", dtype=int)]
     schema = TableSchema("test", columns, max_rows=2)
     test = pd.DataFrame({"a": [0, 1, 2], "b": [2, 3, 4]})
     # schema.valid(test)
@@ -97,20 +93,14 @@ def test_table_schema_custom():
     def custom_func(table):
         return [1] if table.shape[0] > 2 else [0]
 
-    columns = [
-        ColumnSchema("a", dtype=int),
-        ColumnSchema("b", dtype=int)
-    ]
+    columns = [ColumnSchema("a", dtype=int), ColumnSchema("b", dtype=int)]
     schema = TableSchema("test", columns, custom=custom_func)
     test = pd.DataFrame({"a": [0, 1, 2], "b": [2, 3, 4]})
     pytest.raises(TableSchemaError, schema.valid, test)
 
 
 def test_table_schema_enforce_strict():
-    columns = [
-        ColumnSchema("a", dtype=int),
-        ColumnSchema("b", dtype=int)
-    ]
+    columns = [ColumnSchema("a", dtype=int), ColumnSchema("b", dtype=int)]
     schema_enforce = TableSchema("schema_enforce", columns)
     schema_allow = TableSchema("schema_allow", columns, enforce_strict=False)
     test = pd.DataFrame({"a": [0, 1, 2], "b": [2, 3, 4], "c": [1, 2, 3]})

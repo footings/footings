@@ -7,8 +7,6 @@ from .utils import _generate_message
 class ParameterTypeError(Exception):
     """ """
 
-    pass
-
 
 def _check_type(expected, value):
     if isinstance(value, expected) == False:
@@ -19,8 +17,6 @@ def _check_type(expected, value):
 
 class ParameterAllowedError(Exception):
     """ """
-
-    pass
 
 
 def _check_allowed(allowed, value):
@@ -33,8 +29,6 @@ def _check_allowed(allowed, value):
 class ParameterMinValueError(Exception):
     """ """
 
-    pass
-
 
 def _check_min_val(min_val, value):
     if value < min_val:
@@ -45,8 +39,6 @@ def _check_min_val(min_val, value):
 
 class ParameterMaxValueError(Exception):
     """ """
-
-    pass
 
 
 def _check_max_val(max_val, value):
@@ -59,8 +51,6 @@ def _check_max_val(max_val, value):
 class ParameterMinLenError(Exception):
     """ """
 
-    pass
-
 
 def _check_min_len(min_len, value):
     if len(value) < min_len:
@@ -71,8 +61,6 @@ def _check_min_len(min_len, value):
 
 class ParameterMaxLenError(Exception):
     """ """
-
-    pass
 
 
 def _check_max_len(max_len, value):
@@ -85,10 +73,11 @@ def _check_max_len(max_len, value):
 class ParameterCustomError(Exception):
     """ """
 
-    pass
-
 
 def _check_custom(func, value):
+    if callable(func) is False:
+        raise TypeError("the object passed to custom must be callable")
+
     if func(value) == False:
         raise ParameterCustomError(f"The custom test failed with {value}")
     else:

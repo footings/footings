@@ -132,7 +132,6 @@ def check_enforce_strict_pd_dataframe(table, columns):
 
 
 def _validate_wrapper(x, obj, key, func, attributes=None, test_value=None):
-
     def validate():
         s = ""
         if attributes is None:
