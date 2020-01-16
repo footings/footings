@@ -7,6 +7,7 @@ from dask.context import globalmethod
 import pandas as pd
 from warnings import warn
 
+from .table_schema import TableSchema
 from .ffunction import FFunction
 from .parameter import Parameter
 from .errors import ParameterDuplicateError, ParameterNotKnownError
@@ -95,11 +96,11 @@ def _create_setter_and_post_init_funcs(table_schemas, parameters):
     def setter(self, name, value):
         if name in table_nms:
             if "_dask" in self.__dict__:
-                tables[names].valid(value)  # will raise an error if not valid
+                tables_schemas[name].valid(value)
                 self._dask[name] = value
         elif name in param_nms:
             if "_dask" in self.__dict__:
-                parameters[names].valid(value)  # will raise an error if not valid
+                parameters[names].valid(value)
                 self._dask[name] = value
         self.__dict__[name] = value
 
@@ -110,13 +111,13 @@ def _create_setter_and_post_init_funcs(table_schemas, parameters):
 
         for name in table_nms + param_nms:
             if name in table_nms:
-                tables[names].valid(value)  # will raise an error if not valid
-                self._dask[name] = getattr(self, name)
+                value = getattr(self, name)
+                table_schemas[name].valid(value)
+                self._dask[name] = value
             elif name in param_nms:
-                parameters[name].valid(
-                    getattr(self, name)
-                )  # will raise an error if not valid
-                self._dask[name] = getattr(self, name)
+                value = getattr(self, name)
+                parameters[name].valid(value)
+                self._dask[name] = value
 
     return setter, post_init
 
@@ -143,6 +144,10 @@ def build_model(
     meta: Optional[dict] = None,
     **kwargs,
 ):
+    if isinstance(table_schemas, TableSchema):
+        table_schemas = {table_schemas.name: table_schemas}
+    elif isinstance(table_schemas, list):
+        table_schemas = {t.name: t for t in table_schemas}
 
     if isinstance(instructions, dict):
         _validate_instructions(table_schemas, instructions)
