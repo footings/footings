@@ -123,33 +123,35 @@ check_enforce_strict = Dispatch("check_enforce_strict")
 
 @check_enforce_strict.register(pd.DataFrame)
 def check_enforce_strict_pd_dataframe(table, columns):
-
-    return
+    expected = set([c.name for c in columns])
+    received = set(table.columns)
+    return 1 if len(received - expected) > 0 else 0
 
 
 #########################################################################################
 
 
-def _validate_wrapper(x, self, func, attribute=None, test_value=None):
+def _validate_wrapper(x, obj, key, func, attributes=None, test_value=None):
+
     def validate():
         s = ""
-        if attribute is None:
+        if attributes is None:
             count = func(x)
             if count > 0:
                 s = f"failed {count} times"
             else:
                 s = "passed"
         else:
-            count = func(x, getattr(self, attribute))
+            count = func(x, *(getattr(obj, a) for a in attributes))
             if count > 0:
                 s = f"failed {count} times"
             else:
                 s = "passed"
         return s
 
-    if value is not None:
+    if getattr(obj, key) is not None:
         if test_value is not None:
-            if value == test_value:
+            if getattr(obj, key) == test_value:
                 s = validate()
             else:
                 s = "not validated"
@@ -162,13 +164,13 @@ def _validate_wrapper(x, self, func, attribute=None, test_value=None):
 
 
 _WRAPPER_PARAMS_COL = {
-    "nullable": {"func": check_nullable, "pass_value": False, "test_value": False},
-    "allowed": {"func": check_allowed, "pass_value": True},
-    "min_val": {"func": check_min_val, "pass_value": True},
-    "max_val": {"func": check_max_val, "pass_value": True},
-    "min_len": {"func": check_min_len, "pass_value": True},
-    "max_len": {"func": check_max_len, "pass_value": True},
-    "custom": {"func": check_custom, "pass_value": True},
+    "nullable": {"func": check_nullable, "test_value": False},
+    "allowed": {"func": check_allowed, "attributes": ["allowed"]},
+    "min_val": {"func": check_min_val, "attributes": ["min_val"]},
+    "max_val": {"func": check_max_val, "attributes": ["max_val"]},
+    "min_len": {"func": check_min_len, "attributes": ["min_len"]},
+    "max_len": {"func": check_max_len, "attributes": ["max_len"]},
+    "custom": {"func": check_custom, "attributes": ["custom"]},
 }
 
 
@@ -177,14 +179,14 @@ class ColumnSchemaError(Exception):
 
 
 _WRAPPER_PARAMS_TBL = {
-    "min_rows": {"func": check_min_rows, "pass_value": True},
-    "max_rows": {"func": check_max_rows, "pass_value": True},
-    "custom": {"func": check_custom, "pass_value": True},
-    # "enforce_strict": {
-    #     "func": check_enforce_strict,
-    #     "pass_value": True,
-    #     "test_value": True,
-    # },
+    "min_rows": {"func": check_min_rows, "attributes": ["min_rows"]},
+    "max_rows": {"func": check_max_rows, "attributes": ["max_rows"]},
+    "custom": {"func": check_custom, "attributes": ["custom"]},
+    "enforce_strict": {
+        "func": check_enforce_strict,
+        "attributes": ["columns"],
+        "test_value": True,
+    },
 }
 
 
@@ -212,7 +214,7 @@ class ColumnSchema:
             return {
                 **{"dtype": "not validated"},
                 **{
-                    k: _validate_wrapper(column, getattr(self, k), **v)
+                    k: _validate_wrapper(column, obj=self, key=k, **v)
                     for k, v in _WRAPPER_PARAMS_COL.items()
                 },
             }
@@ -220,13 +222,13 @@ class ColumnSchema:
             if self.dtype != column.dtype:
                 return {
                     **{"dtype": "failed and other validations not performed"},
-                    **{k: "not validated" for k, v in _WRAPPER_PARAMS_COL.items()},
+                    **{k: "not validated" for k in _WRAPPER_PARAMS_COL.keys()},
                 }
             else:
                 return {
                     **{"dtype": "passed"},
                     **{
-                        k: _validate_wrapper(column, getattr(self, k), **v)
+                        k: _validate_wrapper(column, obj=self, key=k, **v)
                         for k, v in _WRAPPER_PARAMS_COL.items()
                     },
                 }
@@ -256,7 +258,7 @@ class TableSchema:
     min_rows: Optional[int] = field(default=None)
     max_rows: Optional[int] = field(default=None)
     custom: Optional[Callable] = field(default=None)
-    enforce_strict: bool = True
+    enforce_strict: bool = field(default=True)
 
     def valid(self, table, return_only_errors: bool = True):
         # test columns
@@ -271,13 +273,16 @@ class TableSchema:
 
         # test table
         table_validations = {
-            k: _validate_wrapper(table, getattr(self, k), **v)
+            k: _validate_wrapper(table, obj=self, key=k, **v)
             for k, v in _WRAPPER_PARAMS_TBL.items()
         }
+
         table_errors = {k: v for k, v in table_validations.items() if "failed" in v}
+
         table_failed = False if len(table_errors) == 0 else True
 
         if column_failed or table_failed:
+
             if return_only_errors:
                 raise TableSchemaError({**column_errors, **table_errors})
             else:
