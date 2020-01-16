@@ -95,7 +95,7 @@ def _create_setter_and_post_init_funcs(table_schemas, parameters):
     def setter(self, name, value):
         if name in table_nms:
             if "_dask" in self.__dict__:
-                # tables[names].valid(value) # will raise an error if not valid
+                tables[names].valid(value)  # will raise an error if not valid
                 self._dask[name] = value
         elif name in param_nms:
             if "_dask" in self.__dict__:
@@ -110,12 +110,12 @@ def _create_setter_and_post_init_funcs(table_schemas, parameters):
 
         for name in table_nms + param_nms:
             if name in table_nms:
-                # will raise an error if not valid
-                # tables[names].valid(value)
+                tables[names].valid(value)  # will raise an error if not valid
                 self._dask[name] = getattr(self, name)
             elif name in param_nms:
-                # will raise an error if not valid
-                parameters[name].valid(getattr(self, name))
+                parameters[name].valid(
+                    getattr(self, name)
+                )  # will raise an error if not valid
                 self._dask[name] = getattr(self, name)
 
     return setter, post_init
@@ -165,7 +165,7 @@ def build_model(
         "__footings_table_schemas__": table_schemas,
         "__footings_parameters__": parameters,
         "__footings_functions__": _get_functions(graph),
-        "__footings_dag__": graph.copy(), # copy to prevent updates (_dask gets updated)
+        "__footings_dag__": graph.copy(),  # copy to prevent updates (_dask gets updated)
         **_DASK_NAMESPACE,
     }
 
