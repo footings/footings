@@ -1,3 +1,5 @@
+"""__init__.py"""
+
 from footings.core.parameter import Parameter
 from footings.core.ffunction import (
     FFunction,

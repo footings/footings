@@ -1,87 +1,73 @@
+"""parameter.py"""
+
 from typing import Any, List, Dict, Union, Optional, Callable
 from dataclasses import dataclass, field
 
-from .utils import _generate_message
-
 
 class ParameterTypeError(Exception):
-    """ """
+    """Wrong type passed to parameter"""
 
 
 def _check_type(expected, value):
-    if isinstance(value, expected) == False:
+    if isinstance(value, expected) is False:
         raise ParameterTypeError(f"Expected type {value} but received {type(value)}")
-    else:
-        return True
 
 
 class ParameterAllowedError(Exception):
-    """ """
+    """Value not allowed passed to parameter"""
 
 
 def _check_allowed(allowed, value):
-    if value in allowed == False:
+    if value in allowed is False:
         raise ParameterAllowedError(f"{value} is not in [{allowed}]")
-    else:
-        return True
 
 
 class ParameterMinValueError(Exception):
-    """ """
+    """Value below allowed minimum passed to parameter"""
 
 
 def _check_min_val(min_val, value):
     if value < min_val:
         raise ParameterMinValueError(f"{value} is less than {min_val}")
-    else:
-        return True
 
 
 class ParameterMaxValueError(Exception):
-    """ """
+    """Value above allowed maximum passed to parameter"""
 
 
 def _check_max_val(max_val, value):
     if value > max_val:
         raise ParameterMaxValueError(f"{value} is greater than {max_val}")
-    else:
-        return True
 
 
 class ParameterMinLenError(Exception):
-    """ """
+    """Value with length below allowed minimum passed to parameter"""
 
 
 def _check_min_len(min_len, value):
     if len(value) < min_len:
         raise ParameterMinLenError(f"len {len(value)} is less than {min_len}")
-    else:
-        return True
 
 
 class ParameterMaxLenError(Exception):
-    """ """
+    """Value with length above allowed maximum passed to parameter"""
 
 
 def _check_max_len(max_len, value):
     if len(value) > max_len:
         raise ParameterMaxLenError(f"len {len(value)} is greater than {max_len}")
-    else:
-        return True
 
 
 class ParameterCustomError(Exception):
-    """ """
+    """Value fails custom test"""
 
 
 def _check_custom(func, value):
     if callable(func) is False:
         raise TypeError("the object passed to custom must be callable")
 
-    if func(value) == False:
+    if func(value) is False:
         raise ParameterCustomError(f"The custom test failed with {value}")
-    else:
-        True
 
 
 @dataclass

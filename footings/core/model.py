@@ -1,21 +1,31 @@
-from typing import List, Dict, Tuple, Union, Optional, Any
-from dataclasses import dataclass, make_dataclass, field
-from dask.delayed import delayed, single_key, rebuild, optimize
+"""model.py"""
+
+from typing import List, Union, Optional
+from dataclasses import make_dataclass, field
+from warnings import warn
+from dask.delayed import rebuild, optimize
 from dask.base import DaskMethodsMixin
 from dask import threaded
 from dask.context import globalmethod
 import pandas as pd
-from warnings import warn
 
 from .table_schema import TableSchema
 from .ffunction import FFunction
 from .parameter import Parameter
-from .errors import ParameterDuplicateError, ParameterNotKnownError
-from .utils import _generate_message
+
+from collections import namedtuple
+
+Results = namedtuple("Results", "output parameters")
+
+
+def single_key(seq, *args):
+    """ Pick out the only element of this list, a list of keys """
+    print(seq)
+    return Results(output=seq[0], parameters="zzz")  # (seq[0], args)
 
 
 _DASK_NAMESPACE = {
-    "key": property(lambda self: self._keys),
+    "keys": property(lambda self: self._keys),
     "dask": property(lambda self: self._dask),
     "__dask_graph__": lambda self: self._dask,
     "__dask_keys__": lambda self: self._keys,
@@ -23,7 +33,7 @@ _DASK_NAMESPACE = {
     "__dask_tokenize__": lambda self: self._keys,
     "__dask_scheduler__": staticmethod(threaded.get),
     "__dask_optimize__": globalmethod(optimize, key="delayed_optimize"),
-    "__dask_postcompute__": lambda self: (single_key, ()),
+    "__dask_postcompute__": lambda self: (single_key, (self.dask, self.keys)),
     "__dask_postpersist__": lambda self: (
         rebuild,
         (self.keys, getattr(self, "_length", None)),
@@ -96,11 +106,11 @@ def _create_setter_and_post_init_funcs(table_schemas, parameters):
     def setter(self, name, value):
         if name in table_nms:
             if "_dask" in self.__dict__:
-                tables_schemas[name].valid(value)
+                table_schemas[name].valid(value)
                 self._dask[name] = value
         elif name in param_nms:
             if "_dask" in self.__dict__:
-                parameters[names].valid(value)
+                parameters[name].valid(value)
                 self._dask[name] = value
         self.__dict__[name] = value
 
@@ -144,6 +154,7 @@ def build_model(
     meta: Optional[dict] = None,
     **kwargs,
 ):
+    """ build_model """
     if isinstance(table_schemas, TableSchema):
         table_schemas = {table_schemas.name: table_schemas}
     elif isinstance(table_schemas, list):

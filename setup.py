@@ -14,7 +14,7 @@ VERSION = "0.0.0"
 URL = "https://github.com/dustindall/footings-core"
 DOWNLOAD_URL = "https://github.com/dustindall/footings-core"
 
-INSTALL_REQUIRES = ["dask", "pandas", "numpy", "pyarrow", "toolz", "boltons"]
+INSTALL_REQUIRES = ["numpy", "pandas", "dask"]
 
 PACKAGES = setuptools.find_packages()
 
