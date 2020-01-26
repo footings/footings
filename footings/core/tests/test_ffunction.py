@@ -1,358 +1,122 @@
+"""Tests for ffunction.py"""
+
 import pytest
 import pandas as pd
-import pyarrow as pa
 from pandas.util.testing import assert_frame_equal
 
-from footings import (
-    Parameter,
-    FFunction,
+from footings.core.table_schema import ColumnSchema
+from footings.core.ffunction import (
+    ColumnNotInTableError,
+    ColumnInTableError,
+    FFunctionExtraArgumentError,
+    FFunctionMissingArgumentError,
+    TableIn,
+    TableOut,
     ffunction,
-    series_ffunction,
-    dataframe_ffunction,
 )
-from footings.core.ffunction import to_dataframe_function, DFIn, DFOut
 
 
-def test_new():
-    df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
-
-    def add(a, b):
-        return a + b
-
-    f = FFunction(
-        add,
-        return_type=pd.Series,
-        inputs=[DFIn("df", ["a", "b"])],
-        outputs=DFOut("df", [pa.field("add", pa.int16())], None, None),
-    )
-    assert_frame_equal(f(df), df.assign(add=df.a + df.b))
+def test_table_in():
+    """Test for TableIn"""
+    test = TableIn(name="test", required_columns=["b", "c"])
+    df1 = pd.DataFrame({"a": [1, 2]})
+    pytest.raises(ColumnNotInTableError, test.check_valid, df1)
+    df2 = df1.assign(b=[1, 2])
+    pytest.raises(ColumnNotInTableError, test.check_valid, df2)
+    df3 = df2.assign(c=[1, 2])
+    assert test.check_valid(df3) is True
 
 
-def test_ffunction_fail_return_type():
-    def add(a, b):
-        return a + b
+def test_table_out():
+    """Test for TableOut"""
+    df1 = pd.DataFrame({"a": [1, 2]})
+    df2 = pd.DataFrame({"a": [1, 2], "b": [1, 2]})
 
-    # fails > return_type is None
-    pytest.raises(
-        ValueError,
-        FFunction,
-        add,
-        return_type=None,
-        input_columns=["a", "b"],
-        output_columns=[pa.field("c", pa.int16())],
-    )
+    pytest.raises(TypeError, TableOut, "test", ColumnSchema("b"))
+    test_added_columns = TableOut(name="test", added_columns=[ColumnSchema("b")])
+    pytest.raises(ColumnNotInTableError, test_added_columns.check_valid, df1)
+    assert test_added_columns.check_valid(df2) is True
 
-    # fails > return_type is not pd.Series or pd.DataFrame
-    pytest.raises(
-        ValueError,
-        FFunction,
-        add,
-        return_type=pa.int16(),
-        input_columns=["a", "b"],
-        output_columns=[pa.field("c", pa.int16())],
-    )
+    test_modified_columns = TableOut(name="test", modified_columns=["b"])
+    pytest.raises(ColumnNotInTableError, test_modified_columns.check_valid, df1)
+    assert test_modified_columns.check_valid(df2) is True
+
+    test_removed_columns = TableOut(name="test", removed_columns=["b"])
+    pytest.raises(ColumnInTableError, test_removed_columns.check_valid, df2)
+    assert test_removed_columns.check_valid(df1) is True
 
 
-def test_ffunction_fail_input_columns():
-    def add(a, b):
-        return a + b
+def test_ffunction():
+    """Test for ffunction"""
+    # pylint: disable=function-redefined
 
-    # fails > input_columns is not a dict
-    pytest.raises(
-        TypeError,
-        FFunction,
-        add,
-        return_type=pd.Series,
-        input_columns=None,
-        output_columns=[pa.field("c", pa.int16())],
-    )
+    def add(df):
+        return df.assign(c=df.a + df.b)
 
-    # fails > the values for input_columns are not a pyarrow DataType
-    pytest.raises(
-        TypeError,
-        FFunction,
-        add,
-        return_type=pd.Series,
-        input_columns={"a": pd.Series, "b": pd.Series},
-        output_columns=[pa.field("c", pa.int16())],
-    )
+    inputs = {"df": TableIn("df", required_columns=["a", "b"])}
+    outputs = TableOut("df", added_columns=[ColumnSchema("c")])
 
+    with pytest.raises(TypeError):
+        # test passing inputs
+        # ffunction(add, inputs=[], outputs=outputs)
 
-def test_ffunction_fail_output_columns():
-    def add(a, b):
-        return a + b
+        # @ffunction(inputs=[], outputs=outputs)
+        # def add(a, b):
+        #     return a + b
 
-    def func(a, b):
-        return a + b, a - b
+        ffunction(add, inputs=inputs["df"], outputs=outputs)
 
-    # fails > output_columns is not a dict
-    pytest.raises(
-        TypeError,
-        FFunction,
-        add,
-        return_type=pd.Series,
-        input_columns=["a", "b"],
-        output_columns=None,
-    )
+        @ffunction(inputs=inputs["df"], outputs=outputs)
+        def add(df):
+            return df.assign(c=df.a + df.b)
 
-    # fails > the values for output_columns are not a pyarrow DataType
-    pytest.raises(
-        TypeError,
-        FFunction,
-        add,
-        return_type=pd.Series,
-        input_columns=["a", "b"],
-        output_columns={"c": pa.int16()},
-    )
+        ffunction(add, inputs={"df": []}, outputs=outputs)
 
+        @ffunction(inputs={"df": []}, outputs=outputs)
+        def add(df):
+            return df.assign(c=df.a + df.b)
 
-def test_ffunction_fail_parameters():
-    def func(df, s):
-        if s == "leave":
-            return df.assign(c=(df.a + df.b))
-        else:
-            return df.assign(c=(df.a + df.b) / 2)
+        # test passing outputs
+        ffunction(add, inputs=inputs, outputs=[])
 
-    # fails > the values for input_columns are not a Parameter type
-    pytest.raises(
-        TypeError,
-        FFunction,
-        func,
-        return_type=pd.Series,
-        input_columns=["a", "b"],
-        output_columns={"c": pd.Series},
-        parameters={"s": str},
-    )
+        @ffunction(inputs=inputs, outputs=[])
+        def add(df):
+            return df.assign(c=df.a + df.b)
 
+        ffunction(add, inputs=inputs, outputs=None)
 
-def test_ffunction_fail_drop_columns():
-    def add(a, b):
-        return a + b
+        @ffunction(inputs=inputs, outputs=None)
+        def add(df):
+            return df.assign(c=df.a + df.b)
 
-    # fails > drop_columns is not a list
-    pytest.raises(
-        TypeError,
-        FFunction,
-        add,
-        return_type=pd.Series,
-        input_columns=["a", "b"],
-        output_columns=[pa.field("c", pa.int16())],
-        drop_columns="b",
-    )
+    with pytest.raises(FFunctionMissingArgumentError):
+        ffunction(add, inputs={"z": inputs["df"]}, outputs=outputs)
 
-    # fails > return_type == pd.Series
-    pytest.raises(
-        ValueError,
-        FFunction,
-        add,
-        return_type=pd.Series,
-        input_columns=["a", "b"],
-        output_columns=[pa.field("c", pa.int16())],
-        drop_columns=["b"],
-    )
+        @ffunction(inputs={"z": inputs["df"]}, outputs=outputs)
+        def add(df):
+            return df.assign(c=df.a + df.b)
 
-    # fails > drop_columns d not in input_columns
-    pytest.raises(
-        ValueError,
-        FFunction,
-        add,
-        return_type=pd.DataFrame,
-        input_columns=["a", "b"],
-        output_columns=[pa.field("c", pa.int16())],
-        drop_columns=["d"],
-    )
+    with pytest.raises(FFunctionExtraArgumentError):
+        ffunction(add, inputs={"z": inputs["df"], **inputs}, outputs=outputs)
 
-
-def test_ffunction_series_pass():
-    df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
-
-    def add1(a, b):
-        return a + b
-
-    f = FFunction(
-        add1,
-        return_type=pd.Series,
-        input_columns=["a", "b"],
-        output_columns=[pa.field("c", pa.int16())],
-    )
-    assert_frame_equal(f(df), df.assign(c=df.a + df.b))
-
-    @ffunction(
-        return_type=pd.Series,
-        input_columns=["a", "b"],
-        output_columns=[pa.field("c", pa.int16())],
-    )
-    def add2(a, b):
-        return a + b
-
-    assert_frame_equal(add2(df), df.assign(c=df.a + df.b))
-
-    @series_ffunction(
-        input_columns=["a", "b"], output_columns=[pa.field("c", pa.int16())]
-    )
-    def add3(a, b):
-        return a + b
-
-    assert_frame_equal(add3(df), df.assign(c=df.a + df.b))
-
-
-def test_ffunction_series_properties():
-    df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
-
-    def func(a, b, s):
-        if s == "leave":
+        @ffunction(inputs={"z": inputs["df"], **inputs}, outputs=outputs)
+        def add(a, b):
             return a + b
-        else:
-            return (a + b) / 2
 
-    ffunc = FFunction(
-        func,
-        return_type=pd.Series,
-        input_columns=["a", "b"],
-        parameters={"s": Parameter(allowed=["leave", "divide"])},
-        output_columns=[pa.field("c", pa.float64())],
-    )
+    # need to test __call__
+    df = pd.DataFrame({"a": [1, 2], "b": [1, 2]})
+    f_add = ffunction(function=add, inputs=inputs, outputs=outputs)
+    assert_frame_equal(f_add(df), df.assign(c=df.a + df.b))
 
-    assert ffunc.function == func
-    assert ffunc._return_type == pd.Series
-    assert ffunc.name == func.__name__
-    assert list(ffunc.parameters.keys()) == ["s"]
-    assert ffunc.drop_columns is None
-    assert ffunc.output_columns == [pa.field("c", pa.float64())]
-
-    assert_frame_equal(ffunc(df, s="leave"), df.assign(c=df.a + df.b))
-    assert_frame_equal(ffunc(df, s="divide"), df.assign(c=(df.a + df.b) / 2))
-
-
-def test_ffunction_dataframe_pass():
-    df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
-
-    def add1(df):
+    @ffunction(inputs=inputs, outputs=outputs)
+    def add(df):
         return df.assign(c=df.a + df.b)
 
-    f = FFunction(
-        add1,
-        return_type=pd.DataFrame,
-        input_columns=["a", "b"],
-        output_columns=[pa.field("c", pa.int16())],
-    )
-    assert_frame_equal(f(df), df.assign(c=df.a + df.b))
+    assert_frame_equal(add(df), df.assign(c=df.a + df.b))
 
-    @ffunction(
-        return_type=pd.DataFrame,
-        input_columns=["a", "b"],
-        output_columns=[pa.field("c", pa.int16())],
-    )
-    def add2(df):
-        return df.assign(c=df.a + df.b)
+    # need to test generate_step
+    print(f_add.get_step_items())
+    assert f_add.get_step_items() == (("df",), f_add, ("df",))
+    assert add.get_step_items() == (("df",), add, ("df",))
 
-    assert_frame_equal(add2(df), df.assign(c=df.a + df.b))
-
-    @dataframe_ffunction(
-        input_columns=["a", "b"], output_columns=[pa.field("c", pa.int16())]
-    )
-    def add3(df):
-        return df.assign(c=df.a + df.b)
-
-    assert_frame_equal(add3(df), df.assign(c=df.a + df.b))
-
-
-def test_ffunction_dataframe_properties():
-    df = pd.DataFrame({"a": [1, 2], "b": [3, 4], "b2": [3, 4]})
-
-    def func(df, s):
-        if s == "leave":
-            return df.assign(c=df.a + df.b).drop(columns="b2")
-        else:
-            return df.assign(c=(df.a + df.b) / 2).drop(columns="b2")
-
-    ffunc = FFunction(
-        func,
-        return_type=pd.DataFrame,
-        input_columns=["a", "b", "b2"],
-        parameters={"s": Parameter(allowed=["leave", "divide"])},
-        output_columns=[pa.field("c", pa.float64())],
-        drop_columns=["b2"],
-    )
-
-    assert ffunc.function == func
-    assert ffunc._return_type == pd.DataFrame
-    assert ffunc.name == func.__name__
-    assert list(ffunc.parameters.keys()) == ["s"]
-    assert ffunc.drop_columns == ["b2"]
-    assert ffunc.output_columns == [pa.field("c", pa.float64())]
-
-    assert_frame_equal(ffunc(df, s="leave"), df.assign(c=df.a + df.b).drop(columns="b2"))
-    assert_frame_equal(
-        ffunc(df, s="divide"), df.assign(c=(df.a + df.b) / 2).drop(columns="b2")
-    )
-
-
-def test_to_dataframe_function():
-
-    df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
-
-    def add(a, b):
-        return a + b
-
-    add_df_func = to_dataframe_function(
-        add, input_columns=["a", "b"], output_columns=[pa.field("add", pa.int16())]
-    )
-
-    assert_frame_equal(add_df_func(df), df.assign(add=df.a + df.b))
-
-    def add_subtract(a, b):
-        return a + b, b - a
-
-    add_subtract_df_func = to_dataframe_function(
-        add_subtract,
-        input_columns=["a", "b"],
-        output_columns=[pa.field("add", pa.int16()), pa.field("subtract", pa.int16())],
-    )
-
-    assert_frame_equal(
-        add_subtract_df_func(df), df.assign(add=df.a + df.b, subtract=df.b - df.a)
-    )
-
-
-# def test_ffunction_repr():
-#     def func(df, s):
-#         if s == "leave":
-#             return df.assign(c=df.a + df.b).drop(columns="b2")
-#         else:
-#             return df.assign(c=(df.a + df.b) / 2).drop(columns="b2")
-#
-#     ffunc = FFunction(
-#         func,
-#         return_type=pd.DataFrame,
-#         input_columns={"a": pa.int16(), "b": pa.int16(), "b2": pa.int16()},
-#         parameters={"s": Parameter(allowed=["leave", "divide"])},
-#         output_columns=[pa.field("c", pa.float64())],
-#         drop_columns=["b2"],
-#     )
-#
-#     print(ffunc)
-
-
-# def test_doc_description():
-#     @series_ffunction(
-#         input_columns=["a", "b"],
-#         output_columns=[pa.field("c", pa.int16())],
-#     )
-#     def series_add(a, b):
-#         """Add columns a and b together to produce column c"""
-#         return a + b
-#
-#     print(series_add._function.__doc__)
-#     assert series_add.__doc__ == "Add columns a and b together to produce column c"
-#
-#     @dataframe_ffunction(
-#         input_columns=["a", "b"],
-#         output_columns=[pa.field("c", pa.int16())],
-#     )
-#     def df_add(df):
-#         """Add columns a and b together to produce column c"""
-#         return df.assign(c=df.a + df.b)
-#
-#     print(df_add._function.__doc__)
-#     assert df_add.__doc__ == "Add columns a and b together to produce column c"
+    # need to test docstring and args

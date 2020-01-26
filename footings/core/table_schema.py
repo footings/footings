@@ -1,6 +1,9 @@
-from typing import List, Dict, Tuple, Union, Optional, Any, Callable
-from dataclasses import dataclass, field
-from dask.utils import Dispatch
+"""table_schema.py"""
+
+from typing import List, Optional, Any, Callable
+from functools import singledispatch
+
+from attr import attrs, attrib
 import pandas as pd
 
 __all__ = [
@@ -11,119 +14,152 @@ __all__ = [
 ]
 
 #########################################################################################
-check_type = Dispatch("check_type")
+@singledispatch
+def check_type(column, dtype):
+    """Check type of column"""
+    raise NotImplementedError(f"check not implemented for {type(column)}")
 
 
 @check_type.register(pd.Series)
-def check_type_pd_series(column, dtype):
+def _(column, dtype):
     return column.dtypes == dtype
 
 
 #########################################################################################
-check_nullable = Dispatch("check_nullable")
+@singledispatch
+def check_nullable(column):
+    """Check for null values in a column"""
+    raise NotImplementedError(f"check not implemented for {type(column)}")
 
 
 @check_nullable.register(pd.Series)
-def check_nullable_pd_series(column):
+def _(column):
     return column.isnull().values.sum()
 
 
 #########################################################################################
-check_allowed = Dispatch("check_allowed")
+@singledispatch
+def check_allowed(column, allowed):
+    """Check allowed values in column"""
+    raise NotImplementedError(f"check not implemented for {type(column)}")
 
 
 @check_allowed.register(pd.Series)
-def check_allowed_pd_series(column, allowed):
+def _(column, allowed):
     unique = set(column.unique())
     allowed = set(allowed)
     return len(unique - allowed)
 
 
 #########################################################################################
-check_min_val = Dispatch("check_min_val")
+@singledispatch
+def check_min_val(column, min_val):
+    """Check min values in a column"""
+    raise NotImplementedError(f"check not implemented for {type(column)}")
 
 
 @check_min_val.register(pd.Series)
-def check_min_val_pd_series(column, min_val):
+def _(column, min_val):
     return (column < min_val).sum()
 
 
 #########################################################################################
-check_max_val = Dispatch("check_max_val")
+@singledispatch
+def check_max_val(column, max_val):
+    """Check max values in a column"""
+    raise NotImplementedError(f"check not implemented for {type(column)}")
 
 
 @check_max_val.register(pd.Series)
-def check_max_val_pd_series(column, max_val):
+def _(column, max_val):
     return (column > max_val).sum()
 
 
 #########################################################################################
-check_min_len = Dispatch("check_min_len")
+@singledispatch
+def check_min_len(column, min_len):
+    """Check min length of values in a column"""
+    raise NotImplementedError(f"check not implemented for {type(column)}")
 
 
 @check_min_len.register(pd.Series)
-def check_min_len_pd_series(column, min_len):
+def _(column, min_len):
     return (column.str.len() < min_len).sum()
 
 
 #########################################################################################
-check_max_len = Dispatch("check_max_len")
+@singledispatch
+def check_max_len(column, max_len):
+    """Check max length of values in a column"""
+    raise NotImplementedError(f"check not implemented for {type(column)}")
 
 
 @check_max_len.register(pd.Series)
-def check_max_len_pd_series(column, max_len):
+def _(column, max_len):
     return (column.str.len() > max_len).sum()
 
 
 #########################################################################################
-check_min_rows = Dispatch("check_min_rows")
+@singledispatch
+def check_min_rows(table, min_rows):
+    """Check min number of rows in a table"""
+    raise NotImplementedError(f"check not implemented for {type(table)}")
 
 
 @check_min_rows.register(pd.Series)
-def check_min_rows_pd_series(column, min_rows):
-    return 1 if column.shape[0] < min_rows else 0
+def _(table, min_rows):
+    return 1 if table.shape[0] < min_rows else 0
 
 
 @check_min_rows.register(pd.DataFrame)
-def check_min_rows_pd_dataframe(table, min_rows):
+def _(table, min_rows):
     return 1 if table.shape[0] < min_rows else 0
 
 
 #########################################################################################
-check_max_rows = Dispatch("check_max_rows")
+@singledispatch
+def check_max_rows(table, max_rows):
+    """Check max number of rows in a table"""
+    raise NotImplementedError(f"check not implemented for {type(table)}")
 
 
 @check_max_rows.register(pd.Series)
-def check_max_rows_pd_series(column, max_rows):
-    return 1 if column.shape[0] > max_rows else 0
+def _(table, max_rows):
+    return 1 if table.shape[0] > max_rows else 0
 
 
 @check_max_rows.register(pd.DataFrame)
-def check_max_rows_pd_dataframe(table, max_rows):
+def _(table, max_rows):
     return 1 if table.shape[0] > max_rows else 0
 
 
 #########################################################################################
-check_custom = Dispatch("check_custom")
+@singledispatch
+def check_custom(table, custom):
+    """Check custom function against table"""
+    raise NotImplementedError(f"check not implemented for {type(table)}")
 
 
 @check_custom.register(pd.Series)
-def check_custom_pd_series(column, custom):
-    return sum(custom(column))
+def _(table, custom):
+    return sum(custom(table))
 
 
 @check_custom.register(pd.DataFrame)
-def check_custom_pd_dataframe(dataframe, custom):
-    return sum(custom(dataframe))
+def _(table, custom):
+    return sum(custom(table))
 
 
 #########################################################################################
-check_enforce_strict = Dispatch("check_enforce_strict")
+@singledispatch
+def check_enforce_strict(table, columns):
+    """Check enforce strict columns in table"""
+    raise NotImplementedError(f"check not implemented for {type(table)}")
 
 
 @check_enforce_strict.register(pd.DataFrame)
-def check_enforce_strict_pd_dataframe(table, columns):
-    expected = set([c.name for c in columns])
+def _(table, columns):
+    expected = {c.name for c in columns}
     received = set(table.columns)
     return 1 if len(received - expected) > 0 else 0
 
@@ -132,6 +168,8 @@ def check_enforce_strict_pd_dataframe(table, columns):
 
 
 def _validate_wrapper(x, obj, key, func, attributes=None, test_value=None):
+    """ """
+
     def validate():
         s = ""
         if attributes is None:
@@ -174,7 +212,7 @@ _WRAPPER_PARAMS_COL = {
 
 
 class ColumnSchemaError(Exception):
-    """ """
+    """Column schema error"""
 
 
 _WRAPPER_PARAMS_TBL = {
@@ -190,26 +228,27 @@ _WRAPPER_PARAMS_TBL = {
 
 
 class TableSchemaError(Exception):
-    """ """
+    """Table schema error"""
 
 
-@dataclass(frozen=True)
+@attrs(slots=True, frozen=True)
 class ColumnSchema:
-    """ """
+    """ColumnSchema"""
 
-    name: str
-    description: Optional[str] = field(default=None, repr=False)
-    dtype: Optional[type] = field(default=Any)
-    nullable: Optional[bool] = field(default=None)
-    allowed: Optional[List[Any]] = field(default=None)
-    min_val: Optional[Any] = field(default=None)
-    max_val: Optional[Any] = field(default=None)
-    min_len: Optional[int] = field(default=None)
-    max_len: Optional[int] = field(default=None)
-    custom: Optional[Callable] = field(default=None)
+    # pylint: disable=too-many-instance-attributes
+    name: str = attrib()
+    description: Optional[str] = attrib(default=None, repr=False)
+    dtype: Optional[type] = attrib(default=Any)
+    nullable: Optional[bool] = attrib(default=None)
+    allowed: Optional[List[Any]] = attrib(default=None)
+    min_val: Optional[Any] = attrib(default=None)
+    max_val: Optional[Any] = attrib(default=None)
+    min_len: Optional[int] = attrib(default=None)
+    max_len: Optional[int] = attrib(default=None)
+    custom: Optional[Callable] = attrib(default=None)
 
     def _valid(self, column):
-        if self.dtype is None:
+        if self.dtype is None or self.dtype is Any:
             return {
                 **{"dtype": "not validated"},
                 **{
@@ -217,58 +256,62 @@ class ColumnSchema:
                     for k, v in _WRAPPER_PARAMS_COL.items()
                 },
             }
-        else:
-            if self.dtype != column.dtype:
-                return {
-                    **{"dtype": "failed and other validations not performed"},
-                    **{k: "not validated" for k in _WRAPPER_PARAMS_COL.keys()},
-                }
-            else:
-                return {
-                    **{"dtype": "passed"},
-                    **{
-                        k: _validate_wrapper(column, obj=self, key=k, **v)
-                        for k, v in _WRAPPER_PARAMS_COL.items()
-                    },
-                }
+
+        if self.dtype != column.dtype:
+            return {
+                **{"dtype": "failed and other validations not performed"},
+                **{k: "not validated" for k, v in _WRAPPER_PARAMS_COL.items()},
+            }
+
+        return {
+            **{"dtype": "passed"},
+            **{
+                k: _validate_wrapper(column, obj=self, key=k, **v)
+                for k, v in _WRAPPER_PARAMS_COL.items()
+            },
+        }
 
     def valid(self, column: str, return_only_errors: bool = True):
-        d = self._valid(column)
-        failed = any(["failed" in v for k, v in d.items()])
+        """valid"""
+        dict_ = self._valid(column)
+        failed = any(["failed" in v for k, v in dict_.items()])
         if failed:
             if return_only_errors:
-                raise ColumnSchemaError({k: v for k, v in d.items() if "failed" in v})
-            else:
-                raise ColumnSchemaError(d)
-        else:
-            return True
+                raise ColumnSchemaError({k: v for k, v in dict_.items() if "failed" in v})
+            raise ColumnSchemaError(dict_)
+        return True
 
     def to_pandas_series(self):
-        pass
+        """Create empty pandas series"""
+        raise NotImplementedError()
 
 
-@dataclass(frozen=True)
+@attrs(slots=True, frozen=True)
 class TableSchema:
-    """ """
+    """TableSchema"""
 
-    name: str
-    columns: List[ColumnSchema]
-    description: str = field(default=None)
-    min_rows: Optional[int] = field(default=None)
-    max_rows: Optional[int] = field(default=None)
-    custom: Optional[Callable] = field(default=None)
-    enforce_strict: bool = field(default=True)
+    name: str = attrib()
+    columns: List[ColumnSchema] = attrib()
+    description: str = attrib(default=None)
+    min_rows: Optional[int] = attrib(default=None)
+    max_rows: Optional[int] = attrib(default=None)
+    custom: Optional[Callable] = attrib(default=None)
+    enforce_strict: bool = attrib(default=True)
 
     def valid(self, table, return_only_errors: bool = True):
+        """valid"""
         # test columns
-        column_validations = {c.name: c._valid(table[c.name]) for c in self.columns}
+        column_validations = {
+            c.name: c._valid(table[c.name])
+            for c in self.columns  # pylint: disable=protected-access
+        }
         column_errors = {
             k: {k2: v2}
             for k, v in column_validations.items()
             for k2, v2 in v.items()
             if "failed" in v2
         }
-        column_failed = False if len(column_errors) == 0 else True
+        column_failed = not len(column_errors) == 0
 
         # test table
         table_validations = {
@@ -278,26 +321,33 @@ class TableSchema:
 
         table_errors = {k: v for k, v in table_validations.items() if "failed" in v}
 
-        table_failed = False if len(table_errors) == 0 else True
+        table_failed = not len(table_errors) == 0
 
         if column_failed or table_failed:
-
             if return_only_errors:
                 raise TableSchemaError({**column_errors, **table_errors})
-            else:
-                raise TableSchemaError(d)
-        else:
-            return True
+            raise TableSchemaError({**column_validations, **table_validations})
+
+        return True
+
+    def _create_validator(self):
+        """Create validator for table"""
+
+        def validator(inst, attribute, value):
+            return self.valid(value, True)
+
+        return validator
 
     def to_pandas_dataframe(self):
-        pass
+        """Create empty pandas dataframe"""
+        raise NotImplementedError()
 
 
 def table_schema_from_yaml(file):
-    """ """
-    pass
+    """Create table schema from yaml file"""
+    raise NotImplementedError()
 
 
 def table_schema_from_json(file):
-    """ """
-    pass
+    """Create table schema from json file"""
+    raise NotImplementedError()

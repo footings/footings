@@ -1,7 +1,7 @@
-"""parameter.py"""
+"""Objects tied to creating Parameters"""
 
 from typing import Any, List, Dict, Union, Optional, Callable
-from dataclasses import dataclass, field
+from attr import attrs, attrib
 
 
 class ParameterTypeError(Exception):
@@ -70,51 +70,55 @@ def _check_custom(func, value):
         raise ParameterCustomError(f"The custom test failed with {value}")
 
 
-@dataclass
+_PARAMS_CHECKS = {
+    "dtype": _check_type,
+    "allowed": _check_allowed,
+    "min_val": _check_min_val,
+    "max_val": _check_max_val,
+    "min_len": _check_min_len,
+    "max_len": _check_max_len,
+    "custom": _check_custom,
+}
+
+
+@attrs(frozen=True, slots=True)
 class Parameter:
-    """ """
+    """Parameter"""
 
-    name: str
-    description: Optional[str] = field(default=None, repr=False)
-    default: Optional[Any] = field(default=None)
-    dtype: Optional[type] = field(default=None)
-    allowed: Optional[List[Any]] = field(default=None)
-    min_val: Optional[Union[int, float]] = field(default=None)
-    max_val: Optional[Union[int, float]] = field(default=None)
-    min_len: Optional[int] = field(default=None)
-    max_len: Optional[int] = field(default=None)
-    custom: Optional[Callable] = field(default=None)
-    other_meta: Dict = field(default_factory=lambda: {}, repr=False)
+    # pylint: disable=too-many-instance-attributes
+    name: str = attrib()
+    description: Optional[str] = attrib(default=None, repr=False)
+    default: Optional[Any] = attrib(default=None)
+    dtype: Optional[type] = attrib(default=None)
+    allowed: Optional[List[Any]] = attrib(default=None)
+    min_val: Optional[Union[int, float]] = attrib(default=None)
+    max_val: Optional[Union[int, float]] = attrib(default=None)
+    min_len: Optional[int] = attrib(default=None)
+    max_len: Optional[int] = attrib(default=None)
+    custom: Optional[Callable] = attrib(default=None)
+    other_meta: Dict = attrib(factory=dict, repr=False)
 
-    def __post_init__(self):
+    def __attrs_post_init__(self):
         if self.default is not None:
             self.valid(self.default)
 
     def valid(self, value):
-        if self.dtype is not None:
-            _check_type(self.dtype, value)
-
-        if self.allowed is not None:
-            _check_allowed(self.allowed, value)
-
-        if self.min_val is not None:
-            _check_min_val(self.min_val, value)
-
-        if self.max_val is not None:
-            _check_max_val(self.max_val, value)
-
-        if self.min_len is not None:
-            _check_min_len(self.min_len, value)
-
-        if self.max_len is not None:
-            _check_max_len(self.max_len, value)
-
-        if self.custom is not None:
-            _check_custom(self.custom, value)
-
+        """Test to see if value is valid as a parameter"""
+        for k, v in _PARAMS_CHECKS.items():
+            if getattr(self, k) is not None:
+                v(getattr(self, k), value)
         return True
 
+    def _create_validator(self):
+        """Create validator for table"""
+
+        def validator(inst, attribute, value):
+            return self.valid(value)
+
+        return validator
+
     def generate_meta(self):
+        """Generate meta information for parameter"""
         return {
             "description": self.description,
             "default": self.default,

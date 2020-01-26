@@ -1,157 +1,99 @@
 """model.py"""
 
-from typing import List, Union, Optional
-from dataclasses import make_dataclass, field
-from warnings import warn
-from dask.delayed import rebuild, optimize
+from typing import List, Dict, Optional, Any
+from dask.delayed import single_key, rebuild, optimize
 from dask.base import DaskMethodsMixin
 from dask import threaded
 from dask.context import globalmethod
-import pandas as pd
+from attr import attrs, attrib, make_class
 
 from .table_schema import TableSchema
+from .graph import _build_graph_get_parameters
 from .ffunction import FFunction
-from .parameter import Parameter
-
-from collections import namedtuple
-
-Results = namedtuple("Results", "output parameters")
 
 
-def single_key(seq, *args):
-    """ Pick out the only element of this list, a list of keys """
-    print(seq)
-    return Results(output=seq[0], parameters="zzz")  # (seq[0], args)
+@attrs(slots=True)
+class BaseModel(DaskMethodsMixin):
+    """BaseModel"""
 
+    _table_schemas = attrib(init=False, repr=False, factory=dict)
+    _parameters = attrib(init=False, repr=False, factory=dict)
+    _graph = attrib(init=False, repr=False)
+    _keys = attrib(init=False, repr=False)
 
-_DASK_NAMESPACE = {
-    "keys": property(lambda self: self._keys),
-    "dask": property(lambda self: self._dask),
-    "__dask_graph__": lambda self: self._dask,
-    "__dask_keys__": lambda self: self._keys,
-    "__dask_layers__": lambda self: (self._keys,),
-    "__dask_tokenize__": lambda self: self._keys,
-    "__dask_scheduler__": staticmethod(threaded.get),
-    "__dask_optimize__": globalmethod(optimize, key="delayed_optimize"),
-    "__dask_postcompute__": lambda self: (single_key, (self.dask, self.keys)),
-    "__dask_postpersist__": lambda self: (
-        rebuild,
-        (self.keys, getattr(self, "_length", None)),
-    ),
-}
+    def __attrs_post_init__(self):
+        items = {k: getattr(self, k) for k in self.__slots__ if k[0] != "_"}
+        self._graph.update(**items)
 
+    def __dask_graph__(self):
+        return self._graph.graph
 
-def _validate_instructions(table_schemas, instructions):
-    """ """
-    return instructions
+    def __dask_keys__(self):
+        return self._keys
 
+    def __dask_layers__(self):
+        return (self._keys,)
 
-def _validate_keys(keys):
-    """ """
-    pass
+    def __dask_tokenize__(self):
+        return self._keys
 
+    __dask_scheduler__ = staticmethod(threaded.get)
+    __dask_optimize__ = globalmethod(optimize, key="delayed_optimize")
 
-def _instructions_to_dict(table_schemas, instructions):
-    """ """
-    pass
+    def __dask_postcompute__(self):
+        return single_key, ()
 
+    def __dask_postpersist__(self):
+        return rebuild, (self._keys, getattr(self, "_length", None))
 
-def _get_parameters(instructions):
-    """ """
-    p = {}
-    for k, v in instructions.items():
-        if isinstance(v, Parameter):
-            if k != v.name:
-                msg = "The key [{k}] and name [{v.name}] do not match. \
-                    {k} will be used as the default."
-                warn(msg)
-            p.update({k: v})
-    return p
+    def __footings_meta__(self):
+        return {}
 
+    def __footings_table_schemas___(self):
+        return self._table_schemas
 
-def _get_graph_fields_keys(instructions, tables, parameters, keys, **kwargs):
-    """ """
-    fields = []
-    graph = instructions.copy()
+    def __footings_parameters__(self):
+        return self._parameters
 
-    for k, v in tables.items():
-        if k in kwargs:
-            fields.append((k, pd.DataFrame, field(default=kwargs[k])))
-        else:
-            fields.append((k, pd.DataFrame))
-        graph.update({k: None})
+    def __footings_steps_(self):
+        return self._graph.steps
 
-    for k, v in parameters.items():
-        if k in kwargs:
-            fields.append(
-                (k, v.dtype, field(default=kwargs[k], metadata=v.generate_meta()))
-            )
-        else:
-            fields.append((k, v.dtype, field(metadata=v.generate_meta())))
-        graph.update({k: None})
-
-    if keys is None:
-        keys = [list(graph.keys())[-1]]
-    else:
-        _validate_keys(keys)
-
-    return graph, fields, keys
-
-
-def _create_setter_and_post_init_funcs(table_schemas, parameters):
-    """ """
-    table_nms = list(table_schemas.keys())
-    param_nms = list(parameters.keys())
-
-    def setter(self, name, value):
-        if name in table_nms:
-            if "_dask" in self.__dict__:
-                table_schemas[name].valid(value)
-                self._dask[name] = value
-        elif name in param_nms:
-            if "_dask" in self.__dict__:
-                parameters[name].valid(value)
-                self._dask[name] = value
-        self.__dict__[name] = value
-
-    def post_init(self):
-        # create copy on init to prevent all models from sharing the same dict reference
-        self._dask = self._dask.copy()
-        self._keys = self._keys.copy()
-
-        for name in table_nms + param_nms:
-            if name in table_nms:
-                value = getattr(self, name)
-                table_schemas[name].valid(value)
-                self._dask[name] = value
-            elif name in param_nms:
-                value = getattr(self, name)
-                parameters[name].valid(value)
-                self._dask[name] = value
-
-    return setter, post_init
+    def __footings_dag__(self):
+        return self._graph.graph
 
 
 def _footings_meta(meta):
     """ """
-    return {}
+    return meta
 
 
-def _get_functions(graph):
-    """ """
+def _create_attributes(table_schemas, parameters, graph, defaults, return_kws):
+    tables = {
+        k: attrib(default=getattr(defaults, k, None), validator=v._create_validator())
+        for k, v in table_schemas.items()
+    }
+    params = {
+        k: attrib(default=getattr(defaults, k, None), validator=v._create_validator())
+        for k, v in parameters.items()
+    }
+    keys = [v for k, v in graph.keys.items() if k in return_kws]
     return {
-        v[0].__name__: v[0]
-        for k, v in graph.items()
-        if isinstance(v, tuple) and callable(v[0])
+        **tables,
+        **params,
+        "_table_schemas": attrib(init=False, repr=False, default=table_schemas),
+        "_parameters": attrib(init=False, repr=False, default=parameters),
+        "_graph": attrib(init=False, repr=False, default=graph),
+        "_keys": attrib(init=False, repr=False, default=keys),
     }
 
 
+# pylint: disable=bad-continuation
 def build_model(
     model_name: str,
-    table_schemas,
-    instructions,
-    keys: Optional[Union[str, List[str]]],
-    meta: Optional[dict] = None,
+    table_schemas: List[TableSchema],
+    instructions: List[FFunction],
+    defaults: Optional[Dict[str, Any]] = None,
+    # meta: Optional[Dict[str, Any]] = None,
     **kwargs,
 ):
     """ build_model """
@@ -160,33 +102,15 @@ def build_model(
     elif isinstance(table_schemas, list):
         table_schemas = {t.name: t for t in table_schemas}
 
-    if isinstance(instructions, dict):
-        _validate_instructions(table_schemas, instructions)
-    elif isinstance(instructions, list):
-        instructions = _instructions_to_dict(table_schemas, instructions)
+    if kwargs == {}:
+        return_kws = table_schemas.keys()
     else:
-        raise TypeError("instructions must be a dict or list")
+        return_kws = kwargs
 
-    parameters = _get_parameters(instructions)
-    graph, fields, keys = _get_graph_fields_keys(
-        instructions, table_schemas, parameters, keys, **kwargs
-    )
-    setter, post_init = _create_setter_and_post_init_funcs(table_schemas, parameters)
-    namespace = {
-        "_dask": graph,
-        "_keys": keys,
-        "__setattr__": setter,
-        "__post_init__": post_init,
-        "__footings_meta__": _footings_meta(meta),
-        "__footings_table_schemas__": table_schemas,
-        "__footings_parameters__": parameters,
-        "__footings_functions__": _get_functions(graph),
-        "__footings_dag__": graph.copy(),  # copy to prevent updates (_dask gets updated)
-        **_DASK_NAMESPACE,
-    }
-
-    model = make_dataclass(
-        cls_name=model_name, fields=fields, bases=(DaskMethodsMixin,), namespace=namespace
+    graph, params = _build_graph_get_parameters(instructions, *table_schemas.keys())
+    attributes = _create_attributes(table_schemas, params, graph, defaults, return_kws)
+    model = make_class(
+        name=model_name, attrs=attributes, bases=(BaseModel,), slots=True, frozen=True
     )
 
     return model
