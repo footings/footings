@@ -17,19 +17,19 @@ from footings.core.table_schema import ColumnSchema, TableSchema
 def test_build_model_tables1_params0():
     @ffunction(
         inputs={"df": TableIn("table_ab", required_columns=["a", "b"])},
-        outputs=TableOut("table_ab", added_columns=[ColumnSchema("add")]),
+        outputs=TableOut("table_ab", added_columns=[ColumnSchema("add", int)]),
     )
     def add(df):
         return df.assign(add=df.a + df.b)
 
     @ffunction(
         inputs={"df": TableIn("table_ab", required_columns=["a", "b"])},
-        outputs=TableOut("table_ab", added_columns=[ColumnSchema("subtract")]),
+        outputs=TableOut("table_ab", added_columns=[ColumnSchema("subtract", int)]),
     )
     def subtract(df):
         return df.assign(subtract=df.a - df.b)
 
-    schema_ab = TableSchema("table_ab", [ColumnSchema("a"), ColumnSchema("b")])
+    schema_ab = TableSchema("table_ab", [ColumnSchema("a", int), ColumnSchema("b", int)])
     steps = [add, subtract]
     model = build_model("model", schema_ab, steps)
     df = pd.DataFrame({"a": [1, 2, 3], "b": [1, 2, 3]})
@@ -43,7 +43,7 @@ def test_build_model_tables1_params1():
             "df": TableIn("table_ab", required_columns=["a", "b"]),
             "divide_by": Parameter("param_divide_by"),
         },
-        outputs=TableOut("table_ab", added_columns=[ColumnSchema("add")]),
+        outputs=TableOut("table_ab", added_columns=[ColumnSchema("add", int)]),
     )
     def add(df, divide_by):
         return df.assign(add=(df.a + df.b) / divide_by)
@@ -53,12 +53,12 @@ def test_build_model_tables1_params1():
             "df": TableIn("table_ab", required_columns=["a", "b"]),
             "divide_by": Parameter("param_divide_by"),
         },
-        outputs=TableOut("table_ab", added_columns=[ColumnSchema("subtract")]),
+        outputs=TableOut("table_ab", added_columns=[ColumnSchema("subtract", int)]),
     )
     def subtract(df, divide_by):
         return df.assign(subtract=(df.a - df.b) / divide_by)
 
-    schema_ab = TableSchema("table_ab", [ColumnSchema("a"), ColumnSchema("b")])
+    schema_ab = TableSchema("table_ab", [ColumnSchema("a", int), ColumnSchema("b", int)])
     steps = [add, subtract]
     model = build_model("model", schema_ab, steps)
     df = pd.DataFrame({"a": [1, 2, 3], "b": [1, 2, 3]})
@@ -73,7 +73,7 @@ def test_build_model_tables1_params2():
             "divide_by": Parameter("param_divide_by"),
             "apply_divide": Parameter("param_apply_divide"),
         },
-        outputs=TableOut("table_ab", added_columns=[ColumnSchema("add")]),
+        outputs=TableOut("table_ab", added_columns=[ColumnSchema("add", int)]),
     )
     def add(df, divide_by, apply_divide):
         if apply_divide:
@@ -86,14 +86,14 @@ def test_build_model_tables1_params2():
             "divide_by": Parameter("param_divide_by"),
             "apply_divide": Parameter("param_apply_divide"),
         },
-        outputs=TableOut("table_ab", added_columns=[ColumnSchema("subtract")]),
+        outputs=TableOut("table_ab", added_columns=[ColumnSchema("subtract", int)]),
     )
     def subtract(df, divide_by, apply_divide):
         if apply_divide:
             return df.assign(subtract=(df.a - df.b) / divide_by)
         return df.assign(subtract=(df.a - df.b))
 
-    schema_ab = TableSchema("table_ab", [ColumnSchema("a"), ColumnSchema("b")])
+    schema_ab = TableSchema("table_ab", [ColumnSchema("a", int), ColumnSchema("b", int)])
     steps = [add, subtract]
     model = build_model("model", schema_ab, steps)
     df = pd.DataFrame({"a": [1, 2, 3], "b": [1, 2, 3]})
