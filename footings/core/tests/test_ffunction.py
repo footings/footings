@@ -33,8 +33,8 @@ def test_table_out():
     df1 = pd.DataFrame({"a": [1, 2]})
     df2 = pd.DataFrame({"a": [1, 2], "b": [1, 2]})
 
-    pytest.raises(TypeError, TableOut, "test", ColumnSchema("b"))
-    test_added_columns = TableOut(name="test", added_columns=[ColumnSchema("b")])
+    pytest.raises(TypeError, TableOut, "test", ColumnSchema("b", int))
+    test_added_columns = TableOut(name="test", added_columns=[ColumnSchema("b", int)])
     pytest.raises(ColumnNotInTableError, test_added_columns.check_valid, df1)
     assert test_added_columns.check_valid(df2) is True
 
@@ -52,7 +52,7 @@ def test_ffunction():
         return df.assign(c=df.a + df.b)
 
     inputs = {"df": TableIn("df", required_columns=["a", "b"])}
-    outputs = TableOut("df", added_columns=[ColumnSchema("c")])
+    outputs = TableOut("df", added_columns=[ColumnSchema("c", int)])
 
     with pytest.raises(TypeError):
         # test passing inputs
@@ -124,8 +124,8 @@ def test_ff_one_table():
     def add(df):
         return df.assign(c=df.a + df.b)
 
-    ff_one_table(add, df=TableIn("df", ["a", "b"]), added_columns=[ColumnSchema("c")])
+    ff_one_table(add, df=TableIn("df", ["a", "b"]), added_columns=[ColumnSchema("c", int)])
 
-    @ff_one_table(df=TableIn("df", ["a", "b"]), added_columns=[ColumnSchema("c")])
+    @ff_one_table(df=TableIn("df", ["a", "b"]), added_columns=[ColumnSchema("c", int)])
     def add(df):
         return df.assign(c=df.a + df.b)
