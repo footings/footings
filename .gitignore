@@ -105,3 +105,10 @@ venv.bak/
 
 # vscode
 .vscode
+
+# dask
+dask-worker-space/
+mydask.png
+
+# other
+*.ipynb
