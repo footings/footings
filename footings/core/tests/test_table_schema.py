@@ -1,14 +1,17 @@
+"""Test for table_schemas.py"""
+
 import pytest
 import pandas as pd
+from pandas.testing import assert_series_equal, assert_frame_equal
 
 from footings.core.table_schema import (
     ColumnSchemaError,
     ColumnSchema,
     TableSchemaError,
     TableSchema,
-    table_schema_from_json,
-    table_schema_from_yaml,
 )
+
+# pylint: disable=function-redefined, missing-function-docstring
 
 
 def test_column_schema_dtype():
@@ -62,6 +65,11 @@ def test_column_schema_custom():
     pytest.raises(ColumnSchemaError, schema.valid, test)
 
 
+def test_column_to_pandas_series():
+    schema = ColumnSchema("test", dtype=int)
+    assert_series_equal(schema.to_pandas_series(), pd.Series(dtype="int"))
+
+
 def test_table_schema_column():
     columns = [
         ColumnSchema("a", dtype=int, min_val=1),
@@ -69,7 +77,6 @@ def test_table_schema_column():
     ]
     schema = TableSchema("test", columns)
     test = pd.DataFrame({"a": [0, 1, 2], "b": [2, 3, 4]})
-    # schema.valid(test)
     pytest.raises(TableSchemaError, schema.valid, test)
 
 
@@ -77,7 +84,6 @@ def test_table_schema_min_row():
     columns = [ColumnSchema("a", dtype=int), ColumnSchema("b", dtype=int)]
     schema = TableSchema("test", columns, min_rows=4)
     test = pd.DataFrame({"a": [0, 1, 2], "b": [2, 3, 4]})
-    # schema.valid(test)
     pytest.raises(TableSchemaError, schema.valid, test)
 
 
@@ -85,7 +91,6 @@ def test_table_schema_max_row():
     columns = [ColumnSchema("a", dtype=int), ColumnSchema("b", dtype=int)]
     schema = TableSchema("test", columns, max_rows=2)
     test = pd.DataFrame({"a": [0, 1, 2], "b": [2, 3, 4]})
-    # schema.valid(test)
     pytest.raises(TableSchemaError, schema.valid, test)
 
 
@@ -106,4 +111,11 @@ def test_table_schema_enforce_strict():
     test = pd.DataFrame({"a": [0, 1, 2], "b": [2, 3, 4], "c": [1, 2, 3]})
 
     pytest.raises(TableSchemaError, schema_enforce.valid, test)
-    assert schema_allow.valid(test) == True
+    assert schema_allow.valid(test) is True
+
+
+def test_dataframe_to_pandas_series():
+    columns = [ColumnSchema("a", dtype=int), ColumnSchema("b", dtype=int)]
+    schema = TableSchema("test", columns)
+    test = pd.DataFrame({"a": pd.Series(dtype=int), "b": pd.Series(dtype=int)})
+    assert_frame_equal(schema.to_pandas_dataframe(), test)
