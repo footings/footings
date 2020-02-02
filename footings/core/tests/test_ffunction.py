@@ -13,11 +13,13 @@ from footings.core.ffunction import (
     TableIn,
     TableOut,
     ffunction,
+    ff_one_table,
 )
+
+# pylint: disable=function-redefined, missing-function-docstring
 
 
 def test_table_in():
-    """Test for TableIn"""
     test = TableIn(name="test", required_columns=["b", "c"])
     df1 = pd.DataFrame({"a": [1, 2]})
     pytest.raises(ColumnNotInTableError, test.check_valid, df1)
@@ -28,7 +30,6 @@ def test_table_in():
 
 
 def test_table_out():
-    """Test for TableOut"""
     df1 = pd.DataFrame({"a": [1, 2]})
     df2 = pd.DataFrame({"a": [1, 2], "b": [1, 2]})
 
@@ -47,9 +48,6 @@ def test_table_out():
 
 
 def test_ffunction():
-    """Test for ffunction"""
-    # pylint: disable=function-redefined
-
     def add(df):
         return df.assign(c=df.a + df.b)
 
@@ -120,3 +118,14 @@ def test_ffunction():
     assert add.get_step_items() == (("df",), add, ("df",))
 
     # need to test docstring and args
+
+
+def test_ff_one_table():
+    def add(df):
+        return df.assign(c=df.a + df.b)
+
+    ff_one_table(add, df=TableIn("df", ["a", "b"]), added_columns=[ColumnSchema("c")])
+
+    @ff_one_table(df=TableIn("df", ["a", "b"]), added_columns=[ColumnSchema("c")])
+    def add(df):
+        return df.assign(c=df.a + df.b)

@@ -1,6 +1,6 @@
 """table_schema.py"""
 
-from typing import List, Optional, Any, Callable
+from typing import List, Optional, Any, Callable, Union
 from functools import singledispatch
 
 from attr import attrs, attrib
@@ -237,8 +237,8 @@ class ColumnSchema:
 
     # pylint: disable=too-many-instance-attributes
     name: str = attrib()
+    dtype: Union[type, str] = attrib()
     description: Optional[str] = attrib(default=None, repr=False)
-    dtype: Optional[type] = attrib(default=Any)
     nullable: Optional[bool] = attrib(default=None)
     allowed: Optional[List[Any]] = attrib(default=None)
     min_val: Optional[Any] = attrib(default=None)
@@ -248,15 +248,6 @@ class ColumnSchema:
     custom: Optional[Callable] = attrib(default=None)
 
     def _valid(self, column):
-        if self.dtype is None or self.dtype is Any:
-            return {
-                **{"dtype": "not validated"},
-                **{
-                    k: _validate_wrapper(column, obj=self, key=k, **v)
-                    for k, v in _WRAPPER_PARAMS_COL.items()
-                },
-            }
-
         if self.dtype != column.dtype:
             return {
                 **{"dtype": "failed and other validations not performed"},
@@ -283,16 +274,17 @@ class ColumnSchema:
 
     def to_pandas_series(self):
         """Create empty pandas series"""
-        raise NotImplementedError()
+        return pd.Series(dtype=self.dtype)
 
 
-@attrs(slots=True, frozen=True)
+@attrs(slots=True, frozen=True, repr=False)
 class TableSchema:
     """TableSchema"""
 
     name: str = attrib()
     columns: List[ColumnSchema] = attrib()
     description: str = attrib(default=None)
+    dtype: type = attrib(default=pd.DataFrame)
     min_rows: Optional[int] = attrib(default=None)
     max_rows: Optional[int] = attrib(default=None)
     custom: Optional[Callable] = attrib(default=None)
@@ -340,7 +332,12 @@ class TableSchema:
 
     def to_pandas_dataframe(self):
         """Create empty pandas dataframe"""
-        raise NotImplementedError()
+        return pd.concat(
+            {column.name: column.to_pandas_series() for column in self.columns}, axis=1
+        )
+
+    def __repr__(self):
+        return f"TableSchema({self.name})"
 
 
 def table_schema_from_yaml(file):
