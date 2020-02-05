@@ -7,8 +7,8 @@ from attr import attrs, attrib
 import pandas as pd
 
 __all__ = [
-    "ColumnSchema",
-    "TableSchema",
+    "ColSchema",
+    "TblSchema",
     "table_schema_from_json",
     "table_schema_from_yaml",
 ]
@@ -211,7 +211,7 @@ _WRAPPER_PARAMS_COL = {
 }
 
 
-class ColumnSchemaError(Exception):
+class ColSchemaError(Exception):
     """Column schema error"""
 
 
@@ -227,13 +227,13 @@ _WRAPPER_PARAMS_TBL = {
 }
 
 
-class TableSchemaError(Exception):
+class TblSchemaError(Exception):
     """Table schema error"""
 
 
 @attrs(slots=True, frozen=True)
-class ColumnSchema:
-    """ColumnSchema"""
+class ColSchema:
+    """ColSchema"""
 
     # pylint: disable=too-many-instance-attributes
     name: str = attrib()
@@ -268,8 +268,8 @@ class ColumnSchema:
         failed = any(["failed" in v for k, v in dict_.items()])
         if failed:
             if return_only_errors:
-                raise ColumnSchemaError({k: v for k, v in dict_.items() if "failed" in v})
-            raise ColumnSchemaError(dict_)
+                raise ColSchemaError({k: v for k, v in dict_.items() if "failed" in v})
+            raise ColSchemaError(dict_)
         return True
 
     def to_pandas_series(self):
@@ -278,11 +278,11 @@ class ColumnSchema:
 
 
 @attrs(slots=True, frozen=True, repr=False)
-class TableSchema:
-    """TableSchema"""
+class TblSchema:
+    """TblSchema"""
 
     name: str = attrib()
-    columns: List[ColumnSchema] = attrib()
+    columns: List[ColSchema] = attrib()
     description: str = attrib(default=None)
     dtype: type = attrib(default=pd.DataFrame)
     min_rows: Optional[int] = attrib(default=None)
@@ -317,8 +317,8 @@ class TableSchema:
 
         if column_failed or table_failed:
             if return_only_errors:
-                raise TableSchemaError({**column_errors, **table_errors})
-            raise TableSchemaError({**column_validations, **table_validations})
+                raise TblSchemaError({**column_errors, **table_errors})
+            raise TblSchemaError({**column_validations, **table_validations})
 
         return True
 
@@ -337,7 +337,7 @@ class TableSchema:
         )
 
     def __repr__(self):
-        return f"TableSchema({self.name})"
+        return f"TblSchema({self.name})"
 
 
 def table_schema_from_yaml(file):

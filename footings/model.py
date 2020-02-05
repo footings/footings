@@ -8,7 +8,8 @@ from dask.context import globalmethod
 from attr import attrs, attrib, make_class
 
 from .table_schema import TableSchema
-from .graph import _build_graph_get_parameters
+
+# from .graph import _build_graph_get_parameters
 from .ffunction import FFunction
 
 
@@ -85,6 +86,10 @@ def _create_attributes(table_schemas, parameters, graph, defaults, return_kws):
         "_graph": attrib(init=False, repr=False, default=graph),
         "_keys": attrib(init=False, repr=False, default=keys),
     }
+
+
+def _build_graph_get_parameters(*args, **kwargs):
+    return None
 
 
 # pylint: disable=bad-continuation

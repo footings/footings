@@ -1,6 +1,6 @@
 import pytest
 
-from footings.core.parameter import (
+from footings.parameter import (
     Parameter,
     ParameterTypeError,
     ParameterAllowedError,
