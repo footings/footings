@@ -1,3 +1,7 @@
+"""Test for parameter.py"""
+
+# pylint: disable=function-redefined, missing-function-docstring
+
 import pytest
 
 from footings.parameter import (
@@ -24,7 +28,7 @@ def test_parameter():
     pytest.raises(ParameterTypeError, param1.valid, "2")
     pytest.raises(ParameterMinValueError, param1.valid, 0)
     pytest.raises(ParameterMaxValueError, param1.valid, 6)
-    assert param1.valid(3) == True
+    assert param1.valid(3) is True
 
     param2 = Parameter(
         name="test",
@@ -36,14 +40,14 @@ def test_parameter():
     )
     pytest.raises(ParameterMinLenError, param2.valid, [])
     pytest.raises(ParameterMaxLenError, param2.valid, [1, 2, 3, 4, 5, 6])
-    assert param2.valid([1, 2, 3]) == True
+    assert param2.valid([1, 2, 3]) is True
 
     def is_1(x):
         return x == 1
 
     param3 = Parameter(name="test", description="this is a test", custom=is_1)
     pytest.raises(ParameterCustomError, param3.valid, 2)
-    assert param3.valid(1) == True
+    assert param3.valid(1) is True
 
     # test default
     pytest.raises(

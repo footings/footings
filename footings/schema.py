@@ -6,12 +6,7 @@ from functools import singledispatch
 from attr import attrs, attrib
 import pandas as pd
 
-__all__ = [
-    "ColSchema",
-    "TblSchema",
-    "table_schema_from_json",
-    "table_schema_from_yaml",
-]
+__all__ = ["ColSchema", "TblSchema", "table_schema_from_json", "table_schema_from_yaml"]
 
 #########################################################################################
 @singledispatch
@@ -233,7 +228,32 @@ class TblSchemaError(Exception):
 
 @attrs(slots=True, frozen=True)
 class ColSchema:
-    """ColSchema"""
+    """ColSchema
+
+    Parameters
+    ----------
+    name: str
+        Column name
+    dtype: type or str
+        Column type
+    description: str
+        Column description
+    nullable: bool
+        Can the column be nullable
+    allowed: bool
+        Allowed values for the column
+    min_val: Any
+        The minimum value for the column
+    max_val: Any
+        The maximum value for the column
+    min_len: int
+        The minimum length for a value in the column
+    max_len: int
+        The maximum length for a value in the column
+    custom: callable
+        A custom function to validate a column
+
+    """
 
     # pylint: disable=too-many-instance-attributes
     name: str = attrib()
@@ -279,12 +299,33 @@ class ColSchema:
 
 @attrs(slots=True, frozen=True, repr=False)
 class TblSchema:
-    """TblSchema"""
+    """TblSchema
+
+    Parameters
+    ----------
+    name: str
+        Column name
+    columns:
+        List of ColSchemas
+    dtype: type or str
+        Column type
+    description: str
+        Column description
+    min_rows: int
+        The minimum number of rows for the table
+    max_rows: int
+        The maximum number of rows for the table
+    custom: callable
+        A custom function to validate a column
+    enforce_strict: bool
+        True every column has to be specified; False columns not specified are allowed
+        
+    """
 
     name: str = attrib()
     columns: List[ColSchema] = attrib()
-    description: str = attrib(default=None)
     dtype: type = attrib(default=pd.DataFrame)
+    description: str = attrib(default=None)
     min_rows: Optional[int] = attrib(default=None)
     max_rows: Optional[int] = attrib(default=None)
     custom: Optional[Callable] = attrib(default=None)

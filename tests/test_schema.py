@@ -1,17 +1,12 @@
 """Test for table_schemas.py"""
 
+# pylint: disable=function-redefined, missing-function-docstring
+
 import pytest
 import pandas as pd
 from pandas.testing import assert_series_equal, assert_frame_equal
 
-from footings.schema import (
-    ColSchemaError,
-    ColSchema,
-    TblSchemaError,
-    TblSchema,
-)
-
-# pylint: disable=function-redefined, missing-function-docstring
+from footings.schema import ColSchemaError, ColSchema, TblSchemaError, TblSchema
 
 
 def test_column_schema_dtype():
@@ -71,10 +66,7 @@ def test_column_to_pandas_series():
 
 
 def test_table_schema_column():
-    columns = [
-        ColSchema("a", dtype=int, min_val=1),
-        ColSchema("b", dtype=int, max_val=3),
-    ]
+    columns = [ColSchema("a", dtype=int, min_val=1), ColSchema("b", dtype=int, max_val=3)]
     schema = TblSchema("test", columns)
     test = pd.DataFrame({"a": [0, 1, 2], "b": [2, 3, 4]})
     pytest.raises(TblSchemaError, schema.valid, test)
