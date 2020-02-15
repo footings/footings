@@ -1,10 +1,13 @@
 """Test for model.py"""
 
 # pylint: disable=function-redefined, missing-function-docstring
+from inspect import getfullargspec
 
 from footings.parameter import Parameter
 from footings.schema import TblSchema, ColSchema
-from footings.levels import get, GET_PRIOR_STEP, TblStep, TblFlight, TblPlan
+from footings.levels import TblStep, TblFlight, TblPlan
+from footings.model import build_model
+from footings.utils import GET_PRIOR_STEP
 
 
 def test_model():
@@ -24,15 +27,16 @@ def test_model():
         return df.groupby(["i"])["add", "subtract"].agg("sum")
 
     plan = TblPlan(
+        "plan",
         [
             TblSchema("df", [ColSchema("a", int), ColSchema("b", int)]),
-            TblStep(name="pre_work", function=pre_work, args={"df": GET_PRIOR_STEP}),
+            TblStep(name="pre_work", function=pre_work, args={"df": "df"}),
             TblStep(
                 name="partition",
                 function=partition,
                 args={
                     "df": GET_PRIOR_STEP,
-                    "npartitions": Parameter("npartitions", dtype=int),
+                    "npartitions": Parameter("npartitions", dtype=int, default=2),
                 },
                 partition=True,
             ),
@@ -58,10 +62,14 @@ def test_model():
                 modified_columns=["add", "subtract"],
                 collapse=True,
             ),
-        ]
+        ],
     )
+    model = build_model("model", plan, "hello")
+    print(help(model))
+    print(getfullargspec(model))
+    # assert 1 == 2
 
 
-# model = build_model(plan)
+#
 # model = Model(df, nparameters).run(client=client)
 # model = Model.using_shock_lapse(df, nparameters).run(client=client)

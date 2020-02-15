@@ -363,7 +363,7 @@ class TblSchema:
 
         return True
 
-    def _create_validator(self):
+    def create_validator(self):
         """Create validator for table"""
 
         def validator(inst, attribute, value):
