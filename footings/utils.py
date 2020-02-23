@@ -29,27 +29,8 @@ class PriorStep:
 GET_PRIOR_STEP = PriorStep(nprior=1)
 
 
-# @attrs
-# class _PlanCache:
-#     """Plan values to keep"""
-# 
-# 
-# def _create_plan_cache(levels):
-# 
-#     names = {}
-#     for step in levels:
-#         if isinstance(step, TblSchema):
-#             names.update({step.name: []})
-#             print(names)
-#         elif isinstance(step, (TblStep, TblFlight)):
-#             args = {}
-#             for k, v in step.args.items():
-#                 if isinstance(v, _GetPrior):
-#                     print("check")
-#                     args.update({k: v.get_name(names)})
-#             names.update({step.name: args})
-#         else:
-#             raise TypeError(
-#                 f"Each plan step must be a {TblSchema}, {TblStep}, or {TblFlight}."
-#             )
-#     return names
+class GetTbl:
+    """Get tbl name"""
+
+
+GET_TBL = GetTbl()

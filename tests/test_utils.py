@@ -6,24 +6,24 @@
 # from footings.schema import TblSchema, ColSchema
 # from footings.levels import TblStep, TblFlight, TblPlan
 # from footings.utils import _create_plan_cache, GET_PRIOR_STEP
-# 
-# 
+#
+#
 # def create_plan_cache():
 #     def pre_work(df):
 #         return df
-# 
+#
 #     def partition(df, npartitions):
 #         return [df.assign(i=n) for n in range(npartitions)]
-# 
+#
 #     def add(df):
 #         return df.assign(add=df.a + df.b)
-# 
+#
 #     def subtract(df):
 #         return df.assign(subtract=df.a - df.b)
-# 
+#
 #     def collapse(df):
 #         return df.groupby(["i"])["add", "subtract"].agg("sum")
-# 
+#
 #     plan = TblPlan(
 #         "plan",
 #         [
@@ -62,7 +62,7 @@
 #             ),
 #         ],
 #     )
-# 
+#
 #     values = _create_plan_cache(plan.levels)
 #     print(values)
 #     assert 1 == 2
