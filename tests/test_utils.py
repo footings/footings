@@ -1,68 +1,81 @@
-"""Test for utils.py"""
+"""test for utils.py"""
 
 # pylint: disable=function-redefined, missing-function-docstring
 
-# from footings.parameter import Parameter
-# from footings.schema import TblSchema, ColSchema
-# from footings.levels import TblStep, TblFlight, TblPlan
-# from footings.utils import _create_plan_cache, GET_PRIOR_STEP
-#
-#
-# def create_plan_cache():
-#     def pre_work(df):
-#         return df
-#
-#     def partition(df, npartitions):
-#         return [df.assign(i=n) for n in range(npartitions)]
-#
-#     def add(df):
-#         return df.assign(add=df.a + df.b)
-#
-#     def subtract(df):
-#         return df.assign(subtract=df.a - df.b)
-#
-#     def collapse(df):
-#         return df.groupby(["i"])["add", "subtract"].agg("sum")
-#
-#     plan = TblPlan(
-#         "plan",
-#         [
-#             TblSchema("df", [ColSchema("a", int), ColSchema("b", int)]),
-#             TblStep(name="pre_work", function=pre_work, args={"df": GET_PRIOR_STEP}),
-#             TblStep(
-#                 name="partition",
-#                 function=partition,
-#                 args={
-#                     "df": GET_PRIOR_STEP,
-#                     "npartitions": Parameter("npartitions", dtype=int, default=2),
-#                 },
-#                 partition=True,
-#             ),
-#             TblStep(
-#                 name="add",
-#                 function=add,
-#                 args={"df": GET_PRIOR_STEP},
-#                 required_columns=["a", "b"],
-#                 added_columns=[ColSchema("add", int)],
-#             ),
-#             TblStep(
-#                 name="subtract",
-#                 function=subtract,
-#                 args={"df": GET_PRIOR_STEP},
-#                 required_columns=["a", "b"],
-#                 added_columns=[ColSchema("subtract", int)],
-#             ),
-#             TblStep(
-#                 name="collapse",
-#                 function=collapse,
-#                 args={"df": GET_PRIOR_STEP},
-#                 required_columns=["i", "add", "subtract"],
-#                 modified_columns=["add", "subtract"],
-#                 collapse=True,
-#             ),
-#         ],
-#     )
-#
-#     values = _create_plan_cache(plan.levels)
-#     print(values)
-#     assert 1 == 2
+import pytest
+
+from footings.utils import Dispatcher, DispatcherKeyError
+
+
+def test_dispatch_one_key_no_default():
+    test = Dispatcher(name="test")
+
+    @test.register("x")
+    def _():
+        return "x"
+
+    @test.register("y")
+    def _():
+        return "y"
+
+    assert test("x") == "x"
+    assert test("y") == "y"
+    pytest.raises(DispatcherKeyError, test, "z")
+
+
+def test_dispatch_many_keys_no_default():
+    test = Dispatcher(name="test")
+
+    @test.register(["x1", "x2", "x3"])
+    def _():
+        return "x"
+
+    @test.register("y")
+    def _():
+        return "y"
+
+    assert test("x1") == "x"
+    assert test("x2") == "x"
+    assert test("x3") == "x"
+    assert test("y") == "y"
+    pytest.raises(DispatcherKeyError, test, "z")
+
+
+def test_dispatch_one_key_with_default():
+    def _default():
+        return "default"
+
+    test = Dispatcher(name="test", default=_default)
+
+    @test.register("x1")
+    def _():
+        return "x"
+
+    @test.register("y")
+    def _():
+        return "y"
+
+    assert test("x1") == "x"
+    assert test("y") == "y"
+    assert test("z") == "default"
+
+
+def test_dispatch_many_keys_with_default():
+    def _default():
+        return "default"
+
+    test = Dispatcher(name="test", default=_default)
+
+    @test.register(["x1", "x2", "x3"])
+    def _():
+        return "x"
+
+    @test.register("y")
+    def _():
+        return "y"
+
+    assert test("x1") == "x"
+    assert test("x2") == "x"
+    assert test("x3") == "x"
+    assert test("y") == "y"
+    assert test("z") == "default"
