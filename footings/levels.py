@@ -14,7 +14,7 @@ class TblStep:
     """A step in a case"""
 
     # pylint: disable=too-many-instance-attributes
-    task: callable = attrib(validator=is_callable())
+    function: callable = attrib(validator=is_callable())
     args: dict = attrib(validator=instance_of(dict))
     name: str = attrib(kw_only=True, validator=instance_of(str))
     required_columns: list = attrib(

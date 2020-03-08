@@ -2,11 +2,19 @@
 
 # pylint: disable=function-redefined, missing-function-docstring
 
+import os
 import pytest
 import pandas as pd
 from pandas.testing import assert_series_equal, assert_frame_equal
 
-from footings.schema import ColSchemaError, ColSchema, TblSchemaError, TblSchema
+from footings.schema import (
+    ColSchemaError,
+    ColSchema,
+    TblSchemaError,
+    TblSchema,
+    table_schema_from_yaml,
+    table_schema_from_json,
+)
 
 
 def test_column_schema_dtype():
@@ -111,3 +119,15 @@ def test_dataframe_to_pandas_series():
     schema = TblSchema("test", columns)
     test = pd.DataFrame({"a": pd.Series(dtype=int), "b": pd.Series(dtype=int)})
     assert_frame_equal(schema.to_pandas_dataframe(), test)
+
+
+def test_schema_from_yaml():
+    file = os.path.join("tests", "data", "test-yaml.yaml")
+    schema = table_schema_from_yaml(file)
+    print(file)
+    print(schema)
+    assert 1 == 2
+
+
+def test_schema_from_json():
+    pass

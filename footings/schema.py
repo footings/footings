@@ -1,8 +1,11 @@
 """table_schema.py"""
 
+import os
+import json
 from typing import List, Optional, Any, Callable, Union
 from functools import singledispatch
 
+import yaml
 from attr import attrs, attrib
 import pandas as pd
 
@@ -308,7 +311,7 @@ class TblSchema:
     columns:
         List of ColSchemas
     dtype: type or str
-        Column type
+        Table type
     description: str
         Column description
     min_rows: int
@@ -319,7 +322,6 @@ class TblSchema:
         A custom function to validate a column
     enforce_strict: bool
         True every column has to be specified; False columns not specified are allowed
-        
     """
 
     name: str = attrib()
@@ -335,8 +337,8 @@ class TblSchema:
         """valid"""
         # test columns
         column_validations = {
-            c.name: c._valid(table[c.name])
-            for c in self.columns  # pylint: disable=protected-access
+            c.name: c._valid(table[c.name])  # pylint: disable=protected-access
+            for c in self.columns
         }
         column_errors = {
             k: {k2: v2}
@@ -381,11 +383,36 @@ class TblSchema:
         return f"TblSchema({self.name})"
 
 
+class TableSchemaFromYamlError(Exception):
+    """Error raised trying to read in table schema from yaml."""
+
+
+def _create_table_schema(**kwargs):
+    if not isinstance(kwargs, dict):
+        raise TableSchemaFromYamlError("The loaded file is not a dict. See examples.")
+    if "columns" not in kwargs:
+        raise TableSchemaFromYamlError(
+            "The loaded file does not have columns specified. See examples."
+        )
+    if not isinstance(kwargs["columns"], list):
+        raise TableSchemaFromYamlError("The loaded columns are not a list. See examples.")
+    kwargs["columns"] = [ColSchema(**col_specs) for col_specs in kwargs["columns"]]
+    return TblSchema(**kwargs)
+
+
 def table_schema_from_yaml(file):
     """Create table schema from yaml file"""
-    raise NotImplementedError()
+    if not os.path.exists(file):
+        raise FileExistsError(f"The file [{file}] does not exist.")
+    with open(file, "r") as stream:
+        kwargs = yaml.safe_load(stream)
+    return _create_table_schema(**kwargs)
 
 
 def table_schema_from_json(file):
     """Create table schema from json file"""
-    raise NotImplementedError()
+    if not os.path.exists(file):
+        raise FileExistsError(f"The file [{file}] does not exist.")
+    with open(file, "r") as stream:
+        kwargs = json.loads(stream)
+    return _create_table_schema(**kwargs)
