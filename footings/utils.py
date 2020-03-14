@@ -1,17 +1,18 @@
 """utils.py"""
 
 
-from itertools import product, starmap
+from itertools import product
 from functools import partial
-from collections import namedtuple
 from collections.abc import Iterable
 
 from attr import attrs, attrib
 from attr.validators import optional, is_callable, instance_of, deep_iterable
 
+from .errors import FootingsDispatcherKeyError, FootingsDispatcherRegisterError
 
-class PriorStepError(Exception):
-    """Only a name or nprior can be set, not both."""
+#########################################################################################
+# PriorStep / Get
+#########################################################################################
 
 
 @attrs(slots=True, frozen=True)
@@ -42,22 +43,15 @@ class GetTbl:
 GET_TBL = GetTbl()
 
 
-class DispatcherKeyError(Exception):
-    """Key does not exist within dispatch function registry."""
-
-
-class DispatcherRegisterTypeError(Exception):
-    """The types passed to each keyword in register must be a str or an iterable."""
-
-
-class DispatcherRegisterParameterError(Exception):
-    """The parameter passed to register does not much the parameters of the instance."""
-
-
 def _update_registry(registry, keys, function):
     for key in keys:
         registry.update({key: function})
     return registry
+
+
+#########################################################################################
+# Dispatcher
+#########################################################################################
 
 
 @attrs(slots=True, frozen=True)
@@ -70,12 +64,12 @@ class Dispatcher:
     registry = attrib(init=False, repr=False, factory=dict)
 
     def register(self, function=None, **kwargs):
-        """Register a key and function t o dispatch on."""
+        """Register a key and function to dispatch on."""
         items = []
         for param in self.parameters:
             value = kwargs.get(param, None)
             if value is None:
-                raise DispatcherRegisterParameterError(
+                raise FootingsDispatcherRegisterError(
                     f"The parameter [{param}] is not a parameter of the instance."
                 )
             if isinstance(value, str):
@@ -83,7 +77,7 @@ class Dispatcher:
             elif isinstance(value, Iterable):
                 items.append(value)
             else:
-                raise DispatcherRegisterTypeError(
+                raise FootingsDispatcherRegisterError(
                     f"The value for [{param}] is not a str or an iterable."
                 )
 
@@ -92,7 +86,7 @@ class Dispatcher:
             return partial(_update_registry, self.registry, keys)
         return _update_registry(self.registry, keys, function)
 
-    def __call__(self, **kwargs):
+    def __call__(self, *args, **kwargs):
         key = []
         for param in self.parameters:
             key.append(kwargs.get(param))
@@ -102,6 +96,6 @@ class Dispatcher:
         if func is None:
             if self.default is None:
                 msg = f"The key {key} does not exist within registry and no default."
-                raise DispatcherKeyError(msg)
-            return self.default(**kwargs)
-        return func(**kwargs)
+                raise FootingsDispatcherKeyError(msg)
+            return self.default(*args, **kwargs)
+        return func(*args, **kwargs)

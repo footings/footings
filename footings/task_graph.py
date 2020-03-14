@@ -61,15 +61,14 @@ def _to_dd_task_graph(plan):
         )
         task_args = {**prior_args, **param_args}
         params.update({v: "UNDEFINED" for v in param_args.values()})
-        arg_position = getfullargspec(level.task).args
+        arg_position = getfullargspec(level.function).args
         if partial_args == {}:
-            func = level.task
+            func = level.function
         else:
-            func = curry(level.task, **partial_args)
+            func = curry(level.function, **partial_args)
         if partitioned is False:
             task = (func, *[task_args.get(arg) for arg in arg_position])
         else:
-            # map_part_meta = curry(map_partitions, meta=meta)
             task = (map_partitions, func, *[task_args.get(arg) for arg in arg_position])
         tasks.update({level.name: task})
         if level.partition is True:

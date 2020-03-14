@@ -25,13 +25,13 @@ def test_model():
         levels=[
             TblStep(
                 name="pre_work",
-                task=pre_work,
+                function=pre_work,
                 args={"df": GET_TBL},
                 added_columns=[ColSchema("i", str)],
             ),
             TblStep(
                 name="partition",
-                task=lambda df, npartitions: df.repartition(npartitions=npartitions),
+                function=lambda df, npartitions: df.repartition(npartitions=npartitions),
                 args={
                     "df": GET_PRIOR_STEP,
                     "npartitions": Parameter("npartitions", dtype=int, default=2),
@@ -40,21 +40,21 @@ def test_model():
             ),
             TblStep(
                 name="add",
-                task=lambda df: df.assign(add=df.a + df.b),
+                function=lambda df: df.assign(add=df.a + df.b),
                 args={"df": GET_PRIOR_STEP},
                 required_columns=["a", "b"],
                 added_columns=[ColSchema("add", int)],
             ),
             TblStep(
                 name="subtract",
-                task=lambda df: df.assign(subtract=df.a - df.b),
+                function=lambda df: df.assign(subtract=df.a - df.b),
                 args={"df": GET_PRIOR_STEP},
                 required_columns=["a", "b"],
                 added_columns=[ColSchema("subtract", int)],
             ),
             TblStep(
                 name="collapse",
-                task=lambda df: df.groupby(["i"]).agg({"add": sum, "subtract": sum}),
+                function=lambda df: df.groupby(["i"]).agg({"add": sum, "subtract": sum}),
                 args={"df": GET_PRIOR_STEP},
                 returned_columns=[
                     ColSchema("i", str),
