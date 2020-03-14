@@ -104,6 +104,7 @@ class FootingsTask:
         return obj
 
 
+# pylint: disable=invalid-name
 create_task = Dispatcher("create_task", parameters=("method",))
 
 

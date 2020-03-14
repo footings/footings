@@ -100,9 +100,9 @@ class TblPlan:
         """Turn  step to dict"""
         return self
 
-    def to_task_graph(self, method="dd"):
+    def to_task_graph(self, method="dask.dataframe"):
         """Create dask task graph"""
-        return to_task_graph(self, method)
+        return to_task_graph(self, method=method)
 
     def to_tbl_schema(self, position=None):
         """Create TblSchema based on all steps/flights"""

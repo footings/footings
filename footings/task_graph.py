@@ -6,7 +6,10 @@ from dask.dataframe import map_partitions
 from toolz import curry
 
 from .parameter import Parameter
-from .utils import PriorStep, GetTbl
+from .utils import PriorStep, GetTbl, Dispatcher
+
+# pylint: disable=invalid-name
+to_task_graph = Dispatcher("to_task_graph", parameters=("method",))
 
 
 def _split_args(args, levels, table_name):
@@ -40,7 +43,8 @@ def _update_meta(meta, add=None, modify=None, remove=None, returned=None):
     return meta
 
 
-def _to_dd_task_graph(plan):
+@to_task_graph.register(method="dask.dataframe")
+def _(plan):
     """Creates dask dataframe task graph"""
     partitioned = False
     params = {}
@@ -74,23 +78,6 @@ def _to_dd_task_graph(plan):
         if level.partition is True:
             partitioned = True
     return {plan.tbl.name: "UNDEFINED", **params, **tasks}
-
-
-class TaskGraphMethodNotDefined(Exception):
-    """Task graph method is not defined"""
-
-
-_TASK_GRAPH_OPTIONS = {"dd": _to_dd_task_graph}
-
-
-def to_task_graph(plan, method):
-    """Dispatch task graph function"""
-    func = _TASK_GRAPH_OPTIONS.get(method, None)
-    if func is None:
-        raise TaskGraphMethodNotDefined(
-            f"The method [{method}] is not defined as a task graph option."
-        )
-    return func(plan)
 
 
 def create_graph(model):
