@@ -4,9 +4,7 @@
 
 import pytest
 
-from footings.utils import Dispatcher
-from footings.errors import FootingsDispatcherKeyError, FootingsDispatcherRegisterError
-
+from footings.utils import Dispatcher, DispatcherKeyError, DispatcherRegisterError
 
 def test_dispatch_default():
     def _default():
@@ -40,7 +38,7 @@ def test_dispatch_one_parameter_single_value():
 
     assert test(key="x") == "x"
     assert test(key="y") == "y"
-    pytest.raises(FootingsDispatcherKeyError, test, key="z")
+    pytest.raises(DispatcherKeyError, test, key="z")
 
 
 def test_dispatch_one_parameter_multiple_values():
@@ -58,7 +56,7 @@ def test_dispatch_one_parameter_multiple_values():
     assert test(key="x2") == "x"
     assert test(key="x3") == "x"
     assert test(key="y") == "y"
-    pytest.raises(FootingsDispatcherKeyError, test, key="z")
+    pytest.raises(DispatcherKeyError, test, key="z")
 
 
 def test_dispatch_multiple_parameters_single_value():
@@ -74,7 +72,7 @@ def test_dispatch_multiple_parameters_single_value():
 
     assert test(key1="x1", key2="x2") == "x"
     assert test(key1="y1", key2="y2") == "y"
-    pytest.raises(FootingsDispatcherKeyError, test, key1="x", key2="z")
+    pytest.raises(DispatcherKeyError, test, key1="x", key2="z")
 
 
 def test_dispatch_many_parameter_multiple_values():
@@ -96,13 +94,13 @@ def test_dispatch_many_parameter_multiple_values():
     assert test(key1="x3", key2="xb", key3="xz") == "x"
     assert test(key1="y1", key2="ya", key3="y") == "y"
     assert test(key1="y2", key2="ya", key3="y") == "y"
-    pytest.raises(FootingsDispatcherKeyError, test, key1="x1", key2="xa", key3="z")
+    pytest.raises(DispatcherKeyError, test, key1="x1", key2="xa", key3="z")
 
 
 def test_dispatch_raise_errors():
     test = Dispatcher(name="test", parameters=("key",))
 
-    with pytest.raises(FootingsDispatcherRegisterError):
+    with pytest.raises(DispatcherRegisterError):
 
         @test.register(wrong_key="x")
         def _():
@@ -111,7 +109,7 @@ def test_dispatch_raise_errors():
     class Test:
         pass
 
-    with pytest.raises(FootingsDispatcherRegisterError):
+    with pytest.raises(DispatcherRegisterError):
 
         @test.register(key=Test())
         def _():

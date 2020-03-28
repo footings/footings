@@ -8,51 +8,27 @@ from collections.abc import Iterable
 from attr import attrs, attrib
 from attr.validators import optional, is_callable, instance_of, deep_iterable
 
-from .errors import FootingsDispatcherKeyError, FootingsDispatcherRegisterError
-
 #########################################################################################
-# PriorStep / Get
+# established errors
 #########################################################################################
 
 
-@attrs(slots=True, frozen=True)
-class PriorStep:
-    """Get prior step values"""
-
-    # pylint: disable=bare-except
-    name = attrib(default=None, kw_only=True, validator=optional(instance_of(str)))
-    nprior = attrib(default=None, kw_only=True, validator=optional(instance_of(int)))
-
-    def __attrs_post_init__(self):
-        pass
-
-    def get_name(self, list_):
-        """Get name from list or priors"""
-        if self.nprior is not None:
-            return list_[-self.nprior].name
-        return self.name
+class DispatcherKeyError(Exception):
+    """Key does not exist within dispatch function registry."""
 
 
-GET_PRIOR_STEP = PriorStep(nprior=1)
-
-
-class GetTbl:
-    """Get tbl name"""
-
-
-GET_TBL = GetTbl()
-
-
-def _update_registry(registry, keys, function):
-    for key in keys:
-        registry.update({key: function})
-    return registry
+class DispatcherRegisterError(Exception):
+    """Error occuring registering a function to the Dispatcher."""
 
 
 #########################################################################################
 # Dispatcher
 #########################################################################################
 
+def _update_registry(registry, keys, function):
+    for key in keys:
+        registry.update({key: function})
+    return registry
 
 @attrs(slots=True, frozen=True)
 class Dispatcher:
@@ -69,7 +45,7 @@ class Dispatcher:
         for param in self.parameters:
             value = kwargs.get(param, None)
             if value is None:
-                raise FootingsDispatcherRegisterError(
+                raise DispatcherRegisterError(
                     f"The parameter [{param}] is not a parameter of the instance."
                 )
             if isinstance(value, str):
@@ -77,7 +53,7 @@ class Dispatcher:
             elif isinstance(value, Iterable):
                 items.append(value)
             else:
-                raise FootingsDispatcherRegisterError(
+                raise DispatcherRegisterError(
                     f"The value for [{param}] is not a str or an iterable."
                 )
 
@@ -96,6 +72,6 @@ class Dispatcher:
         if func is None:
             if self.default is None:
                 msg = f"The key {key} does not exist within registry and no default."
-                raise FootingsDispatcherKeyError(msg)
+                raise DispatcherKeyError(msg)
             return self.default(*args, **kwargs)
         return func(*args, **kwargs)
