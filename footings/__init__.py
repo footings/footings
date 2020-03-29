@@ -1,6 +1,7 @@
 """__init__.py"""
 
 from footings.argument import Argument
+from footings.footing import Footing, footing_from_list
 from footings.schema import (
     ColSchema,
     TblSchema,
