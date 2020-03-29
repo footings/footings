@@ -6,6 +6,7 @@ import pytest
 
 from footings.utils import Dispatcher, DispatcherKeyError, DispatcherRegisterError
 
+
 def test_dispatch_default():
     def _default():
         return "default"

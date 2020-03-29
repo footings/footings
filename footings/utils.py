@@ -25,10 +25,12 @@ class DispatcherRegisterError(Exception):
 # Dispatcher
 #########################################################################################
 
+
 def _update_registry(registry, keys, function):
     for key in keys:
         registry.update({key: function})
     return registry
+
 
 @attrs(slots=True, frozen=True)
 class Dispatcher:
@@ -45,17 +47,15 @@ class Dispatcher:
         for param in self.parameters:
             value = kwargs.get(param, None)
             if value is None:
-                raise DispatcherRegisterError(
-                    f"The parameter [{param}] is not a parameter of the instance."
-                )
+                msg = f"The parameter [{param}] is not a parameter of the instance."
+                raise DispatcherRegisterError(msg)
             if isinstance(value, str):
                 items.append([value])
             elif isinstance(value, Iterable):
                 items.append(value)
             else:
-                raise DispatcherRegisterError(
-                    f"The value for [{param}] is not a str or an iterable."
-                )
+                msg = f"The value for [{param}] is not a str or an iterable."
+                raise DispatcherRegisterError(msg)
 
         keys = list(product(*items))
         if function is None:
