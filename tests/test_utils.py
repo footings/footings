@@ -4,14 +4,20 @@
 
 import pytest
 
-from footings.utils import Dispatcher, DispatcherKeyError, DispatcherRegisterError
+from footings.utils import (
+    DispatchFunction,
+    DispatchFunctionKeyError,
+    DispatchFunctionRegisterParameterError,
+    DispatchFunctionRegisterValueError,
+    LoadedFunction,
+)
 
 
 def test_dispatch_default():
     def _default():
         return "default"
 
-    test = Dispatcher(name="test", parameters=("key",), default=_default)
+    test = DispatchFunction(name="test", parameters=("key",), default=_default)
 
     @test.register(key="x")
     def _():
@@ -27,7 +33,7 @@ def test_dispatch_default():
 
 
 def test_dispatch_one_parameter_single_value():
-    test = Dispatcher(name="test", parameters=("key",))
+    test = DispatchFunction(name="test", parameters=("key",))
 
     @test.register(key="x")
     def _():
@@ -39,11 +45,11 @@ def test_dispatch_one_parameter_single_value():
 
     assert test(key="x") == "x"
     assert test(key="y") == "y"
-    pytest.raises(DispatcherKeyError, test, key="z")
+    pytest.raises(DispatchFunctionKeyError, test, key="z")
 
 
 def test_dispatch_one_parameter_multiple_values():
-    test = Dispatcher(name="test", parameters=("key",))
+    test = DispatchFunction(name="test", parameters=("key",))
 
     @test.register(key=["x1", "x2", "x3"])
     def _():
@@ -57,11 +63,11 @@ def test_dispatch_one_parameter_multiple_values():
     assert test(key="x2") == "x"
     assert test(key="x3") == "x"
     assert test(key="y") == "y"
-    pytest.raises(DispatcherKeyError, test, key="z")
+    pytest.raises(DispatchFunctionKeyError, test, key="z")
 
 
 def test_dispatch_multiple_parameters_single_value():
-    test = Dispatcher(name="test", parameters=("key1", "key2"))
+    test = DispatchFunction(name="test", parameters=("key1", "key2"))
 
     @test.register(key1="x1", key2="x2")
     def _():
@@ -73,11 +79,11 @@ def test_dispatch_multiple_parameters_single_value():
 
     assert test(key1="x1", key2="x2") == "x"
     assert test(key1="y1", key2="y2") == "y"
-    pytest.raises(DispatcherKeyError, test, key1="x", key2="z")
+    pytest.raises(DispatchFunctionKeyError, test, key1="x", key2="z")
 
 
 def test_dispatch_many_parameter_multiple_values():
-    test = Dispatcher(name="test", parameters=("key1", "key2", "key3"))
+    test = DispatchFunction(name="test", parameters=("key1", "key2", "key3"))
 
     @test.register(key1=["x1", "x2", "x3"], key2=["xa", "xb"], key3="xz")
     def _():
@@ -95,13 +101,13 @@ def test_dispatch_many_parameter_multiple_values():
     assert test(key1="x3", key2="xb", key3="xz") == "x"
     assert test(key1="y1", key2="ya", key3="y") == "y"
     assert test(key1="y2", key2="ya", key3="y") == "y"
-    pytest.raises(DispatcherKeyError, test, key1="x1", key2="xa", key3="z")
+    pytest.raises(DispatchFunctionKeyError, test, key1="x1", key2="xa", key3="z")
 
 
 def test_dispatch_raise_errors():
-    test = Dispatcher(name="test", parameters=("key",))
+    test = DispatchFunction(name="test", parameters=("key",))
 
-    with pytest.raises(DispatcherRegisterError):
+    with pytest.raises(DispatchFunctionRegisterParameterError):
 
         @test.register(wrong_key="x")
         def _():
@@ -110,8 +116,26 @@ def test_dispatch_raise_errors():
     class Test:
         pass
 
-    with pytest.raises(DispatcherRegisterError):
+    with pytest.raises(DispatchFunctionRegisterValueError):
 
         @test.register(key=Test())
         def _():
             return "y"
+
+
+def test_loaded_function():
+    def main_func(a, b):
+        return a + b
+
+    def pre_hook(a, b):
+        b += 1
+        return a, b
+
+    def post_hook(x):
+        return x + 1
+
+    test_func = LoadedFunction(
+        "test_func", function=main_func, pre_hooks=[pre_hook], post_hooks=[post_hook]
+    )
+
+    assert test_func(a=1, b=1) == 4
