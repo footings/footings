@@ -1,6 +1,6 @@
 """Utility classes and functions that support the footings library."""
 
-
+from typing import Optional, Callable, Dict, Tuple
 from itertools import product
 from functools import partial
 from collections.abc import Hashable, Iterable
@@ -66,11 +66,11 @@ class DispatchFunction:
     """
 
     name: str = attrib(validator=instance_of(str))
-    parameters: tuple = attrib(
+    parameters: Tuple = attrib(
         validator=deep_iterable(instance_of(Hashable), instance_of(tuple))
     )
-    default: callable = attrib(default=None, validator=optional(is_callable()))
-    registry: dict = attrib(init=False, repr=False, factory=dict)
+    default: Callable = attrib(default=None, validator=optional(is_callable()))
+    registry: Dict = attrib(init=False, repr=False, factory=dict)
 
     def register(self, function=None, **kwargs):
         """Register a function using a key established by the required parameters.
@@ -156,16 +156,16 @@ class LoadedFunction:
         The name to assign the LoadedFunction.
     function: callable
         The primary function.
-    pre_hooks: list
+    pre_hook: callable, optional
         A list of functions executed before the primary function is called.
-    post_hooks: list
+    post_hook: callable, optional
         A list of functions executed after the primary function is called.
     """
 
     name: str = attrib(validator=instance_of(str))
-    function: callable = attrib(validator=is_callable())
-    pre_hooks: list = attrib(validator=deep_iterable(is_callable()))
-    post_hooks: list = attrib(validator=deep_iterable(is_callable()))
+    function: Callable = attrib(validator=is_callable())
+    pre_hook: Optional[Callable] = attrib(validator=optional(is_callable()))
+    post_hook: Optional[Callable] = attrib(validator=optional(is_callable()))
 
     @property
     def composition(self) -> list:
@@ -173,18 +173,21 @@ class LoadedFunction:
 
         Returns
         -------
-        list
-            List of functions in order of execution.
+        dict
+            Dict of functions in order of execution.
         """
-
-        return self.pre_hooks + [self.function] + self.post_hooks
+        funcs = ["pre_hook", "function", "post_hook"]
+        return {
+            func: getattr(self, func) for func in funcs if getattr(self, func) is not None
+        }
 
     def __call__(self, *args, **kwargs):
-        funcs = self.composition
+        funcs = list(self.composition.values())
         ret = funcs[0](*args, **kwargs)
-        for func in funcs[1:]:
-            if isinstance(ret, tuple):
-                ret = func(*ret)
-            else:
-                ret = func(ret)
+        if len(funcs) > 1:
+            for func in funcs[1:]:
+                if isinstance(ret, tuple):
+                    ret = func(*ret)
+                else:
+                    ret = func(ret)
         return ret

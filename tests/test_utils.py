@@ -135,7 +135,7 @@ def test_loaded_function():
         return x + 1
 
     test_func = LoadedFunction(
-        "test_func", function=main_func, pre_hooks=[pre_hook], post_hooks=[post_hook]
+        "test_func", function=main_func, pre_hook=pre_hook, post_hook=post_hook
     )
 
     assert test_func(a=1, b=1) == 4
