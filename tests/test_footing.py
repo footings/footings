@@ -1,10 +1,71 @@
 """test for footing.py"""
 
+# pylint: disable=missing-function-docstring
+
 from footings.argument import Argument
-from footings.footing import Footing, FootingStep, footing_from_list, Use
+from footings.footing import Footing, FootingStep, create_footing_from_list, Use
 
 
 def test_footing():
+    test = Footing("test")
+
+    def step_1(a, add):
+        return a + add
+
+    test.add_step(name="step_1", function=step_1, args={"arg_a": Argument("a"), "add": 1})
+
+    def step_2(b, subtract):
+        return b - subtract
+
+    test.add_step(
+        name="step_2", function=step_2, args={"arg_b": Argument("b"), "subtract": 1}
+    )
+
+    def step_3(a, b, c):
+        return a, b, c
+
+    test.add_step(
+        name="step_3",
+        function=step_3,
+        args={"a": Use("step_1"), "b": Use("step_2"), "arg_c": Argument("c")},
+    )
+
+    assert test.dependencies == {
+        "step_1": set(),
+        "step_2": set(),
+        "step_3": set(["step_1", "step_2"]),
+    }
+    assert test.arguments == {
+        "arg_a": Argument("a"),
+        "arg_b": Argument("b"),
+        "arg_c": Argument("c"),
+    }
+    assert test.steps == {
+        "step_1": FootingStep(
+            function=step_1,
+            init_args={"arg_a": "a"},
+            defined_args={"add": 1},
+            dependent_args={},
+            meta={},
+        ),
+        "step_2": FootingStep(
+            function=step_2,
+            init_args={"arg_b": "b"},
+            defined_args={"subtract": 1},
+            dependent_args={},
+            meta={},
+        ),
+        "step_3": FootingStep(
+            function=step_3,
+            init_args={"arg_c": "c"},
+            defined_args={},
+            dependent_args={"a": "step_1", "b": "step_2"},
+            meta={},
+        ),
+    }
+
+
+def test_create_footing_from_list():
     def step_1(a, add):
         return a + add
 
@@ -16,26 +77,26 @@ def test_footing():
 
     steps = [
         {
-            "name": "step-1",
+            "name": "step_1",
             "function": step_1,
             "args": {"arg_a": Argument("a"), "add": 1},
         },
         {
-            "name": "step-2",
+            "name": "step_2",
             "function": step_2,
             "args": {"arg_b": Argument("b"), "subtract": 1},
         },
         {
-            "name": "step-3",
+            "name": "step_3",
             "function": step_3,
-            "args": {"a": Use("step-1"), "b": Use("step-2"), "arg_c": Argument("c")},
+            "args": {"a": Use("step_1"), "b": Use("step_2"), "arg_c": Argument("c")},
         },
     ]
-    test = footing_from_list("test", steps)
+    test = create_footing_from_list("test", steps)
     assert test.dependencies == {
-        "step-1": set(),
-        "step-2": set(),
-        "step-3": set(["step-1", "step-2"]),
+        "step_1": set(),
+        "step_2": set(),
+        "step_3": set(["step_1", "step_2"]),
     }
     assert test.arguments == {
         "arg_a": Argument("a"),
@@ -43,25 +104,25 @@ def test_footing():
         "arg_c": Argument("c"),
     }
     assert test.steps == {
-        "step-1": FootingStep(
+        "step_1": FootingStep(
             function=step_1,
             init_args={"arg_a": "a"},
             defined_args={"add": 1},
             dependent_args={},
             meta={},
         ),
-        "step-2": FootingStep(
+        "step_2": FootingStep(
             function=step_2,
             init_args={"arg_b": "b"},
             defined_args={"subtract": 1},
             dependent_args={},
             meta={},
         ),
-        "step-3": FootingStep(
+        "step_3": FootingStep(
             function=step_3,
             init_args={"arg_c": "c"},
             defined_args={},
-            dependent_args={"a": "step-1", "b": "step-2"},
+            dependent_args={"a": "step_1", "b": "step_2"},
             meta={},
         ),
     }
