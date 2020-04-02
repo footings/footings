@@ -1,14 +1,14 @@
 """model.py"""
 
+from typing import Any, List, Dict
 from inspect import getfullargspec
-from functools import singledispatch
 
 from attr import attrs, attrib, make_class
 
-from .footing import Footing
+from .footing import create_footing_from_list
 from .audit import run_model_audit
 from .visualize import visualize_model
-from .utils import Dispatcher
+from .utils import DispatchFunction
 
 __all__ = ["build_model"]
 
@@ -64,7 +64,7 @@ class ModelScenarioArgDoesNotExist(Exception):
 #     return dict_[output_src[0]]
 
 
-OUTPUT_SRC_AS_SET = Dispatcher("output_src_as_set", parameters=("obj",))
+OUTPUT_SRC_AS_SET = DispatchFunction("output_src_as_set", parameters=("obj",))
 
 
 @OUTPUT_SRC_AS_SET.register(obj=str(tuple))
@@ -72,7 +72,7 @@ def _(output_src):
     return set(output_src)
 
 
-TO_OUTPUT_SRC = Dispatcher("to_output_src", parameters=("obj",))
+TO_OUTPUT_SRC = DispatchFunction("to_output_src", parameters=("obj",))
 
 
 @TO_OUTPUT_SRC.register(obj=str(tuple))
@@ -152,7 +152,7 @@ def run_model(model):
 
 FOOTING_RESERVED_WORDS = [
     "scenarios",
-    "args",
+    "arguments",
     "steps",
     "dependencies",
     "dependency_index",
@@ -224,8 +224,7 @@ def create_attributes(footing, output_src, meta):
         kwargs.update({"kw_only": True, "validator": arg_val.create_validator()})
         attributes.update({arg_key: attrib(**kwargs)})
 
-    arg_nms = tuple(footing.arguments.keys())
-    args_attrib = attrib(init=False, repr=False, default=arg_nms)
+    args_attrib = attrib(init=False, repr=False, default=footing.arguments)
     output_src_attrib = attrib(init=False, repr=False, default=output_src)
     steps_attrib = attrib(init=False, repr=False, default=footing.steps)
     dep_attrib = attrib(init=False, repr=False, default=footing.dependencies)
@@ -234,7 +233,7 @@ def create_attributes(footing, output_src, meta):
     meta_attrib = attrib(init=False, repr=False, default=meta)
     return {
         **attributes,
-        "args": args_attrib,
+        "arguments": args_attrib,
         "output_src": output_src_attrib,
         "steps": steps_attrib,
         "dependencies": dep_attrib,
@@ -243,31 +242,75 @@ def create_attributes(footing, output_src, meta):
     }
 
 
-def create_docstring(attributes, description):
-    """Create docstring"""
-    # need to build description
-    # need to build parameters
-    # need to build returns
-    # need to build doc_meta
-    return attributes, description
+def create_model_docstring(description: str, arguments: dict, output_src: Any) -> str:
+    """Create model docstring.
+
+    Parameters
+    ----------
+    description : str
+        A description of the model.
+    arguments : dict
+        A dict of the argument assocated with the model.
+    output_src : Any
+        The format or object to return the output as, by default None.
+
+    Returns
+    -------
+    str
+       The docstring with sections - Summary | Parameters | Returns
+    """
+    arg_header = f"Arguments\n---------\n"
+    args = "".join([f"{k}\n\t{v.description}\n" for k, v in arguments.items()])
+    ret_header = "Returns\n-------\n"
+    if isinstance(output_src, tuple):
+        rets = "\n".join(output_src)
+    else:
+        rets = output_src.__name__
+    docstring = f"{description}\n\n{arg_header}{args}\n{ret_header}{rets}"
+    return docstring
 
 
 def build_model(
-    name, footing, description=None, output_src=None, scenarios=None, meta=None
+    name: str,
+    steps: List[Dict],
+    output_src: Any = None,
+    description: str = None,
+    scenarios: dict = None,
+    meta: dict = None,
 ):
-    """Build model"""
-    if not isinstance(footing, Footing):
-        msg = (
-            f"The object passed to footing must be of type {footing} not {type(footing)}."
-        )
-        raise TypeError(msg)
+    """Build a custom model based on the passed steps.
+
+    Parameters
+    ----------
+    name : str
+        The name to assign the model.
+    steps : list
+        The list of steps the model will perform.
+    output_src : Any, optional
+        The format or object to return the output as, by default None.
+    description : str, optional
+        A description of the model, by default None.
+    scenarios : dict, optional
+        Defined scenarios to pass to the  model, by default None.
+    meta : dict, optional
+        A placeholder for meta data, by default None.
+
+    Returns
+    -------
+    type(Name)
+        A class called the passed name. The attributes of the class will be the arguments \n
+        defined within the steps.
+    """
+    footing = create_footing_from_list(name=name, steps=steps)
     if output_src is None:
         output_src = (list(footing.steps.keys())[-1],)
     attributes = create_attributes(footing, output_src, meta)
     model = make_class(
         name, attrs=attributes, bases=(BaseModel,), slots=True, frozen=True
     )
-    model.__doc__ = create_docstring(attributes, description)
+    model.__doc__ = create_model_docstring(
+        description, attributes["arguments"]._default, output_src
+    )
     if scenarios is not None:
         for k, v in scenarios.items():
             model.register_scenario(k, **v)
