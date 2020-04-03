@@ -1,43 +1,39 @@
-# Copyright (C) 2019 Dustin Tindall
+"""Package setup"""
 
-import setuptools
+from setuptools import setup
 
-DESCRIPTION = "Actuarial modeling with Dask and the wider PyData ecosystem"
-LONG_DESCRIPTION = """\
-"""
+with open("README.md") as f:
+    README = f.read()
 
-NAME = "footings"
 AUTHOR = "Dustin Tindall"
 AUTHOR_EMAIL = "dustin.tindall@gmail.com"
-LICENSE = "BSD (3-clause)"
-VERSION = "0.0.0"
-URL = "https://github.com/dustindall/footings-core"
-DOWNLOAD_URL = "https://github.com/dustindall/footings-core"
 
-INSTALL_REQUIRES = ["numpy", "pandas", "dask", "attrs"]
-
-PACKAGES = setuptools.find_packages()
-
+INSTALL_REQUIRES = ["attrs"]
+EXTRAS_REQUIRE = {}
+EXTRAS_REQUIRE["docs"] = []
+EXTRAS_REQUIRE["tests"] = ["pytest"]
+EXTRAS_REQUIRE["dev"] = EXTRAS_REQUIRE["tests"] + EXTRAS_REQUIRE["docs"] + ["pre-commit"]
 CLASSIFIERS = [
     "Intended Audience :: Actuaries",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
     "License :: OSI Approved :: BSD License",
 ]
 
-setuptools.setup(
-    name=NAME,
+setup(
+    name="footings",
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     maintainer=AUTHOR,
     maintainer_email=AUTHOR_EMAIL,
-    description=DESCRIPTION,
-    long_description=LONG_DESCRIPTION,
-    license=LICENSE,
-    version=VERSION,
-    url=URL,
-    download_url=DOWNLOAD_URL,
+    description="A DAG Based Model Building Library",
+    long_description=README,
+    long_description_content_type="text/markdown",
+    license="BSD (3-clause)",
+    version="0.1.0",
+    url="https://github.com/dustindall/footings-core",
+    packages=("footings",),
     install_requires=INSTALL_REQUIRES,
-    packages=PACKAGES,
+    extras_require=EXTRAS_REQUIRE,
     classifiers=CLASSIFIERS,
+    include_package_data=True,
+    test_suite="tests",
 )
