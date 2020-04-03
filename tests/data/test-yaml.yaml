@@ -7,4 +7,3 @@ columns:
   - name: "test2"
     dtype: "int"
 enforce_strict: True
-

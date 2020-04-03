@@ -1,6 +1,6 @@
 """Test for model.py"""
 
-# pylint: disable=missing-function-docstring
+# pylint: disable=missing-function-docstring, protected-access
 
 from inspect import getfullargspec
 from typing import NamedTuple

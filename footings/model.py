@@ -150,7 +150,7 @@ def run_model(model):
     return to_output_src(model.output_src, dict_)
 
 
-FOOTING_RESERVED_WORDS = [
+FOOTINGS_RESERVED_WORDS = [
     "scenarios",
     "arguments",
     "steps",
@@ -277,7 +277,7 @@ def build_model(
     description: str = None,
     scenarios: dict = None,
     meta: dict = None,
-):
+):  # pylint: disable=too-many-arguments
     """Build a custom model based on the passed steps.
 
     Parameters
@@ -309,7 +309,9 @@ def build_model(
         name, attrs=attributes, bases=(BaseModel,), slots=True, frozen=True
     )
     model.__doc__ = create_model_docstring(
-        description, attributes["arguments"]._default, output_src
+        description,
+        attributes["arguments"]._default,  # pylint: disable=protected-access
+        output_src,
     )
     if scenarios is not None:
         for k, v in scenarios.items():

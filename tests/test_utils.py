@@ -1,6 +1,6 @@
 """test for utils.py"""
 
-# pylint: disable=function-redefined, missing-function-docstring
+# pylint: disable=function-redefined, missing-function-docstring, too-few-public-methods
 
 import pytest
 
@@ -114,7 +114,7 @@ def test_dispatch_raise_errors():
             return "x"
 
     class Test:
-        pass
+        """Test class"""
 
     with pytest.raises(DispatchFunctionRegisterValueError):
 

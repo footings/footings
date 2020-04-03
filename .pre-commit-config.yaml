@@ -1,5 +1,5 @@
 repos:
-  - repo: https://github.com/python/black
+  - repo: https://github.com/psf/black
     rev: stable
     hooks:
     - id: black
@@ -13,8 +13,11 @@ repos:
       - id: check-toml
       - id: trailing-whitespace
       - id: end-of-file-fixer
-  - repo: https://github.com/pre-commit/mirrors-pylint
-    rev: v2.3.1
+  - repo: local
     hooks:
       - id: pylint
-        args: [--max-line-length=90]
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        args: [--rcfile=pyproject.toml]

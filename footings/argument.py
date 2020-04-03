@@ -18,7 +18,7 @@ class ArgumentAllowedError(Exception):
 
 
 def _check_allowed(allowed, value):
-    if value in allowed is False:
+    if value not in allowed:
         raise ArgumentAllowedError(f"{value} is not in [{allowed}]")
 
 
@@ -112,7 +112,7 @@ class Argument:
     def create_validator(self):
         """Create validator for table"""
 
-        def validator(inst, attribute, value):
+        def validator(inst, attribute, value):  # pylint: disable=unused-argument
             return self.valid(value)
 
         return validator

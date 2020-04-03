@@ -1,4 +1,4 @@
-"""Test for parameter.py"""
+"""Test for argeter.py"""
 
 # pylint: disable=function-redefined, missing-function-docstring
 
@@ -16,8 +16,8 @@ from footings.argument import (
 )
 
 
-def test_parameter():
-    param1 = Argument(
+def test_argument():
+    arg1 = Argument(
         name="test",
         description="this is a test",
         default=3,
@@ -25,12 +25,12 @@ def test_parameter():
         min_val=1,
         max_val=5,
     )
-    pytest.raises(ArgumentTypeError, param1.valid, "2")
-    pytest.raises(ArgumentMinValueError, param1.valid, 0)
-    pytest.raises(ArgumentMaxValueError, param1.valid, 6)
-    assert param1.valid(3) is True
+    pytest.raises(ArgumentTypeError, arg1.valid, "2")
+    pytest.raises(ArgumentMinValueError, arg1.valid, 0)
+    pytest.raises(ArgumentMaxValueError, arg1.valid, 6)
+    assert arg1.valid(3) is True
 
-    param2 = Argument(
+    arg2 = Argument(
         name="test",
         description="this is a test",
         default=[1, 2, 3],
@@ -38,16 +38,22 @@ def test_parameter():
         min_len=1,
         max_len=5,
     )
-    pytest.raises(ArgumentMinLenError, param2.valid, [])
-    pytest.raises(ArgumentMaxLenError, param2.valid, [1, 2, 3, 4, 5, 6])
-    assert param2.valid([1, 2, 3]) is True
+    pytest.raises(ArgumentMinLenError, arg2.valid, [])
+    pytest.raises(ArgumentMaxLenError, arg2.valid, [1, 2, 3, 4, 5, 6])
+    assert arg2.valid([1, 2, 3]) is True
 
     def is_1(x):
         return x == 1
 
-    param3 = Argument(name="test", description="this is a test", custom=is_1)
-    pytest.raises(ArgumentCustomError, param3.valid, 2)
-    assert param3.valid(1) is True
+    arg3 = Argument(name="test", description="this is a test", custom=is_1)
+    pytest.raises(ArgumentCustomError, arg3.valid, 2)
+    assert arg3.valid(1) is True
+
+    arg4 = Argument(
+        name="test", description="this is a test", dtype=str, allowed=["a", "b", "c"]
+    )
+    pytest.raises(ArgumentAllowedError, arg4.valid, "d")
+    assert arg4.valid("a") is True
 
     # test default
     pytest.raises(
