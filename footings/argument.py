@@ -83,7 +83,34 @@ _PARAMS_CHECKS = {
 
 @attrs(frozen=True, slots=True)
 class Argument:
-    """Argument"""
+    """An argument is a representation of a parameter to be passed to model built with \n
+    the footings framework.
+
+    Attributes
+    ----------
+    name : str
+        Name to assign the argument. Will show in docstring of created models.
+    description : str
+        A description of the argument. Will show in docstring of created models.
+    default : Any, optional
+        The default value when a value is not passed to argument in a model.
+    dtype : type, optional
+        The expected type of the passed argument value. Will be used as a validator.
+    allowed : List[Any], optional
+        A list of values that are allowed. Will be used as a validator.
+    min_val :
+        The minimum value allowed. Will be used as a validator.
+    max_val :
+        The maximum value allowed. Will be used as a validator.
+    min_len :
+        The minimum length allowed. Will be used as a valaidator.
+    max_len :
+        The maximum length allowed. Will be used as a validator.
+    custom : callable
+        A custom function that acts as a validator.
+    other_meta : dict
+        Other meta passed to argument.
+    """
 
     # pylint: disable=too-many-instance-attributes
     name: str = attrib()
@@ -117,17 +144,24 @@ class Argument:
 
         return validator
 
-    def generate_meta(self):
-        """Generate meta information for parameter"""
-        return {
-            "description": self.description,
-            "default": self.default,
-            "dtype": self.dtype,
-            "allowed": self.allowed,
-            "min_val": self.min_val,
-            "max_val": self.max_val,
-            "min_len": self.min_len,
-            "max_len": self.max_len,
-            "custom": self.custom,  # probably want to get docstring or turn this into a str
-            **self.other_meta,
-        }
+
+def create_agrument(name: str, **kwargs):
+    """Create an argument.
+
+    Parameters
+    ----------
+    name : str
+        Name to assign the argument. Will show in docstring of created models.
+    **kwargs
+        See Argument details.
+
+    See Also
+    --------
+    Argument
+
+    Returns
+    -------
+    Argument
+        The created argument.
+    """
+    return Argument(name, **kwargs)

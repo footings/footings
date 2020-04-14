@@ -13,6 +13,7 @@ from footings.argument import (
     ArgumentMinLenError,
     ArgumentMaxLenError,
     ArgumentCustomError,
+    create_agrument,
 )
 
 
@@ -64,3 +65,9 @@ def test_argument():
         default="3",
         dtype=int,
     )
+
+
+def test_create_argument():
+    as_arg = Argument("a")
+    arg = create_agrument("a")
+    assert arg == as_arg
