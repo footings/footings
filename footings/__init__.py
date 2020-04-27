@@ -5,4 +5,4 @@ from footings.footing import Footing, use, create_footing_from_list
 from footings.utils import DispatchFunction, LoadedFunction, create_loaded_function
 from footings.model import build_model
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
