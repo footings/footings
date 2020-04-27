@@ -8,7 +8,7 @@ from typing import NamedTuple
 import pytest
 
 from footings.argument import Argument
-from footings.footing import Use, create_footing_from_list
+from footings.footing import use, create_footing_from_list
 from footings.model import (
     build_model,
     create_dependency_index,
@@ -52,8 +52,8 @@ def steps():
             "name": "step_3",
             "function": step_3,
             "args": {
-                "a": Use("step_1"),
-                "b": Use("step_2"),
+                "a": use("step_1"),
+                "b": use("step_2"),
                 "arg_c": Argument("c", description="description for c"),
             },
         },

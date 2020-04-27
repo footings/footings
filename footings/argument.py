@@ -1,6 +1,8 @@
 """Objects tied to creating Arguments"""
 
 from typing import Any, List, Dict, Union, Optional, Callable
+from datetime import date, datetime
+
 from attr import attrs, attrib
 
 
@@ -80,6 +82,27 @@ _PARAMS_CHECKS = {
     "custom": _check_custom,
 }
 
+TYPE_MAP = {
+    "int": int,
+    "float": float,
+    "date": date,
+    "datetime": datetime,
+    "str": str,
+    "bool": bool,
+}
+
+
+def _convert_type(x):
+    if isinstance(x, str):
+        val = TYPE_MAP.get(x, None)
+        if val is None:
+            msg = (
+                f"{x} was passed as a str with no associated mapping. See documentation."
+            )
+            raise ValueError(msg)
+        return val
+    return x
+
 
 @attrs(frozen=True, slots=True)
 class Argument:
@@ -116,7 +139,7 @@ class Argument:
     name: str = attrib()
     description: Optional[str] = attrib(default=None, repr=False)
     default: Optional[Any] = attrib(default=None)
-    dtype: Optional[type] = attrib(default=None)
+    dtype: Optional[type] = attrib(default=None, converter=_convert_type)
     allowed: Optional[List[Any]] = attrib(default=None)
     min_val: Optional[Union[int, float]] = attrib(default=None)
     max_val: Optional[Union[int, float]] = attrib(default=None)
@@ -145,7 +168,7 @@ class Argument:
         return validator
 
 
-def create_agrument(name: str, **kwargs):
+def create_argument(name: str, **kwargs):
     """Create an argument.
 
     Parameters

@@ -3,7 +3,12 @@
 # pylint: disable=missing-function-docstring
 
 from footings.argument import Argument
-from footings.footing import Footing, FootingStep, create_footing_from_list, Use
+from footings.footing import (
+    Footing,
+    FootingStep,
+    create_footing_from_list,
+    Dependent,
+)
 
 
 def test_footing():
@@ -27,7 +32,11 @@ def test_footing():
     test.add_step(
         name="step_3",
         function=step_3,
-        args={"a": Use("step_1"), "b": Use("step_2"), "arg_c": Argument("c")},
+        args={
+            "a": Dependent("step_1"),
+            "b": Dependent("step_2"),
+            "arg_c": Argument("c"),
+        },
     )
 
     assert test.dependencies == {
@@ -89,7 +98,11 @@ def test_create_footing_from_list():
         {
             "name": "step_3",
             "function": step_3,
-            "args": {"a": Use("step_1"), "b": Use("step_2"), "arg_c": Argument("c")},
+            "args": {
+                "a": Dependent("step_1"),
+                "b": Dependent("step_2"),
+                "arg_c": Argument("c"),
+            },
         },
     ]
     test = create_footing_from_list("test", steps)

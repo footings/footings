@@ -5,6 +5,8 @@ from setuptools import setup
 with open("README.md") as f:
     README = f.read()
 
+VERSION = "0.1.0"
+
 AUTHOR = "Dustin Tindall"
 AUTHOR_EMAIL = "dustin.tindall@gmail.com"
 

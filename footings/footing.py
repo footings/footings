@@ -1,10 +1,10 @@
 """Defining the Footing class which is the underlying object that represents a pipeline \n
 and supports the creation of models."""
 
-from typing import Callable, Optional, Dict
+from typing import Callable, Optional, Dict, List, Union
 
 from attr import attrs, attrib
-from attr.validators import instance_of, is_callable
+from attr.validators import instance_of, is_callable, optional
 
 from footings.argument import Argument
 
@@ -27,16 +27,36 @@ class FootingStepNameDoesNotExist(Exception):
 
 
 @attrs(slots=True, frozen=True)
-class Use:
-    """
+class Dependent:
+    """A dependent step to use as input.
 
     Attributes
     ----------
-    name: str
+    name : str
         The name of the step within a Footing to use as an argument.
+    get_attr : str, List[str]
+        Any attribute(s) to get from listed step.
     """
 
     name: str = attrib(validator=instance_of(str))
+    get_attr: str = attrib(default=None, validator=optional(instance_of(str)))
+
+
+def use(name: str, get_attr: Optional[Union[str, List[str]]] = None):
+    """A function to create a Dependent to use within another step.
+
+    Parameters
+    ----------
+    name : str
+        The name of the step within a Footing to use as an argument.
+    get_attr : str, List[str]
+        Any attribute(s) to get from listed step.
+
+    See Also
+    --------
+    Dependent
+    """
+    return Dependent(name=name, get_attr=get_attr)
 
 
 @attrs(slots=True, frozen=True)
@@ -49,7 +69,7 @@ class FootingStep:
         The callable for a step.
     init_args: dict
         Arguments to callable that will be pulled from the initialization of a Model.
-    depdendent_args: dict
+    dependent_args: dict
         Arguments to callable that will be pulled from other steps within Footing.
     defined_args: dict
         Arguments to callable that have been defined when creating the Footing.
@@ -143,7 +163,7 @@ class Footing:
                     if arg_nm not in self.arguments:
                         self.arguments.update({arg_nm: arg_val})
                     init_args.update({arg_nm: arg_val.name})
-                elif isinstance(arg_val, Use):
+                elif isinstance(arg_val, Dependent):
                     if arg_val.name not in self.steps:
                         msg = f"The step [{arg_val.name}] does not exist."
                         raise FootingStepNameDoesNotExist(msg)
@@ -197,7 +217,7 @@ def create_footing_from_list(name: str, steps: list, meta: Optional[Dict] = None
         {
             "name": "step_3",
             "function": lambda a, b, c: a + b + c,
-            "args": {"a": Use("step_1"), "b": Use("step_2"), "arg_c": Argument("c")},
+            "args": {"a": Dependent("step_1"), "b": Dependent("step_2"), "arg_c": Argument("c")},
         },
     ]
     footing = create_footing_from_list("footing", steps)

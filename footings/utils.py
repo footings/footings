@@ -116,8 +116,7 @@ class DispatchFunction:
             elif isinstance(value, Iterable):
                 items.append(value)
             else:
-                msg = f"The value for [{param}] is not a str or an iterable."
-                raise DispatchFunctionRegisterValueError(msg)
+                items.append([value])
 
         keys = list(product(*items))
         if function is None:
@@ -191,3 +190,11 @@ class LoadedFunction:
                 else:
                     ret = func(ret)
         return ret
+
+
+def create_loaded_function(function, pre_hook=None, post_hook=None):
+    """Create loaded function."""
+    name = function.__name__
+    return LoadedFunction(
+        name=name, function=function, pre_hook=pre_hook, post_hook=post_hook
+    )
