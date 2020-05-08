@@ -143,7 +143,7 @@ def run_model(model):
     for k, v in steps.items():
         if k not in dependency_index[k]:
             continue
-        init_args = {v: getattr(model, k) for k, v in v.init_args.items()}
+        init_args = {k: getattr(model, v) for k, v in v.init_args.items()}
         dependent_args = {k: dict_[v] for k, v in v.dependent_args.items()}
         out = v.function(**init_args, **dependent_args, **v.defined_args)
         update_dict_(dict_, dependency_index[k], k, out)
@@ -166,7 +166,7 @@ class BaseModel:
     """BaseModel"""
 
     _scenarios = {}
-    args = attrib(init=False, repr=False)
+    arguments = attrib(init=False, repr=False)
     steps = attrib(init=False, repr=False)
     dependencies = attrib(init=False, repr=False)
     dependency_index = attrib(init=False, repr=False)

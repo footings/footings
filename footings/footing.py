@@ -153,6 +153,8 @@ class Footing:
         FootingStepNameExist
             The step name already exisits within the Footing.
         """
+        if name in self.steps:
+            raise FootingStepNameExist(f"The name [{name}] already exists as a step.")
         dependencies = set()
         init_args = {}
         dependent_args = {}
@@ -160,8 +162,8 @@ class Footing:
         if args is not None:
             for arg_nm, arg_val in args.items():
                 if isinstance(arg_val, Argument):
-                    if arg_nm not in self.arguments:
-                        self.arguments.update({arg_nm: arg_val})
+                    if arg_val.name not in self.arguments:
+                        self.arguments.update({arg_val.name: arg_val})
                     init_args.update({arg_nm: arg_val.name})
                 elif isinstance(arg_val, Dependent):
                     if arg_val.name not in self.steps:
@@ -174,8 +176,6 @@ class Footing:
         self.dependencies.update({name: dependencies})
         if meta is None:
             meta = {}
-        if name in self.steps:
-            raise FootingStepNameExist(f"The name [{name}] already exists as a step.")
         step = FootingStep(function, init_args, dependent_args, defined_args, meta)
         self.steps.update({name: step})
 
