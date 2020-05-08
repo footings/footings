@@ -161,7 +161,7 @@ FOOTINGS_RESERVED_WORDS = [
 ]
 
 
-@attrs(slots=True, frozen=True)
+@attrs(slots=True, frozen=True, repr=False)
 class BaseModel:
     """BaseModel"""
 
@@ -259,7 +259,7 @@ def create_model_docstring(description: str, arguments: dict, output_src: Any) -
     str
        The docstring with sections - Summary | Parameters | Returns
     """
-    arg_header = f"Arguments\n---------\n"
+    arg_header = "Arguments\n---------\n"
     args = "".join([f"{k}\n\t{v.description}\n" for k, v in arguments.items()])
     ret_header = "Returns\n-------\n"
     if isinstance(output_src, tuple):
@@ -306,7 +306,7 @@ def build_model(
         output_src = (list(footing.steps.keys())[-1],)
     attributes = create_attributes(footing, output_src, meta)
     model = make_class(
-        name, attrs=attributes, bases=(BaseModel,), slots=True, frozen=True
+        name, attrs=attributes, bases=(BaseModel,), slots=True, frozen=True, repr=False
     )
     model.__doc__ = create_model_docstring(
         description,

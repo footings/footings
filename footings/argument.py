@@ -104,7 +104,7 @@ def _convert_type(x):
     return x
 
 
-@attrs(frozen=True, slots=True)
+@attrs(frozen=True, slots=True, repr=False)
 class Argument:
     """An argument is a representation of a parameter to be passed to model built with \n
     the footings framework.

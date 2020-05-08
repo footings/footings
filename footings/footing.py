@@ -26,7 +26,7 @@ class FootingStepNameDoesNotExist(Exception):
 #########################################################################################
 
 
-@attrs(slots=True, frozen=True)
+@attrs(slots=True, frozen=True, repr=False)
 class Dependent:
     """A dependent step to use as input.
 
@@ -59,7 +59,7 @@ def use(name: str, get_attr: Optional[Union[str, List[str]]] = None):
     return Dependent(name=name, get_attr=get_attr)
 
 
-@attrs(slots=True, frozen=True)
+@attrs(slots=True, frozen=True, repr=False)
 class FootingStep:
     """A container of attributes representing a step within a Footing.
 
@@ -84,7 +84,7 @@ class FootingStep:
     meta: Dict = attrib(validator=instance_of(dict))
 
 
-@attrs(slots=True, frozen=True)
+@attrs(slots=True, frozen=True, repr=False)
 class Footing:
     """The foundational object to build a model.
 

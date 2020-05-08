@@ -36,7 +36,7 @@ def _update_registry(registry, keys, function):
     return registry
 
 
-@attrs(slots=True, frozen=True)
+@attrs(slots=True, frozen=True, repr=False)
 class DispatchFunction:
     """A function that is disptaches other functions based on established parameters.
 
@@ -143,7 +143,7 @@ class DispatchFunction:
 #########################################################################################
 
 
-@attrs(slots=True, frozen=True)
+@attrs(slots=True, frozen=True, repr=False)
 class LoadedFunction:
     """A primary function that can be loaded with additional functions to call before \n
     executing the primary function (i.e., pre_hooks) and/or additional functions to \n
