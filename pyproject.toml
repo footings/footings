@@ -2,7 +2,6 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 
-
 [tool.black]
 line-length = 90
 target-version = ['py37', 'py38']
@@ -21,3 +20,9 @@ exclude = '''
   | dist
 )/
 '''
+
+
+[tool.pylint.messages_control]
+disable="""
+bad-continuation,invalid-name
+"""

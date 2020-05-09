@@ -5,3 +5,5 @@ include CHANGELOG.md
 include MANIFEST.in
 
 graft tests
+include versioneer.py
+include footings/_version.py

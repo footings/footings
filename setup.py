@@ -1,11 +1,10 @@
 """Package setup"""
 
 from setuptools import setup
+import versioneer
 
 with open("README.md") as f:
     README = f.read()
-
-VERSION = "0.1.1"
 
 AUTHOR = "Dustin Tindall"
 AUTHOR_EMAIL = "dustin.tindall@gmail.com"
@@ -22,6 +21,8 @@ CLASSIFIERS = [
 
 setup(
     name="footings",
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     maintainer=AUTHOR,
@@ -30,7 +31,6 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
     license="BSD (3-clause)",
-    version="0.1.1",
     url="https://github.com/dustindall/footings-core",
     packages=("footings",),
     install_requires=INSTALL_REQUIRES,

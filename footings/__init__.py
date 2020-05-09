@@ -6,3 +6,8 @@ from footings.utils import DispatchFunction, LoadedFunction, create_loaded_funct
 from footings.model import build_model
 
 __version__ = "0.1.1"
+
+from ._version import get_versions
+
+__version__ = get_versions()["version"]
+del get_versions
