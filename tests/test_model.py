@@ -38,15 +38,12 @@ def steps():
         {
             "name": "step_1",
             "function": step_1,
-            "args": {"arg_a": Argument("a", description="description for a"), "add": 1},
+            "args": {"a": Argument("a", description="description for a"), "add": 1},
         },
         {
             "name": "step_2",
             "function": step_2,
-            "args": {
-                "arg_b": Argument("b", description="description for b"),
-                "subtract": 1,
-            },
+            "args": {"b": Argument("b", description="description for b"), "subtract": 1,},
         },
         {
             "name": "step_3",
@@ -54,7 +51,7 @@ def steps():
             "args": {
                 "a": use("step_1"),
                 "b": use("step_2"),
-                "arg_c": Argument("c", description="description for c"),
+                "c": Argument("c", description="description for c"),
             },
         },
     ]
@@ -95,9 +92,9 @@ def test_create_attributes():
     meta = {}
     attributes = create_attributes(footing, output_src, meta)
     keys = [
-        "arg_a",
-        "arg_b",
-        "arg_c",
+        "a",
+        "b",
+        "c",
         "arguments",
         "output_src",
         "steps",
@@ -118,11 +115,11 @@ def test_create_model_docstring():
         "\n",
         "Arguments\n",
         "---------\n",
-        "arg_a\n",
+        "a\n",
         "\tdescription for a\n",
-        "arg_b\n",
+        "b\n",
         "\tdescription for b\n",
-        "arg_c\n",
+        "c\n",
         "\tdescription for c\n",
         "\n",
         "Returns\n",
@@ -138,21 +135,21 @@ def test_model():
 
     # no output_src
     model_1 = build_model("model_1", steps=steps())
-    assert getfullargspec(model_1).kwonlyargs == ["arg_a", "arg_b", "arg_c"]
-    test_1 = model_1(arg_a=1, arg_b=1, arg_c=1)
+    assert getfullargspec(model_1).kwonlyargs == ["a", "b", "c"]
+    test_1 = model_1(a=1, b=1, c=1)
     assert test_1.run() == 3
 
     # defined output_src
     model_2 = build_model("model_2", steps=steps(), output_src=("step_3",))
-    assert getfullargspec(model_2).kwonlyargs == ["arg_a", "arg_b", "arg_c"]
-    test_2 = model_2(arg_a=1, arg_b=1, arg_c=1)
+    assert getfullargspec(model_2).kwonlyargs == ["a", "b", "c"]
+    test_2 = model_2(a=1, b=1, c=1)
     assert test_2.run() == 3
 
     # defined output_src multiple
     output_src = ("step_1", "step_2", "step_3")
     model_3 = build_model("model_3", steps=steps(), output_src=output_src)
-    assert getfullargspec(model_3).kwonlyargs == ["arg_a", "arg_b", "arg_c"]
-    test_3 = model_3(arg_a=1, arg_b=1, arg_c=1)
+    assert getfullargspec(model_3).kwonlyargs == ["a", "b", "c"]
+    test_3 = model_3(a=1, b=1, c=1)
     assert test_3.run() == (2, 0, 3)
 
     # defined output_src multiple using NamedTuple
@@ -170,26 +167,27 @@ def test_model():
     )
 
     model_4 = build_model("model_4", steps=steps(), output_src=OutputType)
-    assert getfullargspec(model_4).kwonlyargs == ["arg_a", "arg_b", "arg_c"]
-    test_4 = model_3(arg_a=1, arg_b=1, arg_c=1)
+    assert getfullargspec(model_4).kwonlyargs == ["a", "b", "c"]
+    test_4 = model_3(a=1, b=1, c=1)
     assert test_4.run() == OutputType(step_1=2, step_2=0, step_3=3)
 
 
 def test_model_scenarios():
 
-    model = build_model("model", steps=steps(), output_src=("step_3",))
-    model.register_scenario("test", arg_a=1, arg_b=1, arg_c=1)
-    assert model._scenarios == {"test": {"arg_a": 1, "arg_b": 1, "arg_c": 1}}
+    model = build_model("model", steps=steps())
+    model.register_scenario("test", a=1, b=1, c=1)
+
+    assert model._scenarios == {"test": {"a": 1, "b": 1, "c": 1}}
     assert model.using_scenario("test").run() == 3
 
     with pytest.raises(ModelScenarioAlreadyExist):
-        model.register_scenario("test", arg_a=1, arg_b=1, arg_c=1)
+        model.register_scenario("test", a=1, b=1, c=1)
 
     with pytest.raises(ModelScenarioDoesNotExist):
         model.using_scenario("test-not-exist")
 
     with pytest.raises(ModelScenarioArgAlreadyExist):
-        model.using_scenario("test", arg_a=2)
+        model.using_scenario("test", a=2)
 
     with pytest.raises(ModelScenarioArgDoesNotExist):
-        model.register_scenario("test-2", not_exist_a=1, arg_b=1, arg_c=1)
+        model.register_scenario("test-2", not_exist_a=1, b=1, c=1)

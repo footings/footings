@@ -45,9 +45,9 @@ def test_footing():
         "step_3": set(["step_1", "step_2"]),
     }
     assert test.arguments == {
-        "arg_a": Argument("a"),
-        "arg_b": Argument("b"),
-        "arg_c": Argument("c"),
+        "a": Argument("a"),
+        "b": Argument("b"),
+        "c": Argument("c"),
     }
     assert test.steps == {
         "step_1": FootingStep(
@@ -112,9 +112,9 @@ def test_create_footing_from_list():
         "step_3": set(["step_1", "step_2"]),
     }
     assert test.arguments == {
-        "arg_a": Argument("a"),
-        "arg_b": Argument("b"),
-        "arg_c": Argument("c"),
+        "a": Argument("a"),
+        "b": Argument("b"),
+        "c": Argument("c"),
     }
     assert test.steps == {
         "step_1": FootingStep(

@@ -24,5 +24,5 @@ exclude = '''
 
 [tool.pylint.messages_control]
 disable="""
-bad-continuation,invalid-name
+bad-continuation,invalid-name,R0801
 """

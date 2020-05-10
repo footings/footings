@@ -21,10 +21,6 @@ class DispatchFunctionRegisterParameterError(Exception):
     """Parameter does not belong to DispatchFunction."""
 
 
-class DispatchFunctionRegisterValueError(Exception):
-    """Error occuring registering a function to the DispatchFunction."""
-
-
 #########################################################################################
 # DispatchFunction
 #########################################################################################
@@ -53,8 +49,6 @@ class DispatchFunction:
     ------
     DispatchFunctionRegisterParameterError
         Parameter does not belong to DispatchFunction.
-    DispatchFunctionRegisterValueError
-        The value passed is not a String or Iterable.
     DispatchFunctionKeyError
         Key does not exist within dispatch function registry.
 

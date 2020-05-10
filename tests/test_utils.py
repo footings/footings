@@ -8,7 +8,6 @@ from footings.utils import (
     DispatchFunction,
     DispatchFunctionKeyError,
     DispatchFunctionRegisterParameterError,
-    DispatchFunctionRegisterValueError,
     LoadedFunction,
 )
 
@@ -112,15 +111,6 @@ def test_dispatch_raise_errors():
         @test.register(wrong_key="x")
         def _():
             return "x"
-
-    class Test:
-        """Test class"""
-
-    with pytest.raises(DispatchFunctionRegisterValueError):
-
-        @test.register(key=Test())
-        def _():
-            return "y"
 
 
 def test_loaded_function():
