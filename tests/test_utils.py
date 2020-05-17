@@ -1,6 +1,6 @@
 """test for utils.py"""
 
-# pylint: disable=function-redefined, missing-function-docstring, too-few-public-methods
+# pylint: disable=function-redefined, missing-function-docstring, unused-variable
 
 import pytest
 
@@ -117,15 +117,15 @@ def test_loaded_function():
     def main_func(a, b):
         return a + b
 
+    test_func = LoadedFunction("test_func", function=main_func)
+
+    @test_func.register(position="start")
     def pre_hook(a, b):
         b += 1
         return a, b
 
-    def post_hook(x):
+    @test_func.register
+    def post_hook_1(x):
         return x + 1
-
-    test_func = LoadedFunction(
-        "test_func", function=main_func, pre_hook=pre_hook, post_hook=post_hook
-    )
 
     assert test_func(a=1, b=1) == 4

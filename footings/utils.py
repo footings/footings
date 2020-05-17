@@ -1,6 +1,6 @@
 """Utility classes and functions that support the footings library."""
 
-from typing import Optional, Callable, Dict, Tuple
+from typing import Callable, Dict, Tuple
 from itertools import product
 from functools import partial
 from collections.abc import Hashable, Iterable
@@ -26,7 +26,7 @@ class DispatchFunctionRegisterParameterError(Exception):
 #########################################################################################
 
 
-def _update_registry(registry, keys, function):
+def _update_dispatch_registry(registry, keys, function):
     for key in keys:
         registry.update({key: function})
     return registry
@@ -114,8 +114,8 @@ class DispatchFunction:
 
         keys = list(product(*items))
         if function is None:
-            return partial(_update_registry, self.registry, keys)
-        return _update_registry(self.registry, keys, function)
+            return partial(_update_dispatch_registry, self.registry, keys)
+        return _update_dispatch_registry(self.registry, keys, function)
 
     def __call__(self, *args, **kwargs):
         key = []
@@ -137,6 +137,16 @@ class DispatchFunction:
 #########################################################################################
 
 
+def _update_loaded_registry(registry, position, function):
+    if position == "end":
+        registry.append(function)
+    elif position == "start":
+        registry.insert(0, function)
+    else:
+        msg = f"The position {position} is not known. Please use 'start' or 'end'."
+        raise ValueError(msg)
+
+
 @attrs(slots=True, frozen=True, repr=False)
 class LoadedFunction:
     """A primary function that can be loaded with additional functions to call before \n
@@ -149,36 +159,25 @@ class LoadedFunction:
         The name to assign the LoadedFunction.
     function: callable
         The primary function.
-    pre_hook: callable, optional
-        A list of functions executed before the primary function is called.
-    post_hook: callable, optional
-        A list of functions executed after the primary function is called.
     """
 
     name: str = attrib(validator=instance_of(str))
     function: Callable = attrib(validator=is_callable())
-    pre_hook: Optional[Callable] = attrib(validator=optional(is_callable()))
-    post_hook: Optional[Callable] = attrib(validator=optional(is_callable()))
+    registry: list = attrib(init=False, repr=False, factory=list)
 
-    @property
-    def composition(self) -> list:
-        """The composition of functions to execute.
+    def __attrs_post_init__(self):
+        self.register(self.function)
 
-        Returns
-        -------
-        dict
-            Dict of functions in order of execution.
-        """
-        funcs = ["pre_hook", "function", "post_hook"]
-        return {
-            func: getattr(self, func) for func in funcs if getattr(self, func) is not None
-        }
+    def register(self, function=None, position="end"):
+        """Register function"""
+        if function is None:
+            return partial(_update_loaded_registry, self.registry, position)
+        return _update_loaded_registry(self.registry, position, function)
 
     def __call__(self, *args, **kwargs):
-        funcs = list(self.composition.values())
-        ret = funcs[0](*args, **kwargs)
-        if len(funcs) > 1:
-            for func in funcs[1:]:
+        ret = self.registry[0](*args, **kwargs)
+        if len(self.registry) > 1:
+            for func in self.registry[1:]:
                 if isinstance(ret, tuple):
                     ret = func(*ret)
                 else:
@@ -186,9 +185,7 @@ class LoadedFunction:
         return ret
 
 
-def create_loaded_function(function, pre_hook=None, post_hook=None):
+def create_loaded_function(function):
     """Create loaded function."""
     name = function.__name__
-    return LoadedFunction(
-        name=name, function=function, pre_hook=pre_hook, post_hook=post_hook
-    )
+    return LoadedFunction(name=name, function=function)
