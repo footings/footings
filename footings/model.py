@@ -207,10 +207,12 @@ class BaseModel:
         """Visualize model"""
         return visualize_model(self)
 
-    def run(self, audit=False):
+    def audit(self, **kwargs):
+        """Audit model"""
+        return run_model_audit(self, **kwargs)
+
+    def run(self):
         """Run model"""
-        if audit:
-            return run_model_audit(self)
         return run_model(self)
 
 
