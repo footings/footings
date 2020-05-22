@@ -1,6 +1,7 @@
 """Function and classes for auditing models."""
 
 import json
+from functools import singledispatch
 from inspect import getfullargspec
 
 from attr import attrs, attrib
@@ -29,27 +30,7 @@ def _get_model_output(model):
     return output
 
 
-def create_signature_string(step):
-    """Create signature"""
-    sig = getfullargspec(step.function)
-    args = sig.args + sig.kwonlyargs
-    sig_str = ""
-    for idx, arg in enumerate(args, 1):
-        if arg in step.init_args:
-            sig_str += f"{arg}=argument({step.init_args.get(arg)})"
-        elif arg in step.dependent_args:
-            sig_str += f"{arg}=use({step.dependent_args.get(arg)})"
-        else:
-            sig_str += f"{arg}={step.defined_args.get(arg)}"
-        if idx < len(args):
-            sig_str += ", "
-        name = getattr(step.function, "name", None)
-        if name is None:
-            name = step.function.__name__
-    return f"{name}({sig_str})"
-
-
-def create_class_output(model_name, arguments, steps):
+def _create_class_output(model_name, arguments, steps):
     """Create class output"""
     return_dict = {}
     return_dict["model_name"] = model_name
@@ -69,45 +50,68 @@ def create_class_output(model_name, arguments, steps):
     ]
     return_dict["steps"] = [
         {
-            "Step": step["Name"],
-            "Return Type": step["Output"].__class__.__name__,
-            "Description": step["Description"],
+            "Step": step_key,
+            "Return Type": step_val["Output"].__class__.__name__,
+            "Description": step_val["Summary"],
         }
-        for step in steps.values()
+        for step_key, step_val in steps.items()
     ]
     return return_dict
 
 
-def create_argument_output(arguments):
+def _create_argument_output(arguments):
     """Create argument output"""
     return {k: attr.asdict(v) for k, v in arguments.items()}
 
 
-def create_step_output(steps, steps_output):
+def _create_step_output(steps, steps_output):
     """Create step output"""
     return_dict = {}
-    for key, value in steps.items():
+    for k, v in steps.items():
         step_dict = {}
-        step_dict["Name"] = key
-        step_dict["Description"] = value.__doc__
-        step_dict["Signature"] = value.create_signature_string()
-        step_dict["Meta"] = value.meta
-        step_dict["Output"] = steps_output.get(key)
-        return_dict[key] = step_dict
+        audit = v.to_audit_format()
+        step_dict["Signature"] = audit["Signature"]
+        step_dict["Docstring"] = audit["Docstring"]
+        step_dict["Summary"] = audit["Summary"][0]
+        step_dict["Output"] = steps_output[k]
+        return_dict[k] = step_dict
     return return_dict
 
 
-def create_return_dict(model):
-    """Create return dict"""
-    step_output = _get_model_output(model)
-    return_dict = {}
-    return_dict["arguments"] = create_argument_output(model.arguments)
-    return_dict["steps"] = create_step_output(model.steps, step_output)
-    return_dict["model"] = create_class_output(
-        model.__class__.__name__, return_dict["arguments"], return_dict["steps"]
-    )
-    return return_dict
+@attrs(slots=True, frozen=True, repr=False)
+class ModelAudit:
+    model: dict = attrib()
+    arguments: dict = attrib()
+    steps: dict = attrib()
 
+    @classmethod
+    def create_audit(cls, model):
+        """Create audit"""
+        output = _get_model_output(model)
+        arguments = _create_argument_output(model.arguments)
+        steps = _create_step_output(model.steps, output)
+        model = _create_class_output(model.__class__.__name__, arguments, steps)
+        return cls(model, arguments, steps)
+
+
+# def create_signature_string(step):
+#     """Create signature"""
+#     sig = getfullargspec(step.function)
+#     args = sig.args + sig.kwonlyargs
+#     sig_str = ""
+#     for idx, arg in enumerate(args, 1):
+#         if arg in step.init_args:
+#             sig_str += f"{arg}=argument({step.init_args.get(arg)})"
+#         elif arg in step.dependent_args:
+#             sig_str += f"{arg}=use({step.dependent_args.get(arg)})"
+#         else:
+#             sig_str += f"{arg}={step.defined_args.get(arg)}"
+#         if idx < len(args):
+#             sig_str += ", "
+#         name = getattr(step.function, "name", None)
+#         if name is None:
+#             name = step.function.__name__
+#     return f"{name}({sig_str})"
 
 #########################################################################################
 # json_serializer
@@ -143,8 +147,38 @@ class XlsxRange:
     row_end: int = attrib()
     col_end: int = attrib()
 
+@attrs(slots=True, repr=False)
+class XlsxWorksheet:
+    """XlsxRange"""
 
-def _xlsx_dispatch_default(worksheet, obj, start_row, start_col, **kwargs):
+    worksheet = attrib()
+    registry = attrib()
+
+    def write_data(self, ):
+        pass
+
+
+@attrs(slots=True, frozen=True, repr=False)
+class XlsxWorkbook:
+    """XlsxWorkbook"""
+    
+    workbook = attrib()
+    worksheets = attrib(factory=dict)
+
+    def add_worksheet(self, name, **kwargs):
+        self.worksheets.update({name: self.workbook.add_worksheet(**kwargs)})
+
+    def write_obj(self, worksheet, obj, **kwargs):
+        pass
+
+    def save_workbook(self):
+        self.workbook.close()
+
+
+
+
+
+def _xlsx_dispatch_default(obj, workbook, worksheet, start_row, start_col, **kwargs):
     worksheet.write(start_row, start_col, obj, **kwargs)
     end_row = start_row
     end_col = start_col
@@ -154,6 +188,16 @@ def _xlsx_dispatch_default(worksheet, obj, start_row, start_col, **kwargs):
 xlsx_dispatch = DispatchFunction(
     "xlsx_dispatch", parameters=("dtype",), default=_xlsx_dispatch_default
 )
+
+
+@xlsx_dispatch.register(dtype=str)
+def _(worksheet, obj, start_row, start_col, **kwargs):
+    obj_split = obj.split("\n")
+    for idx, line in enumerate(obj_split):
+        worksheet.write(start_row + idx, start_col, line, **kwargs)
+    end_row = start_row + len(obj_split) - 1
+    end_col = start_col
+    return XlsxRange(start_row, start_col, end_row, end_col)
 
 
 @xlsx_dispatch.register(dtype=type)
@@ -257,11 +301,11 @@ def write_steps(workbook, steps):
         wrkst = workbook.add_worksheet(step_name)
         wrkst.hide_gridlines(2)
         wrkst.set_column(0, 0, width=2.14)
-        obj_to_excel(wrkst, {"Name:": step_value["Name"]}, 1, 1)
-        obj_to_excel(wrkst, {"Description:": step_value["Description"]}, 2, 1)
+        obj_to_excel(wrkst, {"Name:": step_name}, 1, 1)
         obj_to_excel(wrkst, {"Signature:": step_value["Signature"]}, 3, 1)
-        obj_to_excel(wrkst, {"Meta:": step_value["Meta"]}, 4, 1)
-        obj_to_excel(wrkst, step_value["Output"], 6, 1)
+        ret = obj_to_excel(wrkst, {"Docstring:": step_value["Docstring"]}, 5, 1)
+        # obj_to_excel(wrkst, {"Meta:": step_value["Meta"]}, 15, 1)
+        obj_to_excel(wrkst, {"Output:": step_value["Output"]}, ret.row_end + 2, 1)
 
 
 def to_excel(dict_, file):
@@ -284,13 +328,13 @@ run_model_audit = DispatchFunction("run_model_audit", parameters=("output_type",
 @run_model_audit.register(output_type="json")
 def _(model, file, **kwargs):
     """Run model audit"""
-    ret_dict = create_return_dict(model)
+    audit = attr.asdict(ModelAudit.create_audit(model))
     with open(file, "w") as stream:
-        json.dump(obj=ret_dict, fp=stream, default=json_serialize, **kwargs)
+        json.dump(obj=audit, fp=stream, default=json_serialize, **kwargs)
 
 
 @run_model_audit.register(output_type="xlsx")
 def _(model, file, **kwargs):
     """Run model audit"""
-    ret_dict = create_return_dict(model)
-    to_excel(ret_dict, file, **kwargs)
+    audit = attr.asdict(ModelAudit.create_audit(model))
+    to_excel(audit, file, **kwargs)
