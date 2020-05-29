@@ -5,7 +5,9 @@ from collections.abc import Mapping, Iterable
 
 from attr import attrs, attrib
 import pandas as pd
-import xlsxwriter
+from openpyxl import Workbook
+from openpyxl.worksheet.worksheet import Worksheet
+from openpyxl.styles import NamedStyle
 
 #########################################################################################
 # xlsx_dispatch
@@ -27,6 +29,11 @@ _COL_SPACING = {
     "iterable": 0,
 }
 
+_PANDAS_FORMATTING = {
+    "ALIGNMENT": {"object": "", "int64": "",},
+    "HEADER": {},
+}
+
 
 @attrs(slots=True, frozen=True, repr=False)
 class XlsxRange:
@@ -40,8 +47,11 @@ class XlsxRange:
     col_spacing: int = attrib()
 
 
-def _obj_to_xlsx_builtins(obj, worksheet, start_row, start_col, xlsx_format):
-    worksheet.write(start_row, start_col, obj, xlsx_format)
+def _obj_to_xlsx_builtins(obj, worksheet, start_row, start_col, style):
+    cell = worksheet.cell(row=start_row, column=start_col)
+    cell.value = obj
+    if style is not None:
+        cell.style = style
     return XlsxRange(
         row_start=start_row,
         col_start=start_col,
@@ -52,11 +62,10 @@ def _obj_to_xlsx_builtins(obj, worksheet, start_row, start_col, xlsx_format):
     )
 
 
-def _obj_to_xlsx_series(obj, worksheet, start_row, start_col, xlsx_format):
-    # write header
-    worksheet.write(start_row, start_col, obj.name, xlsx_format)
-    # write rows
-    worksheet.write_column(start_row + 1, start_col, obj.values, xlsx_format)
+def _obj_to_xlsx_series(obj, worksheet, start_row, start_col, style):
+    _obj_to_xlsx_builtins(obj.name, worksheet, start_row, start_col, style)
+    for idx, row in enumerate(obj, 1):
+        _obj_to_xlsx_builtins(row, worksheet, start_row + idx, start_col, style)
     return XlsxRange(
         row_start=start_row,
         col_start=start_col,
@@ -67,11 +76,9 @@ def _obj_to_xlsx_series(obj, worksheet, start_row, start_col, xlsx_format):
     )
 
 
-def _obj_to_xlsx_dataframe(obj, worksheet, start_row, start_col, xlsx_format):
-    for idx, column in enumerate(obj):
-        _obj_to_xlsx_series(
-            obj[column], worksheet, start_row, start_col + idx, xlsx_format
-        )
+def _obj_to_xlsx_dataframe(obj, worksheet, start_row, start_col, style):
+    for idx, col in enumerate(obj):
+        _obj_to_xlsx_series(obj[col], worksheet, start_row, start_col + idx, style)
     return XlsxRange(
         row_start=start_row,
         col_start=start_col,
@@ -82,7 +89,7 @@ def _obj_to_xlsx_dataframe(obj, worksheet, start_row, start_col, xlsx_format):
     )
 
 
-def _obj_to_xlsx_mapping(obj, worksheet, start_row, start_col, xlsx_format):
+def _obj_to_xlsx_mapping(obj, worksheet, start_row, start_col, style):
     if len(obj) > 0:
         for idx, (k, v) in enumerate(obj.items()):
             if not isinstance(k, str):
@@ -91,14 +98,12 @@ def _obj_to_xlsx_mapping(obj, worksheet, start_row, start_col, xlsx_format):
                 except:
                     raise ValueError("Converting key of mapping to string failed.")
             if idx == 0:
-                obj_to_xlsx(k, worksheet, start_row, start_col, xlsx_format)
-                ret_xlsx = obj_to_xlsx(
-                    v, worksheet, start_row, start_col + 1, xlsx_format
-                )
+                obj_to_xlsx(k, worksheet, start_row, start_col, style)
+                ret_xlsx = obj_to_xlsx(v, worksheet, start_row, start_col + 1, style)
             else:
                 row = ret_xlsx.row_end + ret_xlsx.row_spacing
-                obj_to_xlsx(k, worksheet, row, start_col, xlsx_format)
-                ret_xlsx = obj_to_xlsx(v, worksheet, row, start_col + 1, xlsx_format)
+                obj_to_xlsx(k, worksheet, row, start_col, style)
+                ret_xlsx = obj_to_xlsx(v, worksheet, row, start_col + 1, style)
         return XlsxRange(
             row_start=start_row,
             col_start=start_col,
@@ -117,18 +122,18 @@ def _obj_to_xlsx_mapping(obj, worksheet, start_row, start_col, xlsx_format):
     )
 
 
-def _obj_to_xlsx_iterable(obj, worksheet, start_row, start_col, xlsx_format):
+def _obj_to_xlsx_iterable(obj, worksheet, start_row, start_col, style):
     if len(obj) > 0:
         for idx, x in enumerate(obj):
             if idx == 0:
-                ret_xlsx = obj_to_xlsx(x, worksheet, start_row, start_col, xlsx_format)
+                ret_xlsx = obj_to_xlsx(x, worksheet, start_row, start_col, style)
             else:
                 ret_xlsx = obj_to_xlsx(
                     x,
                     worksheet,
                     ret_xlsx.row_end + ret_xlsx.row_spacing,
                     start_col,
-                    xlsx_format,
+                    style,
                 )
         return XlsxRange(
             row_start=start_row,
@@ -148,29 +153,31 @@ def _obj_to_xlsx_iterable(obj, worksheet, start_row, start_col, xlsx_format):
     )
 
 
-def obj_to_xlsx(
-    obj, worksheet, start_row, start_col, xlsx_format
-):  # pylint: disable=too-many-return-statements
+def obj_to_xlsx(obj, worksheet, start_row, start_col, style):
     """Object to xlsx"""
-    builtins = [bool, str, int, float, datetime.date, datetime.datetime]
-    if any([isinstance(obj, x) for x in builtins]):
-        return _obj_to_xlsx_builtins(obj, worksheet, start_row, start_col, xlsx_format)
-    if isinstance(obj, pd.Series):
-        return _obj_to_xlsx_series(obj, worksheet, start_row, start_col, xlsx_format)
-    if isinstance(obj, pd.DataFrame):
-        return _obj_to_xlsx_dataframe(obj, worksheet, start_row, start_col, xlsx_format)
-    if isinstance(obj, Mapping):
-        return _obj_to_xlsx_mapping(obj, worksheet, start_row, start_col, xlsx_format)
-    if isinstance(obj, Iterable):
-        return _obj_to_xlsx_iterable(obj, worksheet, start_row, start_col, xlsx_format)
-    if hasattr(obj, "to_audit_format"):
+    builtins = [str, int, float, datetime.date, datetime.datetime]
+    if isinstance(obj, bool):
+        ret = _obj_to_xlsx_builtins(str(obj), worksheet, start_row, start_col, style)
+    elif any([isinstance(obj, x) for x in builtins]):
+        ret = _obj_to_xlsx_builtins(obj, worksheet, start_row, start_col, style)
+    elif isinstance(obj, pd.Series):
+        ret = _obj_to_xlsx_series(obj, worksheet, start_row, start_col, style)
+    elif isinstance(obj, pd.DataFrame):
+        ret = _obj_to_xlsx_dataframe(obj, worksheet, start_row, start_col, style)
+    elif isinstance(obj, Mapping):
+        ret = _obj_to_xlsx_mapping(obj, worksheet, start_row, start_col, style)
+    elif isinstance(obj, Iterable):
+        ret = _obj_to_xlsx_iterable(obj, worksheet, start_row, start_col, style)
+    elif hasattr(obj, "to_audit_format"):
         new_obj = obj.to_audit_format()
-        return obj_to_xlsx(new_obj, worksheet, start_row, start_col, xlsx_format)
-    if callable(obj):
+        ret = obj_to_xlsx(new_obj, worksheet, start_row, start_col, style)
+    elif callable(obj):
         new_obj = "callable: " + obj.__module__ + "." + obj.__qualname__
-        return obj_to_xlsx(new_obj, worksheet, start_row, start_col, xlsx_format)
-    msg = ""
-    raise TypeError(msg)
+        ret = obj_to_xlsx(new_obj, worksheet, start_row, start_col, style)
+    else:
+        msg = "Not able to output object to an xlsx worksheet."
+        raise TypeError(msg)
+    return ret
 
 
 #########################################################################################
@@ -182,7 +189,7 @@ def obj_to_xlsx(
 class XlsxWorksheet:
     """XlsxWorksheet"""
 
-    obj: xlsxwriter.worksheet = attrib()
+    obj: Worksheet = attrib()
     write_row: int = attrib()
     write_col: int = attrib()
 
@@ -191,45 +198,48 @@ class XlsxWorksheet:
 class XlsxWorkbook:
     """XlsxWorkbook"""
 
-    workbook: xlsxwriter.Workbook = attrib()
+    workbook: Workbook = attrib()
     worksheets: dict = attrib(factory=dict)
-    formats: dict = attrib(factory=dict)
+    styles: dict = attrib(factory=dict)
 
     @classmethod
-    def create(cls, name, **kwargs):
+    def create(cls):
         """Create xlsx workbook"""
-        workbook = xlsxwriter.Workbook(name, options=kwargs)
-        return cls(workbook=workbook)
+        return cls(workbook=Workbook())
 
-    def add_worksheet(self, name, start_row, start_col, **kwargs):
+    def create_sheet(self, name, start_row, start_col, **kwargs):
         """Add worksheet"""
         wrksht = XlsxWorksheet(
-            obj=self.workbook.add_worksheet(name, **kwargs),
+            obj=self.workbook.create_sheet(name, **kwargs),
             write_row=start_row,
             write_col=start_col,
         )
         self.worksheets.update({name: wrksht})
 
-    def add_format(self, name, **kwargs):
-        """Add formats"""
-        self.formats.update({name: self.workbook.add_format(kwargs)})
+    def add_named_style(self, name, style):
+        """Add style"""
+        if isinstance(style, NamedStyle) is False:
+            msg = f"The value passsed to style is not an instance of {NamedStyle}."
+            raise TypeError(msg)
+        self.styles.update({name: style})
 
-    def write_obj(self, worksheet, obj, add_rows=0, add_cols=0, xlsx_format=None):
+    def write_obj(self, worksheet, obj, add_rows=0, add_cols=0, style=None):
         """Write object to worksheet"""
         wrksht = self.worksheets[worksheet]
         start_row = wrksht.write_row
         start_col = wrksht.write_col
-        if xlsx_format is not None:
+        if style is not None:
             try:
-                xlsx_format = self.formats.get(xlsx_format)
+                style = self.styles.get(style)
             except KeyError as err:
                 raise err
         ret_range = obj_to_xlsx(
-            obj, wrksht.obj, start_row + add_rows, start_col + add_cols, xlsx_format
+            obj, wrksht.obj, start_row + add_rows, start_col + add_cols, style
         )
         wrksht.write_row = ret_range.row_end + ret_range.row_spacing
         wrksht.write_col = start_col + ret_range.col_spacing
 
-    def close(self):
+    def save(self, file):
         """Close workbook"""
-        self.workbook.close()
+        del self.workbook["Sheet"]
+        self.workbook.save(file)
