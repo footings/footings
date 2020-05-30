@@ -1,14 +1,14 @@
 """model.py"""
 
-from typing import Any, List, Dict
+from typing import List, Dict
 from inspect import getfullargspec
 
 from attr import attrs, attrib, make_class
+from numpydoc.docscrape import FunctionDoc
 
 from .footing import create_footing_from_list
 from .audit import run_model_audit
 from .visualize import visualize_model
-from .utils import DispatchFunction
 
 __all__ = ["build_model"]
 
@@ -38,69 +38,9 @@ class ModelScenarioArgDoesNotExist(Exception):
 #########################################################################################
 
 
-# @singledispatch
-# def output_src_as_set(output_src):
-#     """Set output_src based on different types."""
-#     msg = f"output_src_as_set has not been defined for type [{output_src}]."
-#     raise NotImplementedError(msg)
-#
-#
-# @output_src_as_set.register
-# def _(output_src: tuple):
-#     return set(output_src)
-#
-#
-# @singledispatch
-# def to_output_src(output_src, dict_):
-#     """Set to_output_src based on different types."""
-#     msg = f"to_output_src has not been defined for type [{output_src}]."
-#     raise NotImplementedError(msg)
-#
-#
-# @to_output_src.register
-# def _(output_src: tuple, dict_):
-#     if len(output_src) > 1:
-#         return tuple(dict_[x] for x in output_src)
-#     return dict_[output_src[0]]
-
-
-OUTPUT_SRC_AS_SET = DispatchFunction("output_src_as_set", parameters=("obj",))
-
-
-@OUTPUT_SRC_AS_SET.register(obj=str(tuple))
-def _(output_src):
-    return set(output_src)
-
-
-TO_OUTPUT_SRC = DispatchFunction("to_output_src", parameters=("obj",))
-
-
-@TO_OUTPUT_SRC.register(obj=str(tuple))
-def _(output_src, dict_):
-    if len(output_src) > 1:
-        return tuple(dict_[x] for x in output_src)
-    return dict_[output_src[0]]
-
-
-def register_output(obj, as_set, to_output):
-    """Tegister output"""
-    OUTPUT_SRC_AS_SET.register(obj=str(type(obj)), function=as_set)
-    TO_OUTPUT_SRC.register(obj=str(type(obj)), function=to_output)
-
-
-def output_src_as_set(output_src):
-    """Output src as set"""
-    return OUTPUT_SRC_AS_SET(output_src=output_src, obj=str(type(output_src)))
-
-
-def to_output_src(output_src, dict_):
-    """To output src"""
-    return TO_OUTPUT_SRC(output_src=output_src, dict_=dict_, obj=str(type(output_src)))
-
-
-def create_dependency_index(dependencies, output_src):
+def create_dependency_index(dependencies):
     """Create dependency index"""
-    store = output_src_as_set(output_src)
+    store = set()
     store_dict = {}
     keys = list(dependencies.keys())
     keys_reverse = keys[::-1]
@@ -113,7 +53,7 @@ def create_dependency_index(dependencies, output_src):
         prior: store_dict[current]
         for prior, current in zip(keys_reverse[1:][::-1], keys_reverse[:-1][::-1])
     }
-    ret.update({keys[-1]: output_src_as_set(output_src)})
+    ret.update({keys[-1]: set([keys[-1]])})
 
     ret = {
         v[0]: v[1].intersection(set(keys[: (idx + 1)]))
@@ -139,7 +79,6 @@ def run_model(model):
     dict_ = {}
     steps = model.steps
     dependency_index = model.dependency_index
-
     for k, v in steps.items():
         if k not in dependency_index[k]:
             continue
@@ -147,7 +86,7 @@ def run_model(model):
         dependent_args = {k: dict_[v] for k, v in v.dependent_args.items()}
         out = v.function(**init_args, **dependent_args, **v.defined_args)
         update_dict_(dict_, dependency_index[k], k, out)
-    return to_output_src(model.output_src, dict_)
+    return dict_[list(steps.keys())[-1]]
 
 
 FOOTINGS_RESERVED_WORDS = [
@@ -156,7 +95,6 @@ FOOTINGS_RESERVED_WORDS = [
     "steps",
     "dependencies",
     "dependency_index",
-    "output_src",
     "meta",
 ]
 
@@ -170,7 +108,6 @@ class BaseModel:
     steps = attrib(init=False, repr=False)
     dependencies = attrib(init=False, repr=False)
     dependency_index = attrib(init=False, repr=False)
-    output_src = attrib(init=False, repr=False)
     meta = attrib(init=False, repr=False)
 
     @classmethod
@@ -216,7 +153,7 @@ class BaseModel:
         return run_model(self)
 
 
-def create_attributes(footing, output_src, meta):
+def create_attributes(footing, meta):
     """Create attributes"""
     attributes = {}
     for arg_key, arg_val in footing.arguments.items():
@@ -227,16 +164,14 @@ def create_attributes(footing, output_src, meta):
         attributes.update({arg_key: attrib(**kwargs)})
 
     args_attrib = attrib(init=False, repr=False, default=footing.arguments)
-    output_src_attrib = attrib(init=False, repr=False, default=output_src)
     steps_attrib = attrib(init=False, repr=False, default=footing.steps)
     dep_attrib = attrib(init=False, repr=False, default=footing.dependencies)
-    dep_index = create_dependency_index(footing.dependencies, output_src)
+    dep_index = create_dependency_index(footing.dependencies)
     dep_index_attrib = attrib(init=False, repr=False, default=dep_index)
     meta_attrib = attrib(init=False, repr=False, default=meta)
     return {
         **attributes,
         "arguments": args_attrib,
-        "output_src": output_src_attrib,
         "steps": steps_attrib,
         "dependencies": dep_attrib,
         "dependency_index": dep_index_attrib,
@@ -244,7 +179,24 @@ def create_attributes(footing, output_src, meta):
     }
 
 
-def create_model_docstring(description: str, arguments: dict, output_src: Any) -> str:
+def get_returns(steps):
+    """Get return string from docstring of last step"""
+    last_func = steps[-1].get("function")
+    parsed_doc = FunctionDoc(last_func)
+    ret = parsed_doc["Returns"][0]
+    nl = "\n"
+    tab = "\t"
+    ret_str = ""
+    if ret.name != "":
+        ret_str += f"{ret.name} : "
+    if ret.type != "":
+        ret_str += f"{ret.type}"
+    if ret.desc != []:
+        ret_str += f"{nl}{tab}{nl.join(ret.desc)}"
+    return ret_str
+
+
+def create_model_docstring(description: str, arguments: dict, returns: str) -> str:
     """Create model docstring.
 
     Parameters
@@ -253,8 +205,8 @@ def create_model_docstring(description: str, arguments: dict, output_src: Any) -
         A description of the model.
     arguments : dict
         A dict of the argument assocated with the model.
-    output_src : Any
-        The format or object to return the output as, by default None.
+    returns : str
+        The descripton of returns for the docstring.
 
     Returns
     -------
@@ -264,18 +216,13 @@ def create_model_docstring(description: str, arguments: dict, output_src: Any) -
     arg_header = "Arguments\n---------\n"
     args = "".join([f"{k}\n\t{v.description}\n" for k, v in arguments.items()])
     ret_header = "Returns\n-------\n"
-    if isinstance(output_src, tuple):
-        rets = "\n".join(output_src)
-    else:
-        rets = output_src.__name__
-    docstring = f"{description}\n\n{arg_header}{args}\n{ret_header}{rets}"
+    docstring = f"{description}\n\n{arg_header}{args}\n{ret_header}{returns}"
     return docstring
 
 
 def build_model(
     name: str,
     steps: List[Dict],
-    output_src: Any = None,
     description: str = None,
     scenarios: dict = None,
     meta: dict = None,
@@ -288,8 +235,6 @@ def build_model(
         The name to assign the model.
     steps : list
         The list of steps the model will perform.
-    output_src : Any, optional
-        The format or object to return the output as, by default None.
     description : str, optional
         A description of the model, by default None.
     scenarios : dict, optional
@@ -304,16 +249,12 @@ def build_model(
         defined within the steps.
     """
     footing = create_footing_from_list(name=name, steps=steps)
-    if output_src is None:
-        output_src = (list(footing.steps.keys())[-1],)
-    attributes = create_attributes(footing, output_src, meta)
+    attributes = create_attributes(footing, meta)
     model = make_class(
         name, attrs=attributes, bases=(BaseModel,), slots=True, frozen=True, repr=False
     )
     model.__doc__ = create_model_docstring(
-        description,
-        attributes["arguments"]._default,  # pylint: disable=protected-access
-        output_src,
+        description, footing.arguments, get_returns(steps)
     )
     if scenarios is not None:
         for k, v in scenarios.items():
