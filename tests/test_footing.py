@@ -55,21 +55,18 @@ def test_footing():
             init_args={"arg_a": "a"},
             defined_args={"add": 1},
             dependent_args={},
-            meta={},
         ),
         "step_2": FootingStep(
             function=step_2,
             init_args={"arg_b": "b"},
             defined_args={"subtract": 1},
             dependent_args={},
-            meta={},
         ),
         "step_3": FootingStep(
             function=step_3,
             init_args={"arg_c": "c"},
             defined_args={},
             dependent_args={"a": "step_1", "b": "step_2"},
-            meta={},
         ),
     }
 
@@ -122,20 +119,17 @@ def test_create_footing_from_list():
             init_args={"arg_a": "a"},
             defined_args={"add": 1},
             dependent_args={},
-            meta={},
         ),
         "step_2": FootingStep(
             function=step_2,
             init_args={"arg_b": "b"},
             defined_args={"subtract": 1},
             dependent_args={},
-            meta={},
         ),
         "step_3": FootingStep(
             function=step_3,
             init_args={"arg_c": "c"},
             defined_args={},
             dependent_args={"a": "step_1", "b": "step_2"},
-            meta={},
         ),
     }

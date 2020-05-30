@@ -155,9 +155,12 @@ def _obj_to_xlsx_iterable(obj, worksheet, start_row, start_col, style):
 
 def obj_to_xlsx(obj, worksheet, start_row, start_col, style):
     """Object to xlsx"""
-    builtins = [str, int, float, datetime.date, datetime.datetime]
+    builtins = [int, float, str, datetime.date, datetime.datetime]
     if isinstance(obj, bool):
-        ret = _obj_to_xlsx_builtins(str(obj), worksheet, start_row, start_col, style)
+        ret = obj_to_xlsx(str(obj), worksheet, start_row, start_col, style)
+    elif isinstance(obj, str) and "\n" in obj:
+        new_obj = obj.split("\n")
+        ret = obj_to_xlsx(new_obj, worksheet, start_row, start_col, style)
     elif any([isinstance(obj, x) for x in builtins]):
         ret = _obj_to_xlsx_builtins(obj, worksheet, start_row, start_col, style)
     elif isinstance(obj, pd.Series):

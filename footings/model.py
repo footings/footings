@@ -279,7 +279,7 @@ def build_model(
     description: str = None,
     scenarios: dict = None,
     meta: dict = None,
-):  # pylint: disable=too-many-arguments
+):
     """Build a custom model based on the passed steps.
 
     Parameters

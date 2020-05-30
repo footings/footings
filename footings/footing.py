@@ -73,15 +73,12 @@ class FootingStep:
         Arguments to callable that will be pulled from other steps within Footing.
     defined_args: dict
         Arguments to callable that have been defined when creating the Footing.
-    meta: dict
-        A placeholder for meta data.
     """
 
     function: Callable = attrib(validator=is_callable())
     init_args: Dict = attrib(validator=instance_of(dict))
     dependent_args: Dict = attrib(validator=instance_of(dict))
     defined_args: Dict = attrib(validator=instance_of(dict))
-    meta: Dict = attrib(validator=instance_of(dict))
 
 
 @attrs(slots=True, frozen=True, repr=False)
@@ -104,8 +101,6 @@ class Footing:
         A dict acting as a registry of steps where the values are FootingSteps.
     dependencies: dict
         A dict recording the dependencies between steps.
-    meta: dict, optional
-        A placeholder for meta data.
 
     Raises
     ------
@@ -123,11 +118,8 @@ class Footing:
     arguments: Dict = attrib(factory=dict)
     steps: Dict = attrib(factory=dict)
     dependencies: Dict = attrib(factory=dict)
-    meta: Optional[Dict] = attrib(factory=dict)
 
-    def add_step(
-        self, name: str, function: callable, args: dict, meta: Optional[Dict] = None
-    ):
+    def add_step(self, name: str, function: callable, args: dict):
         """Add a step to the footing.
 
         Parameters
@@ -138,8 +130,6 @@ class Footing:
             The function to call within a step.
         args : dict
             The arguments to passed to the function.
-        meta : dict, optional
-            A placeholder for meta data.
 
         Returns
         -------
@@ -174,13 +164,11 @@ class Footing:
                 else:
                     defined_args.update({arg_nm: arg_val})
         self.dependencies.update({name: dependencies})
-        if meta is None:
-            meta = {}
-        step = FootingStep(function, init_args, dependent_args, defined_args, meta)
+        step = FootingStep(function, init_args, dependent_args, defined_args)
         self.steps.update({name: step})
 
 
-def create_footing_from_list(name: str, steps: list, meta: Optional[Dict] = None):
+def create_footing_from_list(name: str, steps: list):
     """A helper function to create a Footing from a list.
 
     Parameters
@@ -189,8 +177,6 @@ def create_footing_from_list(name: str, steps: list, meta: Optional[Dict] = None
         The name to assign to the Footing.
     steps : list
         A list of steps to create the Footing.
-    meta : Optional[Dict]
-        A placeholder for meta data.
 
     Returns
     -------
@@ -222,7 +208,7 @@ def create_footing_from_list(name: str, steps: list, meta: Optional[Dict] = None
     ]
     footing = create_footing_from_list("footing", steps)
     """
-    new_footing = Footing(name=name, meta=meta)
+    new_footing = Footing(name=name)
     for step in steps:
         new_footing.add_step(**step)
     return new_footing
