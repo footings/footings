@@ -17,6 +17,7 @@ from footings.model import (
     ModelScenarioDoesNotExist,
     ModelScenarioArgAlreadyExist,
     ModelScenarioArgDoesNotExist,
+    ModelRunError,
 )
 
 from .shared import STEPS_USING_INTEGERS, STEPS_USING_ATTR_LOOKUP, STEPS_USING_KEY_LOOKUP
@@ -100,6 +101,13 @@ def test_model():
     assert getfullargspec(model_3).kwonlyargs == ["n", "add", "subtract"]
     test_3 = model_3(n=3, add=1, subtract=2)
     assert_series_equal(test_3.run(), pd.Series([0, 1, 2], name="n"))
+
+
+def test_model_errors():
+    model_1 = build_model("model_1", steps=STEPS_USING_INTEGERS)
+    test_1 = model_1(a=1, b=1, c="c")
+    with pytest.raises(ModelRunError):
+        test_1.run()
 
 
 def test_model_scenarios():

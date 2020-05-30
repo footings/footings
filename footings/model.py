@@ -2,6 +2,8 @@
 
 from typing import List, Dict
 from inspect import getfullargspec
+import sys
+from traceback import extract_tb, format_list
 
 from attr import attrs, attrib, make_class
 from numpydoc.docscrape import FunctionDoc
@@ -31,6 +33,10 @@ class ModelScenarioArgAlreadyExist(Exception):
 
 class ModelScenarioArgDoesNotExist(Exception):
     """The argument passed does not exist."""
+
+
+class ModelRunError(Exception):
+    """Error occured during model run."""
 
 
 #########################################################################################
@@ -86,7 +92,14 @@ def run_model(model):
         dependent_args = {
             k: v.get_value(dict_[v.name]) for k, v in v.dependent_args.items()
         }
-        out = v.function(**init_args, **dependent_args, **v.defined_args)
+        try:
+            out = v.function(**init_args, **dependent_args, **v.defined_args)
+        except:
+            nl = "\n"
+            exc_type, exc_value, exc_trace = sys.exc_info()
+            msg = f"At step [{k}], a {exc_type} error occured.\n"
+            msg += f"The message = {exc_value}.\n{nl.join(format_list(extract_tb(exc_trace)))}"
+            raise ModelRunError(msg)
         update_dict_(dict_, dependency_index[k], k, out)
     return dict_[list(steps.keys())[-1]]
 
