@@ -7,8 +7,7 @@ from typing import NamedTuple
 
 import pytest
 
-from footings.argument import Argument
-from footings.footing import use, create_footing_from_list
+from footings.footing import create_footing_from_list
 from footings.model import (
     build_model,
     create_dependency_index,
@@ -20,42 +19,7 @@ from footings.model import (
     register_output,
 )
 
-
-def steps():
-    def step_1(a, add):
-        """Run step_1"""
-        return a + add
-
-    def step_2(b, subtract):
-        """Run step_2"""
-        return b - subtract
-
-    def step_3(a, b, c):
-        """Run step_3"""
-        return a + b + c
-
-    list_ = [
-        {
-            "name": "step_1",
-            "function": step_1,
-            "args": {"a": Argument("a", description="description for a"), "add": 1},
-        },
-        {
-            "name": "step_2",
-            "function": step_2,
-            "args": {"b": Argument("b", description="description for b"), "subtract": 1,},
-        },
-        {
-            "name": "step_3",
-            "function": step_3,
-            "args": {
-                "a": use("step_1"),
-                "b": use("step_2"),
-                "c": Argument("c", description="description for c"),
-            },
-        },
-    ]
-    return list_
+from .shared import steps_using_integers
 
 
 def test_create_dependency_index():
@@ -87,7 +51,7 @@ def test_create_dependency_index():
 
 
 def test_create_attributes():
-    footing = create_footing_from_list("test", steps=steps())
+    footing = create_footing_from_list("test", steps=steps_using_integers())
     output_src = ("step_3",)
     meta = {}
     attributes = create_attributes(footing, output_src, meta)
@@ -108,7 +72,10 @@ def test_create_attributes():
 
 def test_create_model_docstring():
     model = build_model(
-        "model", steps=steps(), description="This is a test", output_src=("step_3",)
+        "model",
+        steps=steps_using_integers(),
+        description="This is a test",
+        output_src=("step_3",),
     )
     test_doc = [
         "This is a test\n",
@@ -134,20 +101,20 @@ def test_create_model_docstring():
 def test_model():
 
     # no output_src
-    model_1 = build_model("model_1", steps=steps())
+    model_1 = build_model("model_1", steps=steps_using_integers())
     assert getfullargspec(model_1).kwonlyargs == ["a", "b", "c"]
     test_1 = model_1(a=1, b=1, c=1)
     assert test_1.run() == 3
 
     # defined output_src
-    model_2 = build_model("model_2", steps=steps(), output_src=("step_3",))
+    model_2 = build_model("model_2", steps=steps_using_integers(), output_src=("step_3",))
     assert getfullargspec(model_2).kwonlyargs == ["a", "b", "c"]
     test_2 = model_2(a=1, b=1, c=1)
     assert test_2.run() == 3
 
     # defined output_src multiple
     output_src = ("step_1", "step_2", "step_3")
-    model_3 = build_model("model_3", steps=steps(), output_src=output_src)
+    model_3 = build_model("model_3", steps=steps_using_integers(), output_src=output_src)
     assert getfullargspec(model_3).kwonlyargs == ["a", "b", "c"]
     test_3 = model_3(a=1, b=1, c=1)
     assert test_3.run() == (2, 0, 3)
@@ -166,7 +133,7 @@ def test_model():
         lambda output_src, dict_: output_src(**dict_),
     )
 
-    model_4 = build_model("model_4", steps=steps(), output_src=OutputType)
+    model_4 = build_model("model_4", steps=steps_using_integers(), output_src=OutputType)
     assert getfullargspec(model_4).kwonlyargs == ["a", "b", "c"]
     test_4 = model_3(a=1, b=1, c=1)
     assert test_4.run() == OutputType(step_1=2, step_2=0, step_3=3)
@@ -174,7 +141,7 @@ def test_model():
 
 def test_model_scenarios():
 
-    model = build_model("model", steps=steps())
+    model = build_model("model", steps=steps_using_integers())
     model.register_scenario("test", a=1, b=1, c=1)
 
     assert model._scenarios == {"test": {"a": 1, "b": 1, "c": 1}}

@@ -8,15 +8,56 @@ def steps_using_integers():
     """Steps using integers"""
 
     def step_1(a, add):
-        """Run step_1"""
+        """
+        Run step_1.
+
+        Parameters
+        ----------
+        a : int
+            A number
+        add : int
+            Amount to add
+
+        Returns
+        -------
+        int
+        """
         return a + add
 
     def step_2(b, subtract):
-        """Run step_2"""
+        """
+        Run step_2.
+
+        Parameters
+        ----------
+        b : int
+            A number
+        subtract : int
+            Amount to subtract
+
+        Returns
+        -------
+        int
+        """
         return b - subtract
 
     def step_3(a, b, c):
-        """Run step_3"""
+        """
+        Run step_3.
+
+        Parameters
+        ----------
+        a : int
+            A number A
+        b : int
+            A number B
+        c : int
+            A number C
+
+        Returns
+        -------
+        int
+        """
         return a + b + c
 
     list_ = [
@@ -53,7 +94,8 @@ def steps_using_pandas():
     """Steps using pandas"""
 
     def create_frame(n):
-        """Create DataFrame with rows equal to n.
+        """
+        Create DataFrame with rows equal to n.
 
         Parameters
         ----------
@@ -67,7 +109,8 @@ def steps_using_pandas():
         return pd.DataFrame({"n": range(0, n)})
 
     def frame_add_column(frame, add):
-        """Create add column in frame
+        """
+        Create add column in frame
 
         Parameters
         ----------
@@ -83,7 +126,8 @@ def steps_using_pandas():
         return frame.assign(add_col=lambda df: df["n"] + add)
 
     def frame_subtract_column(frame, subtract):
-        """Create subtract column in frame
+        """
+        Create subtract column in frame
 
         Parameters
         ----------
