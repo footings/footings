@@ -5,6 +5,8 @@
 from inspect import getfullargspec
 
 import pytest
+import pandas as pd
+from pandas.testing import assert_series_equal
 
 from footings.footing import create_footing_from_list
 from footings.model import (
@@ -17,7 +19,7 @@ from footings.model import (
     ModelScenarioArgDoesNotExist,
 )
 
-from .shared import steps_using_integers
+from .shared import STEPS_USING_INTEGERS, STEPS_USING_ATTR_LOOKUP, STEPS_USING_KEY_LOOKUP
 
 
 def test_create_dependency_index():
@@ -39,7 +41,7 @@ def test_create_dependency_index():
 
 
 def test_create_attributes():
-    footing = create_footing_from_list("test", steps=steps_using_integers())
+    footing = create_footing_from_list("test", steps=STEPS_USING_INTEGERS)
     meta = {}
     attributes = create_attributes(footing, meta)
     keys = [
@@ -58,7 +60,7 @@ def test_create_attributes():
 
 def test_create_model_docstring():
     model = build_model(
-        "model", steps=steps_using_integers(), description="This is a test",
+        "model", steps=STEPS_USING_INTEGERS, description="This is a test",
     )
     test_doc = [
         "This is a test\n",
@@ -84,15 +86,25 @@ def test_create_model_docstring():
 def test_model():
 
     # no output_src
-    model_1 = build_model("model_1", steps=steps_using_integers())
+    model_1 = build_model("model_1", steps=STEPS_USING_INTEGERS)
     assert getfullargspec(model_1).kwonlyargs == ["a", "b", "c"]
     test_1 = model_1(a=1, b=1, c=1)
     assert test_1.run() == 3
 
+    model_2 = build_model("model_2", steps=STEPS_USING_KEY_LOOKUP)
+    assert getfullargspec(model_2).kwonlyargs == ["a", "b"]
+    test_2 = model_2(a="a", b="b")
+    assert test_2.run() == "a"
+
+    model_3 = build_model("model_3", steps=STEPS_USING_ATTR_LOOKUP)
+    assert getfullargspec(model_3).kwonlyargs == ["n", "add", "subtract"]
+    test_3 = model_3(n=3, add=1, subtract=2)
+    assert_series_equal(test_3.run(), pd.Series([0, 1, 2], name="n"))
+
 
 def test_model_scenarios():
 
-    model = build_model("model", steps=steps_using_integers())
+    model = build_model("model", steps=STEPS_USING_INTEGERS)
     model.register_scenario("test", a=1, b=1, c=1)
 
     assert model._scenarios == {"test": {"a": 1, "b": 1, "c": 1}}

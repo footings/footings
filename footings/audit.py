@@ -36,13 +36,13 @@ def _get_model_output(model):
     for k, v in model.steps.items():
         if isinstance(v.function, LoadedFunction):
             init_args = {k: getattr(model, v) for k, v in v.init_args.items()}
-            dependent_args = {k: output[v] for k, v in v.dependent_args.items()}
+            dependent_args = {k: output[v.name] for k, v in v.dependent_args.items()}
             output.update(
                 {k: v.function(**init_args, **dependent_args, **v.defined_args)}
             )
         else:
             init_args = {k: getattr(model, v) for k, v in v.init_args.items()}
-            dependent_args = {k: output[v] for k, v in v.dependent_args.items()}
+            dependent_args = {k: output[v.name] for k, v in v.dependent_args.items()}
             output.update(
                 {k: v.function(**init_args, **dependent_args, **v.defined_args)}
             )

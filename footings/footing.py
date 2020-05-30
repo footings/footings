@@ -1,16 +1,20 @@
 """Defining the Footing class which is the underlying object that represents a pipeline \n
 and supports the creation of models."""
 
-from typing import Callable, Optional, Dict, List, Union
+from typing import Callable, Dict, Any
 
 from attr import attrs, attrib
-from attr.validators import instance_of, is_callable, optional
+from attr.validators import instance_of, is_callable
 
 from footings.argument import Argument
 
 #########################################################################################
 # established errors
 #########################################################################################
+
+
+class FootingDependentGetError(Exception):
+    """Footing Dependent get attribute or key error."""
 
 
 class FootingStepNameExist(Exception):
@@ -34,29 +38,63 @@ class Dependent:
     ----------
     name : str
         The name of the step within a Footing to use as an argument.
-    get_attr : str, List[str]
-        Any attribute(s) to get from listed step.
+    get_attr : Any
+        Any attribute to get from named dependent.
+    get_key : Any
+        Any key to get from named dependent.
+
+    Raises
+    ------
+    ValueError
+        Error raised if both get_attr and get_key are not None
     """
 
     name: str = attrib(validator=instance_of(str))
-    get_attr: str = attrib(default=None, validator=optional(instance_of(str)))
+    get_attr: Any = attrib(default=None, kw_only=True)
+    get_key: Any = attrib(default=None, kw_only=True)
+
+    def __attrs_post_init__(self):
+        if self.get_attr is not None and self.get_key is not None:
+            msg = "Both get_attr and get_key cannot be None."
+            raise ValueError(msg)
+
+    def get_value(self, val: Any):
+        """Get value from dependence"""
+        if self.get_attr is not None:
+            if not hasattr(val, self.get_attr):
+                msg = f"The attribute [{self.get_attr}] does not exist within val."
+                raise FootingDependentGetError(msg)
+            ret = getattr(val, self.get_attr)
+        elif self.get_key is not None:
+            if not hasattr(val, "__getitem__"):
+                msg = "The object val does not have a __getitem__ method."
+                raise FootingDependentGetError(msg)
+            if self.get_key not in val:
+                msg = "The key [{self.get_key}] does not exist within val."
+                raise FootingDependentGetError(msg)
+            ret = val[self.get_key]
+        else:
+            ret = val
+        return ret
 
 
-def use(name: str, get_attr: Optional[Union[str, List[str]]] = None):
+def use(name: str, get_attr: Any = None, get_key: Any = None):
     """A function to create a Dependent to use within another step.
 
     Parameters
     ----------
     name : str
         The name of the step within a Footing to use as an argument.
-    get_attr : str, List[str]
+    get_attr : Any
         Any attribute(s) to get from listed step.
+    get_key : Any
+        Any key(s) to get from list step.
 
     See Also
     --------
     Dependent
     """
-    return Dependent(name=name, get_attr=get_attr)
+    return Dependent(name, get_attr=get_attr, get_key=get_key)
 
 
 @attrs(slots=True, frozen=True, repr=False)
@@ -159,7 +197,7 @@ class Footing:
                     if arg_val.name not in self.steps:
                         msg = f"The step [{arg_val.name}] does not exist."
                         raise FootingStepNameDoesNotExist(msg)
-                    dependent_args.update({arg_nm: arg_val.name})
+                    dependent_args.update({arg_nm: arg_val})
                     dependencies.add(arg_val.name)
                 else:
                     defined_args.update({arg_nm: arg_val})

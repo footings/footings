@@ -2,13 +2,31 @@
 
 # pylint: disable=missing-function-docstring
 
+from collections import namedtuple
+
+import pytest
+
 from footings.argument import Argument
 from footings.footing import (
     Footing,
     FootingStep,
     create_footing_from_list,
     Dependent,
+    FootingDependentGetError,
 )
+
+
+def test_dependent():
+    assert pytest.raises(ValueError, Dependent, name="test", get_attr="x", get_key="x")
+    TestTuple = namedtuple("TestTuple", "a b")
+    test_tuple = TestTuple(1, 2)
+    dep_attr = Dependent("test_attr", get_attr="c")
+    test_dict = {"a": 1, "b": 2}
+    dep_key = Dependent("test_key", get_key="c")
+    with pytest.raises(FootingDependentGetError):
+        dep_attr.get_value(test_tuple)
+        dep_key.get_value(test_dict)
+        dep_key.get_value(1)
 
 
 def test_footing():
@@ -66,7 +84,7 @@ def test_footing():
             function=step_3,
             init_args={"arg_c": "c"},
             defined_args={},
-            dependent_args={"a": "step_1", "b": "step_2"},
+            dependent_args={"a": Dependent("step_1"), "b": Dependent("step_2")},
         ),
     }
 
@@ -130,6 +148,6 @@ def test_create_footing_from_list():
             function=step_3,
             init_args={"arg_c": "c"},
             defined_args={},
-            dependent_args={"a": "step_1", "b": "step_2"},
+            dependent_args={"a": Dependent("step_1"), "b": Dependent("step_2")},
         ),
     }

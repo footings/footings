@@ -83,7 +83,9 @@ def run_model(model):
         if k not in dependency_index[k]:
             continue
         init_args = {k: getattr(model, v) for k, v in v.init_args.items()}
-        dependent_args = {k: dict_[v] for k, v in v.dependent_args.items()}
+        dependent_args = {
+            k: v.get_value(dict_[v.name]) for k, v in v.dependent_args.items()
+        }
         out = v.function(**init_args, **dependent_args, **v.defined_args)
         update_dict_(dict_, dependency_index[k], k, out)
     return dict_[list(steps.keys())[-1]]
@@ -183,17 +185,20 @@ def get_returns(steps):
     """Get return string from docstring of last step"""
     last_func = steps[-1].get("function")
     parsed_doc = FunctionDoc(last_func)
-    ret = parsed_doc["Returns"][0]
-    nl = "\n"
-    tab = "\t"
-    ret_str = ""
-    if ret.name != "":
-        ret_str += f"{ret.name} : "
-    if ret.type != "":
-        ret_str += f"{ret.type}"
-    if ret.desc != []:
-        ret_str += f"{nl}{tab}{nl.join(ret.desc)}"
-    return ret_str
+    ret = parsed_doc["Returns"]
+    if ret != []:
+        ret = ret[0]
+        nl = "\n"
+        tab = "\t"
+        ret_str = ""
+        if ret.name != "":
+            ret_str += f"{ret.name} : "
+        if ret.type != "":
+            ret_str += f"{ret.type}"
+        if ret.desc != []:
+            ret_str += f"{nl}{tab}{nl.join(ret.desc)}"
+        return ret_str
+    return ""
 
 
 def create_model_docstring(description: str, arguments: dict, returns: str) -> str:
