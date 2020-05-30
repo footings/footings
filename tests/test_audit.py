@@ -1,33 +1,35 @@
 """Test for audit.py"""
 
-# pylint: disable=function-redefined, missing-function-docstring
+# pylint: disable=function-redefined, missing-function-docstring, too-many-locals
 
-# from footings import build_model
-#
-# from .shared import steps_using_integers, steps_using_pandas
-#
-#
-# def test_audit_json():
+import os
+
+from footings import build_model
+
+from .shared import steps_using_integers, steps_using_pandas
+from .xlsx_helpers import compare_xlsx_files
+
+# def test_audit_json(tmp_path):
 #     integer_model = build_model("IntegerModel", steps=steps_using_integers())
 #     loaded_integer_model = integer_model(a=1, b=1, c=1)
-#     print(loaded_integer_model)
-#     # loaded_integer_model.audit(output_type="json", file="test-integers.json", indent=2)
-#
+#     loaded_integer_model.audit(output_type="json", file="test-integers.json", indent=2)
 #     pandas_model = build_model("PandasModel", steps=steps_using_pandas())
 #     loaded_pandas_model = pandas_model(n=5, add=1, subtract=1)
-#     print(loaded_pandas_model)
-#     # z = loaded_pandas_model.audit(output_type="json", file="test-pandas.json", indent=2)
-#     # assert 0
-#
-#
-# def test_audit_xlsx():
-#     integer_model = build_model("IntegerModel", steps=steps_using_integers())
-#     loaded_integer_model = integer_model(a=1, b=1, c=1)
-#     print(loaded_integer_model)
-#     # loaded_integer_model.audit(output_type="xlsx", file="test-integers.xlsx", indent=2)
-#
-#     pandas_model = build_model("PandasModel", steps=steps_using_pandas())
-#     loaded_pandas_model = pandas_model(n=5, add=1, subtract=1)
-#     print(loaded_pandas_model)
-#     # z = loaded_pandas_model.audit(output_type="xlsx", file="test-pandas.xlsx", indent=2)
-#     # assert 0
+#     loaded_pandas_model.audit(output_type="json", file="test-pandas.json", indent=2)
+#     assert 0
+
+
+def test_audit_xlsx(tmp_path):
+    test_integer_out = os.path.join(tmp_path, "test-integers.xlsx")
+    expected_integer_out = os.path.join("tests", "data", "expected-integers.xlsx")
+    integer_model = build_model("IntegerModel", steps=steps_using_integers())
+    loaded_integer_model = integer_model(a=1, b=1, c=1)
+    loaded_integer_model.audit(output_type="xlsx", file=test_integer_out)
+    assert compare_xlsx_files(test_integer_out, expected_integer_out)
+
+    test_pandas_out = os.path.join(tmp_path, "test-pandas.xlsx")
+    expected_pandas_out = os.path.join("tests", "data", "expected-pandas.xlsx")
+    pandas_model = build_model("PandasModel", steps=steps_using_pandas())
+    loaded_pandas_model = pandas_model(n=5, add=1, subtract=1)
+    loaded_pandas_model.audit(output_type="xlsx", file=test_pandas_out)
+    assert compare_xlsx_files(test_pandas_out, expected_pandas_out)
