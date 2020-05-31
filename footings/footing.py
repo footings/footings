@@ -41,7 +41,6 @@ FOOTINGS_RESERVED_WORDS = [
     "steps",
     "dependencies",
     "dependency_index",
-    "meta",
 ]
 
 

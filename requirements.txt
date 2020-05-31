@@ -1,4 +1,4 @@
 attrs
-openpyxl
 pandas
 numpydoc
+openpyxl

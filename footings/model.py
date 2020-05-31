@@ -112,7 +112,6 @@ class BaseModel:
     steps = attrib(init=False, repr=False)
     dependencies = attrib(init=False, repr=False)
     dependency_index = attrib(init=False, repr=False)
-    meta = attrib(init=False, repr=False)
 
     @classmethod
     def register_scenario(cls, name, **kwargs):
@@ -157,7 +156,7 @@ class BaseModel:
         return run_model(self)
 
 
-def create_attributes(footing, meta):
+def create_attributes(footing):
     """Create attributes"""
     attributes = {}
     for arg_key, arg_val in footing.arguments.items():
@@ -172,14 +171,12 @@ def create_attributes(footing, meta):
     dep_attrib = attrib(init=False, repr=False, default=footing.dependencies)
     dep_index = create_dependency_index(footing.dependencies)
     dep_index_attrib = attrib(init=False, repr=False, default=dep_index)
-    meta_attrib = attrib(init=False, repr=False, default=meta)
     return {
         **attributes,
         "arguments": args_attrib,
         "steps": steps_attrib,
         "dependencies": dep_attrib,
         "dependency_index": dep_index_attrib,
-        "meta": meta_attrib,
     }
 
 
@@ -228,11 +225,7 @@ def create_model_docstring(description: str, arguments: dict, returns: str) -> s
 
 
 def build_model(
-    name: str,
-    steps: List[Dict],
-    description: str = None,
-    scenarios: dict = None,
-    meta: dict = None,
+    name: str, steps: List[Dict], description: str = None, scenarios: dict = None,
 ):
     """Build a custom model based on the passed steps.
 
@@ -246,8 +239,6 @@ def build_model(
         A description of the model, by default None.
     scenarios : dict, optional
         Defined scenarios to pass to the  model, by default None.
-    meta : dict, optional
-        A placeholder for meta data, by default None.
 
     Returns
     -------
@@ -256,7 +247,7 @@ def build_model(
         defined within the steps.
     """
     footing = create_footing_from_list(name=name, steps=steps)
-    attributes = create_attributes(footing, meta)
+    attributes = create_attributes(footing)
     model = make_class(
         name, attrs=attributes, bases=(BaseModel,), slots=True, frozen=True, repr=False
     )

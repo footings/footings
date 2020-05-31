@@ -43,8 +43,7 @@ def test_create_dependency_index():
 
 def test_create_attributes():
     footing = create_footing_from_list("test", steps=STEPS_USING_INTEGERS)
-    meta = {}
-    attributes = create_attributes(footing, meta)
+    attributes = create_attributes(footing)
     keys = [
         "a",
         "b",
@@ -53,7 +52,6 @@ def test_create_attributes():
         "steps",
         "dependencies",
         "dependency_index",
-        "meta",
     ]
     assert list(attributes.keys()) == keys
     assert [k for k, v in attributes.items() if v.init is True] == keys[:3]
