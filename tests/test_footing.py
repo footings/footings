@@ -8,11 +8,14 @@ import pytest
 
 from footings.argument import Argument
 from footings.footing import (
+    Dependent,
     Footing,
     FootingStep,
     create_footing_from_list,
-    Dependent,
     FootingDependentGetError,
+    FootingStepNameExist,
+    FootingStepNameDoesNotExist,
+    FootingReserveWordError,
 )
 
 
@@ -151,3 +154,41 @@ def test_create_footing_from_list():
             dependent_args={"a": Dependent("step_1"), "b": Dependent("step_2")},
         ),
     }
+
+
+def test_footing_errors():
+
+    # duplicate step error
+    steps = [
+        {
+            "name": "test-duplicate",
+            "function": lambda x: x,
+            "args": {"arg_x": Argument("x")},
+        },
+        {
+            "name": "test-duplicate",
+            "function": lambda y: y,
+            "args": {"arg_y": Argument("y")},
+        },
+    ]
+    with pytest.raises(FootingStepNameExist):
+        create_footing_from_list("test-name-exist", steps)
+
+    # duplicate step error
+    steps = [
+        {"name": "test-x", "function": lambda x: x, "args": {"arg_x": Argument("x")},},
+        {"name": "test-y", "function": lambda y: y, "args": {"arg_y": Dependent("y")},},
+    ]
+    with pytest.raises(FootingStepNameDoesNotExist):
+        create_footing_from_list("test-name-does-not-exist", steps)
+
+    # reserve words error
+    steps = [
+        {
+            "name": "test-reserve-word",
+            "function": lambda scenario: scenario,
+            "args": {"arg_scenario": Argument("scenarios")},
+        }
+    ]
+    with pytest.raises(FootingReserveWordError):
+        create_footing_from_list("test", steps)

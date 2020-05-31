@@ -3,7 +3,6 @@
 from typing import List, Dict
 from inspect import getfullargspec
 import sys
-from traceback import extract_tb, format_list
 
 from attr import attrs, attrib, make_class
 from numpydoc.docscrape import FunctionDoc
@@ -95,23 +94,13 @@ def run_model(model):
         try:
             out = v.function(**init_args, **dependent_args, **v.defined_args)
         except:
-            nl = "\n"
-            exc_type, exc_value, exc_trace = sys.exc_info()
-            msg = f"At step [{k}], a {exc_type} error occured.\n"
-            msg += f"The message = {exc_value}.\n{nl.join(format_list(extract_tb(exc_trace)))}"
+            exc_type, exc_value, _ = sys.exc_info()
+            msg = f"At step [{k}], an error occured.\n"
+            msg += f"  Error Type = {exc_type}\n"
+            msg += f"  Error Message = {exc_value}"
             raise ModelRunError(msg)
         update_dict_(dict_, dependency_index[k], k, out)
     return dict_[list(steps.keys())[-1]]
-
-
-FOOTINGS_RESERVED_WORDS = [
-    "scenarios",
-    "arguments",
-    "steps",
-    "dependencies",
-    "dependency_index",
-    "meta",
-]
 
 
 @attrs(slots=True, frozen=True, repr=False)

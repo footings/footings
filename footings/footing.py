@@ -6,7 +6,8 @@ from typing import Callable, Dict, Any
 from attr import attrs, attrib
 from attr.validators import instance_of, is_callable
 
-from footings.argument import Argument
+from .argument import Argument
+
 
 #########################################################################################
 # established errors
@@ -25,9 +26,23 @@ class FootingStepNameDoesNotExist(Exception):
     """The step name to use as a dependency is not present."""
 
 
+class FootingReserveWordError(Exception):
+    """Argument name is a reserve word."""
+
+
 #########################################################################################
 # footing
 #########################################################################################
+
+
+FOOTINGS_RESERVED_WORDS = [
+    "scenarios",
+    "arguments",
+    "steps",
+    "dependencies",
+    "dependency_index",
+    "meta",
+]
 
 
 @attrs(slots=True, frozen=True, repr=False)
@@ -190,6 +205,10 @@ class Footing:
         if args is not None:
             for arg_nm, arg_val in args.items():
                 if isinstance(arg_val, Argument):
+                    if arg_val.name in FOOTINGS_RESERVED_WORDS:
+                        msg = f"The [{arg_val.name}] is a reserve word."
+                        msg += "Use a different argument name."
+                        raise FootingReserveWordError(msg)
                     if arg_val.name not in self.arguments:
                         self.arguments.update({arg_val.name: arg_val})
                     init_args.update({arg_nm: arg_val.name})
