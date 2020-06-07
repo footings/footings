@@ -1,0 +1,13 @@
+site_name: Footings
+nav:
+    - Home: 'index.md'
+    - User Guide: 'user_guide.md'
+    - API: 'api.md'
+    - Changelog: 'changelog.md'
+
+extra_css:
+  - css/extra.css
+
+markdown_extensions:
+  - footnotes
+  - attr_list
