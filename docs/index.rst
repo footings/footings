@@ -1,21 +1,21 @@
-# Footings
 
-A Model Building Library
+Footings
+========
 
----
+*A Model Building Library*
 
-<br>
+Summary
+-------
 
-## Summary
----
 Footings is a model building Python library. No out-of-the box models are provided. Instead it is a framework library that provides key objects and functions to help users  construct custom models.
 
-## Purpose
----
+Purpose
+-------
+
 The footings library was developed with the intention of making it easier to develop actuarial models in Python. Actuarial models are a mix of data engineering and math/calculations. In addition, actuarial models are ususally not defined by one calculation, but a series of calculations. So even though the original purpose is actuarial work, if the problem at hand sounds familiar, others might find this library useful.
 
-## Principles
----
+Principles
+----------
 
 The Footings library was designed as framework library using the below princples -
 
@@ -30,18 +30,18 @@ The Footings library was designed as framework library using the below princples
 
 **These all become easier when you can leverage the amazing Python and wider open source ecosystems.**
 
-## Installation
----
+Installation
+------------
 
-This library is not yet on PyPI, but can be installed directly from this repo.
+This library is not yet on PyPI, but can be installed directly from this repo. To do this run ::
 
-```
-pip install git+https://github.com/foootings/footings-core.git
-```
+   pip install git+https://github.com/foootings/footings-core.git
 
 
-## License
----
+
+License
+-------
+
 BSD 3-Clause License
 
 Copyright (c) 2019-2020 Dustin Tindall
@@ -72,3 +72,11 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   user_guide.rst
+   api.rst
+   changelog.rst
