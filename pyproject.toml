@@ -20,9 +20,3 @@ exclude = '''
   | dist
 )/
 '''
-
-
-[tool.pylint.messages_control]
-disable="""
-bad-continuation,invalid-name,R0801,too-many-return-statements,too-many-arguments
-"""
