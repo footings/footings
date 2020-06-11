@@ -1,7 +1,3 @@
-"""Test for argeter.py"""
-
-# pylint: disable=function-redefined, missing-function-docstring
-
 import pytest
 
 from footings.argument import (
