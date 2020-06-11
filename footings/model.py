@@ -11,8 +11,6 @@ from .footing import create_footing_from_list
 from .audit import run_model_audit
 from .visualize import visualize_model
 
-__all__ = ["build_model"]
-
 #########################################################################################
 # established errors
 #########################################################################################
@@ -163,7 +161,7 @@ def create_attributes(footing):
         kwargs = {}
         if arg_val.default is not None:
             kwargs.update({"default": arg_val.default})
-        kwargs.update({"kw_only": True, "validator": arg_val.create_validator()})
+        kwargs.update({"kw_only": True, "validator": arg_val._create_validator()})
         attributes.update({arg_key: attrib(**kwargs)})
 
     args_attrib = attrib(init=False, repr=False, default=footing.arguments)
@@ -224,16 +222,21 @@ def create_model_docstring(description: str, arguments: dict, returns: str) -> s
     return docstring
 
 
-def build_model(
+def create_model(
     name: str, steps: List[Dict], description: str = None, scenarios: dict = None,
 ):
-    """Build a custom model based on the passed steps.
+    """A factory function that creates a model.
+
+    A model is a sequential list of function calls. Defined Arguments will become model input arguments and
+    any defined Dependents will link output from  one step as input to another.
+
+    A model is a child of the BaseModel class with the type equal to the passed name parameter.
 
     Parameters
     ----------
     name : str
         The name to assign the model.
-    steps : list
+    steps : list[Dict]
         The list of steps the model will perform.
     description : str, optional
         A description of the model, by default None.
@@ -242,9 +245,13 @@ def build_model(
 
     Returns
     -------
-    type(Name)
-        A class called the passed name. The attributes of the class will be the arguments \n
-        defined within the steps.
+    name
+        An object with type equal to the passed parameter name.
+
+    See Also
+    --------
+    footings.model.BaseModel
+
     """
     footing = create_footing_from_list(name=name, steps=steps)
     attributes = create_attributes(footing)

@@ -1,7 +1,3 @@
-"""Test for model.py"""
-
-# pylint: disable=missing-function-docstring, protected-access
-
 from inspect import getfullargspec
 
 import pytest
@@ -10,7 +6,7 @@ from pandas.testing import assert_series_equal
 
 from footings.footing import create_footing_from_list
 from footings.model import (
-    build_model,
+    create_model,
     create_dependency_index,
     create_attributes,
     ModelScenarioAlreadyExist,
@@ -58,7 +54,7 @@ def test_create_attributes():
 
 
 def test_create_model_docstring():
-    model = build_model(
+    model = create_model(
         "model", steps=STEPS_USING_INTEGERS, description="This is a test",
     )
     test_doc = [
@@ -77,32 +73,29 @@ def test_create_model_docstring():
         "-------\n",
         "int",
     ]
-    print("".join(test_doc))
-    print(model.__doc__)
     assert model.__doc__ == "".join(test_doc)
 
 
 def test_model():
 
-    # no output_src
-    model_1 = build_model("model_1", steps=STEPS_USING_INTEGERS)
+    model_1 = create_model("model_1", steps=STEPS_USING_INTEGERS)
     assert getfullargspec(model_1).kwonlyargs == ["a", "b", "c"]
     test_1 = model_1(a=1, b=1, c=1)
     assert test_1.run() == 3
 
-    model_2 = build_model("model_2", steps=STEPS_USING_KEY_LOOKUP)
+    model_2 = create_model("model_2", steps=STEPS_USING_KEY_LOOKUP)
     assert getfullargspec(model_2).kwonlyargs == ["a", "b"]
     test_2 = model_2(a="a", b="b")
     assert test_2.run() == "a"
 
-    model_3 = build_model("model_3", steps=STEPS_USING_ATTR_LOOKUP)
+    model_3 = create_model("model_3", steps=STEPS_USING_ATTR_LOOKUP)
     assert getfullargspec(model_3).kwonlyargs == ["n", "add", "subtract"]
     test_3 = model_3(n=3, add=1, subtract=2)
     assert_series_equal(test_3.run(), pd.Series([0, 1, 2], name="n"))
 
 
 def test_model_errors():
-    model_1 = build_model("model_1", steps=STEPS_USING_INTEGERS)
+    model_1 = create_model("model_1", steps=STEPS_USING_INTEGERS)
     test_1 = model_1(a=1, b=1, c="c")
     with pytest.raises(ModelRunError):
         test_1.run()
@@ -110,7 +103,7 @@ def test_model_errors():
 
 def test_model_scenarios():
 
-    model = build_model("model", steps=STEPS_USING_INTEGERS)
+    model = create_model("model", steps=STEPS_USING_INTEGERS)
     model.register_scenario("test", a=1, b=1, c=1)
 
     assert model._scenarios == {"test": {"a": 1, "b": 1, "c": 1}}
