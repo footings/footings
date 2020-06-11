@@ -1,6 +1,3 @@
-"""Defining the Footing class which is the underlying object that represents a pipeline \n
-and supports the creation of models."""
-
 from typing import Callable, Dict, Any
 
 from attr import attrs, attrib
@@ -46,7 +43,12 @@ FOOTINGS_RESERVED_WORDS = [
 
 @attrs(slots=True, frozen=True, repr=False)
 class Dependent:
-    """A dependent step to use as input.
+    """A dependent marks an object as a child of an earlier computed step within a model.
+
+    When an argument within a defined step is set to a Dependent of another step, when the step is called,
+    the model will input the output of the dependent step.
+
+    get_attr or get_key can be set to retrieve an attribute or a key from a dependent step.
 
     Attributes
     ----------
@@ -92,8 +94,10 @@ class Dependent:
         return ret
 
 
-def use(name: str, get_attr: Any = None, get_key: Any = None):
-    """A function to create a Dependent to use within another step.
+def use(name: str, get_attr: Any = None, get_key: Any = None) -> Dependent:
+    """A factory function that creates a Dependent.
+
+    A dependent marks an object as a child of an earlier computed step within a model.
 
     Parameters
     ----------
@@ -106,7 +110,7 @@ def use(name: str, get_attr: Any = None, get_key: Any = None):
 
     See Also
     --------
-    Dependent
+    footings.footing.Dependent
     """
     return Dependent(name, get_attr=get_attr, get_key=get_key)
 

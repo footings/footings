@@ -1,7 +1,3 @@
-"""test for footing.py"""
-
-# pylint: disable=missing-function-docstring
-
 from collections import namedtuple
 
 import pytest
