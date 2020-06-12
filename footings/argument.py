@@ -165,7 +165,7 @@ class Argument:
 
 
 def create_argument(name: str, **kwargs) -> Argument:
-    """A factory function that creates an Argument.
+    """A factory function to create an Argument.
 
     An argument is a representation of a parameter to be passed to a model.
 

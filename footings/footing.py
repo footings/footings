@@ -95,7 +95,7 @@ class Dependent:
 
 
 def use(name: str, get_attr: Any = None, get_key: Any = None) -> Dependent:
-    """A factory function that creates a Dependent.
+    """A factory function to create a Dependent.
 
     A dependent marks an object as a child of an earlier computed step within a model.
 

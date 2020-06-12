@@ -225,7 +225,7 @@ def create_model_docstring(description: str, arguments: dict, returns: str) -> s
 def create_model(
     name: str, steps: List[Dict], description: str = None, scenarios: dict = None,
 ):
-    """A factory function that creates a model.
+    """A factory function to create a model.
 
     A model is a sequential list of function calls. Defined Arguments will become model input arguments and
     any defined Dependents will link output from  one step as input to another.

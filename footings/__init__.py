@@ -1,9 +1,9 @@
 """__init__.py"""
 
 from footings.argument import create_argument
-from footings.footing import Footing, use, create_footing_from_list
-from footings.utils import DispatchFunction, LoadedFunction, create_loaded_function
-from footings.model import build_model
+from footings.footing import use
+from footings.utils import create_dispatch_function, create_loaded_function
+from footings.model import create_model
 
 from ._version import get_versions
 

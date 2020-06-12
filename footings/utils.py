@@ -1,6 +1,6 @@
 """Utility classes and functions that support the footings library."""
 
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Tuple, Optional
 from itertools import product
 from functools import partial
 from collections.abc import Hashable, Iterable
@@ -34,7 +34,7 @@ def _update_dispatch_registry(registry, keys, function):
 
 @attrs(slots=True, frozen=True, repr=False)
 class DispatchFunction:
-    """A function that is disptaches other functions based on established parameters.
+    """A function that dispatches other functions based on set parameters.
 
     Attributes
     ----------
@@ -54,9 +54,26 @@ class DispatchFunction:
 
     Notes
     -----
-    The class uses the registry pattern. On initilization of the class, a dict called \n
+    The class uses the registry pattern. On initilization of the class, a dict called
     registry is created which keeps track of the registered keys to dispatch functions on.
 
+    Examples
+    --------
+    >>> single_key = DispatchFunction(name="single_key", parameters=("key",))
+    >>>
+    >>> @single_key.register(key="x")
+    >>> def _():
+    >>>     return "x"
+    >>>
+    >>> assert single_key(key="x") == "x"
+    >>>
+    >>> multi_key = DispatchFunction(name="multi_key", parameters=("key1", "key2"))
+    >>>
+    >>> @multi_key.register(key1="x1", key2="x2")
+    >>> def _():
+            return "x"
+    >>>
+    >>> assert single_key(key1="x1", key2="x2") == "x"
     """
 
     name: str = attrib(validator=instance_of(str))
@@ -71,8 +88,11 @@ class DispatchFunction:
 
         Parameters
         ----------
-        function : [type], optional
-            [description], by default None
+        function : callable
+            The function to register.
+        **kwargs
+            The parameter keys to register for the given function.
+
 
         Returns
         -------
@@ -84,20 +104,6 @@ class DispatchFunction:
             Parameter does not belong to DispatchFunction.
         DispatchFunctionRegisterValueError
             The value passed is not a String or Iterable.
-
-        Examples
-        --------
-        single_key = DispatchFunction(name="single_key", parameters=("key",))
-
-        @single_key.register(key="x")
-        def _():
-            return "x"
-
-        multi_key = DispatchFunction(name="multi_key", parameters=("key1", "key2"))
-
-        @multi_key.register(key1="x1", key2="x2")
-        def _():
-            return "x"
         """
         items = []
         for param in self.parameters:
@@ -132,6 +138,49 @@ class DispatchFunction:
         return func(*args, **kwargs)
 
 
+def create_dispatch_function(
+    name: str, parameters: tuple, default: Optional[Callable]
+) -> DispatchFunction:
+    """A factory function to create a DispatchFunction
+
+    Parameters
+    ----------
+    name: str
+        The name to assign the DispatchFunction
+    parameters: tuple
+        The parameters by which a key is established
+    default: callable, optional
+        The default function to run if no key exists within the registry.
+
+    Returns
+    -------
+    DispatchFunction
+
+    See Also
+    --------
+    footings.utils.DispatchFunction
+
+    Examples
+    --------
+    >>> single_key = create_dispatch_function(name="single_key", parameters=("key",))
+    >>>
+    >>> @single_key.register(key="x")
+    >>> def _():
+    >>>     return "x"
+    >>>
+    >>> assert single_key(key="x") == "x"
+    >>>
+    >>> multi_key = create_dispatch_function(name="multi_key", parameters=("key1", "key2"))
+    >>>
+    >>> @multi_key.register(key1="x1", key2="x2")
+    >>> def _():
+    >>>     return "x"
+    >>>
+    >>> assert single_key(key1="x1", key2="x2") == "x"
+    """
+    return DispatchFunction(name=name, parameters=parameters, default=default)
+
+
 #########################################################################################
 # LoadedFunction
 #########################################################################################
@@ -149,9 +198,14 @@ def _update_loaded_registry(registry, position, function):
 
 @attrs(slots=True, frozen=True, repr=False)
 class LoadedFunction:
-    """A primary function that can be loaded with additional functions to call before \n
-    executing the primary function (i.e., pre_hooks) and/or additional functions to \n
-    call after executing the primary function.
+    """A function that can be loaded with additional functions to be called all at once.
+
+    The initial function is the primary function and any added functions can be though of as
+    pre hooks if added before primary (i.e., position=start) and post hooks if added after
+    the primary function (i.e., position=end).
+
+    A LoadedFunction has the added benefit of being recognized when auditing models as
+    a function with multiple internal calls.
 
     Attributes
     ----------
@@ -159,6 +213,29 @@ class LoadedFunction:
         The name to assign the LoadedFunction.
     function: callable
         The primary function.
+
+    Notes
+    -----
+    The class uses the registry pattern. On initilization of the class, a list called
+    registry is created which records and orders the functions to be called.
+
+    Examples
+    --------
+    >>> def test_primary(x):
+    >>>     return x
+    >>>
+    >>> test = LoadedFunction(name="single_key", function=test_primary)
+    >>>
+    >>> @test.register
+    >>> def _(x):
+    >>>     return x > 3
+    >>>
+    >>> @test.register(position="start")
+    >>> def _(x):
+    >>>     return x + 1
+    >>>
+    >>> assert test(2) == False
+    >>> assert test(3) == True
     """
 
     name: str = attrib(validator=instance_of(str))
@@ -169,7 +246,19 @@ class LoadedFunction:
         self.register(self.function)
 
     def register(self, function=None, position="end"):
-        """Register function"""
+        """Register a function into the registry.
+
+        Parameters
+        ----------
+        function : callable
+            The function to register.
+        position : str
+            Use end if adding to the end of the registry or start to add to the begining.
+
+        Returns
+        -------
+        None
+        """
         if function is None:
             return partial(_update_loaded_registry, self.registry, position)
         return _update_loaded_registry(self.registry, position, function)
@@ -185,7 +274,39 @@ class LoadedFunction:
         return ret
 
 
-def create_loaded_function(function):
-    """Create loaded function."""
+def create_loaded_function(function: callable) -> LoadedFunction:
+    """A factory function to create a LoadedFunction
+
+    Parameters
+    ----------
+    function: callable
+        The primary function.
+
+    Returns
+    -------
+    LoadedFunction
+
+    See Also
+    --------
+    footings.utils.LoadedFunction
+
+    Examples
+    --------
+    >>> def test_primary(x):
+    >>>     return x
+    >>>
+    >>> test = LoadedFunction(name="single_key", function=test_primary)
+    >>>
+    >>> @test.register
+    >>> def _(x):
+    >>>     return x > 3
+    >>>
+    >>> @test.register(position="start")
+    >>> def _(x):
+    >>>     return x + 1
+    >>>
+    >>> assert test(2) == False
+    >>> assert test(3) == True
+    """
     name = function.__name__
     return LoadedFunction(name=name, function=function)
