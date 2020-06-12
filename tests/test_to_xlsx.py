@@ -1,7 +1,3 @@
-"""Test for audit.py"""
-
-# pylint: disable=function-redefined, missing-function-docstring, too-many-locals
-
 import os
 import datetime
 

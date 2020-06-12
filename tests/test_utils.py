@@ -1,7 +1,3 @@
-"""test for utils.py"""
-
-# pylint: disable=function-redefined, missing-function-docstring, unused-variable
-
 import pytest
 
 from footings.utils import (

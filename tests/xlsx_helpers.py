@@ -1,5 +1,3 @@
-"""Helper functions for testing xlsx files."""
-
 # This file was copyied from XlsxWriter/test/helperfunctions.py
 # b644cf25c0f252735a99faa6af3675dbf8216801
 #
