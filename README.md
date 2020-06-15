@@ -23,6 +23,8 @@ The Footings library was designed as framework library using the below principle
 - Models need to scale when needed.
 - Models can be combined to form other models.
 
+**These all become easier when you can leverage the amazing Python and wider open source ecosystems.**
+
 ## Installation
 
 
