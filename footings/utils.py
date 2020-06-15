@@ -139,7 +139,7 @@ class DispatchFunction:
 
 
 def create_dispatch_function(
-    name: str, parameters: tuple, default: Optional[Callable]
+    name: str, parameters: tuple, default: Optional[Callable] = None
 ) -> DispatchFunction:
     """A factory function to create a DispatchFunction
 
