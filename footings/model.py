@@ -215,7 +215,7 @@ def create_model_docstring(description: str, arguments: dict, returns: str) -> s
     str
        The docstring with sections - Summary | Parameters | Returns
     """
-    arg_header = "Arguments\n---------\n"
+    arg_header = "Attributes\n---------\n"
     args = "".join([f"{k}\n\t{v.description}\n" for k, v in arguments.items()])
     ret_header = "Returns\n-------\n"
     docstring = f"{description}\n\n{arg_header}{args}\n{ret_header}{returns}"
