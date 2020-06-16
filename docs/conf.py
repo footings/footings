@@ -11,6 +11,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 import os
 import sys
+from footings import __version__ as version
 
 sys.path.insert(0, os.path.abspath("./.."))
 
@@ -22,7 +23,7 @@ copyright = "2020, Dustin Tindall"
 author = "Dustin Tindall"
 
 # The full version, including alpha/beta/rc tags
-release = "v0.2"
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -47,6 +48,8 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
+# The master toctree document.
+master_doc = "index"
 
 # -- Options for HTML output -------------------------------------------------
 
