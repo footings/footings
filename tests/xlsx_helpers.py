@@ -19,6 +19,9 @@ import os.path
 from zipfile import ZipFile
 from zipfile import BadZipfile
 from zipfile import LargeZipFile
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 
 def _xml_to_list(xml_str):
@@ -114,6 +117,9 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files, ignore_elements):
     #
     # In order to compare the XLSX files we convert the data in each
     # XML file into an list of XML elements.
+
+    LOGGER.info("Starting xlsx comparison...")
+
     try:
         # Open the XlsxWriter as a zip file for testing.
         got_zip = ZipFile(got_file, "r")
@@ -146,8 +152,13 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files, ignore_elements):
     if got_files != exp_files:
         return got_files, exp_files
 
+    LOGGER.info("XLSX passed same files...")
+
     # Compare each file in the XLSX containers.
     for filename in exp_files:
+
+        LOGGER.info(f"Starting comparison of {filename}...")
+
         got_xml_str = got_zip.read(filename)
         exp_xml_str = exp_zip.read(filename)
 
@@ -210,10 +221,12 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files, ignore_elements):
 
         # Compared the XML elements in each file.
         if got_xml != exp_xml:
+            LOGGER.info(f"XML different for file {filename}...")
             got_xml.insert(0, filename)
             exp_xml.insert(0, filename)
-            print(filename)
             return got_xml, exp_xml
+
+        LOGGER.info(f"Comparison of {filename} passed")
 
     # If we got here the files are the same.
     return "Ok", "Ok"
