@@ -1,6 +1,8 @@
 # Footings - A Model Building Library
 
-![CI](https://github.com/dustindall/footings-core/workflows/CI/badge.svg)
+![build](https://github.com/dustindall/footings-core/workflows/CI/badge.svg)
+[![docs](https://readthedocs.org/projects/footings/badge/?version=latest)](https://footings.readthedocs.io/en/latest/?badge=latest)
+[![license](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 
 ## What is it?
