@@ -16,7 +16,7 @@ from .xlsx_helpers import compare_xlsx_files
 #     loaded_pandas_model.audit(output_type="json", file="test-pandas.json", indent=2)
 #     assert 0
 
-EXCLUDE_FILES = ["[Content_Types].xml", "_rels/.rels"]
+EXCLUDE_FILES = ["[Content_Types].xml", "_rels/.rels", "docProps/core.xml"]
 
 
 def test_audit_xlsx(tmp_path):
