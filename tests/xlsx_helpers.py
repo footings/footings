@@ -221,9 +221,12 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files, ignore_elements):
 
         # Compared the XML elements in each file.
         if got_xml != exp_xml:
-            LOGGER.info(f"XML different for file {filename}...")
             got_xml.insert(0, filename)
             exp_xml.insert(0, filename)
+
+            LOGGER.info(f"XML different for file {filename}...")
+            LOGGER.info(f"Got XML = {str(got_xml)}")
+            LOGGER.info(f"Expected XML = {str(exp_xml)}")
             return got_xml, exp_xml
 
         LOGGER.info(f"Comparison of {filename} passed")
