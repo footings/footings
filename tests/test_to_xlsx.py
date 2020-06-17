@@ -10,7 +10,12 @@ from footings.to_xlsx import obj_to_xlsx, XlsxWorkbook
 
 from .xlsx_helpers import compare_xlsx_files
 
-EXCLUDE_FILES = ["[Content_Types].xml", "_rels/.rels", "docProps/core.xml"]
+EXCLUDE_FILES = [
+    "[Content_Types].xml",
+    "_rels/.rels",
+    "docProps/core.xml",
+    "xl/_rels/workbook.xml.rels",
+]
 
 
 def test_obj_to_xlsx(tmp_path):
