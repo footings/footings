@@ -84,7 +84,7 @@ def test_obj_to_xlsx(tmp_path):
 
     expected_wb = os.path.join("tests", "data", "expected-obj-to-xlsx.xlsx")
 
-    assert compare_xlsx_files(test_wb, expected_wb, [], {})
+    assert compare_xlsx_files(test_wb, expected_wb, ["[Content_Types].xml"], {})
 
 
 def test_xlsx_workbook(tmp_path):
@@ -104,4 +104,4 @@ def test_xlsx_workbook(tmp_path):
 
     expected_wb = os.path.join("tests", "data", "expected-xlsx-workbook.xlsx")
 
-    assert compare_xlsx_files(test_wb, expected_wb, [], {})
+    assert compare_xlsx_files(test_wb, expected_wb, ["[Content_Types].xml"], {})
