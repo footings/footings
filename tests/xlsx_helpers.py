@@ -2,7 +2,10 @@
 # b644cf25c0f252735a99faa6af3675dbf8216801
 #
 # Edits to the file include:
-# - commenting out line 167
+# - Commenting out line 167
+# - Added logging
+# - Added sort attributes function within _sort_rel_file_data
+# - Apply _sort_rel_file_data to all files
 
 # pylint: disable-all
 
@@ -12,6 +15,33 @@
 #
 # Copyright (c), 2013-2020, John McNamara, jmcnamara@cpan.org
 #
+# LICENSE
+# Copyright (c) 2013-2020, John McNamara <jmcnamara@cpan.org>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# The views and conclusions contained in the software and documentation are those
+# of the authors and should not be interpreted as representing official policies,
+# either expressed or implied, of the FreeBSD Project.
 
 import re
 import sys
@@ -20,6 +50,7 @@ from zipfile import ZipFile
 from zipfile import BadZipfile
 from zipfile import LargeZipFile
 import logging
+import xml.etree.ElementTree as ET
 
 LOGGER = logging.getLogger(__name__)
 
@@ -99,7 +130,18 @@ def _sort_rel_file_data(xml_elements):
     last = xml_elements.pop()
 
     # Sort the relationship elements.
-    xml_elements.sort()
+    def sort_attributes(xml):
+        try:
+            root = ET.fromstring(xml)
+            root.attrib = {k: root.attrib[k] for k in sorted(root.attrib.keys())}
+            xmlstr = ET.tostring(root, encoding="utf-8", method="xml")
+            ret = xmlstr.decode("utf-8")
+        except ET.ParseError:
+            ret = xml
+        LOGGER.info(ret)
+        return ret
+
+    xml_elements = sorted([sort_attributes(xml) for xml in xml_elements])
 
     # Add back the first and last elements.
     xml_elements.insert(0, first)
@@ -215,9 +257,8 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files, ignore_elements):
                 got_xml = [tag for tag in got_xml if not re.match(pattern, tag)]
 
         # Reorder the XML elements in the XLSX relationship files.
-        if filename == "[Content_Types].xml" or re.search(".rels$", filename):
-            got_xml = _sort_rel_file_data(got_xml)
-            exp_xml = _sort_rel_file_data(exp_xml)
+        got_xml = _sort_rel_file_data(got_xml)
+        exp_xml = _sort_rel_file_data(exp_xml)
 
         # Compared the XML elements in each file.
         if got_xml != exp_xml:

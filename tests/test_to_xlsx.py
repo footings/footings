@@ -10,13 +10,6 @@ from footings.to_xlsx import obj_to_xlsx, XlsxWorkbook
 
 from .xlsx_helpers import compare_xlsx_files
 
-EXCLUDE_FILES = [
-    "[Content_Types].xml",
-    "_rels/.rels",
-    "docProps/core.xml",
-    "xl/_rels/workbook.xml.rels",
-]
-
 
 def test_obj_to_xlsx(tmp_path):
 
@@ -31,7 +24,7 @@ def test_obj_to_xlsx(tmp_path):
     obj_to_xlsx("test-int", wksht_builtins, 4, 2, None)
     obj_to_xlsx(1, wksht_builtins, 4, 3, None)
     obj_to_xlsx("test-float", wksht_builtins, 5, 2, None)
-    obj_to_xlsx(1.23456789, wksht_builtins, 6, 3, None)
+    obj_to_xlsx(1.23456789, wksht_builtins, 5, 3, None)
     obj_to_xlsx("test-date", wksht_builtins, 6, 2, None)
     obj_to_xlsx(datetime.date(2018, 12, 31), wksht_builtins, 6, 3, None)
     obj_to_xlsx("test-datetime", wksht_builtins, 7, 2, None)
@@ -91,7 +84,7 @@ def test_obj_to_xlsx(tmp_path):
 
     expected_wb = os.path.join("tests", "data", "expected-obj-to-xlsx.xlsx")
 
-    assert compare_xlsx_files(test_wb, expected_wb, EXCLUDE_FILES, {})
+    assert compare_xlsx_files(test_wb, expected_wb, [], {})
 
 
 def test_xlsx_workbook(tmp_path):
@@ -111,4 +104,4 @@ def test_xlsx_workbook(tmp_path):
 
     expected_wb = os.path.join("tests", "data", "expected-xlsx-workbook.xlsx")
 
-    assert compare_xlsx_files(test_wb, expected_wb, EXCLUDE_FILES, {})
+    assert compare_xlsx_files(test_wb, expected_wb, [], {})

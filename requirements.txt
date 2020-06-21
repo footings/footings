@@ -1,4 +1,0 @@
-attrs
-pandas
-numpydoc
-openpyxl
