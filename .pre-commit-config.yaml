@@ -18,3 +18,4 @@ repos:
     hooks:
     - id: flake8
       language_version: python3.7
+      exclude: __init__.py, _version.py, versioneer.py
