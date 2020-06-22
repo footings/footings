@@ -2,8 +2,8 @@ from collections import namedtuple
 
 import pytest
 
-from footings.argument import Argument
-from footings.footing import (
+from footings.core.argument import Argument
+from footings.core.footing import (
     Dependent,
     Footing,
     FootingStep,

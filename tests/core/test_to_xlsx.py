@@ -6,7 +6,7 @@ import pandas as pd
 from openpyxl import Workbook
 from openpyxl.styles import NamedStyle, Font
 
-from footings.to_xlsx import obj_to_xlsx, XlsxWorkbook
+from footings.core.to_xlsx import obj_to_xlsx, XlsxWorkbook
 
 from .xlsx_helpers import compare_xlsx_files
 
@@ -82,7 +82,7 @@ def test_obj_to_xlsx(tmp_path):
     test_wb = os.path.join(tmp_path, "test-obj-to-xlsx.xlsx")
     wb.save(test_wb)
 
-    expected_wb = os.path.join("tests", "data", "expected-obj-to-xlsx.xlsx")
+    expected_wb = os.path.join("tests", "core", "data", "expected-obj-to-xlsx.xlsx")
 
     assert compare_xlsx_files(test_wb, expected_wb, [], {})
 
@@ -102,6 +102,6 @@ def test_xlsx_workbook(tmp_path):
     test_wb = os.path.join(tmp_path, "test-xlsx-workbook.xlsx")
     wb.save(test_wb)
 
-    expected_wb = os.path.join("tests", "data", "expected-xlsx-workbook.xlsx")
+    expected_wb = os.path.join("tests", "core", "data", "expected-xlsx-workbook.xlsx")
 
     assert compare_xlsx_files(test_wb, expected_wb, [], {})

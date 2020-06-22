@@ -1,6 +1,6 @@
 import pytest
 
-from footings.utils import (
+from footings.core.utils import (
     DispatchFunction,
     DispatchFunctionKeyError,
     DispatchFunctionRegisterParameterError,

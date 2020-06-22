@@ -138,7 +138,6 @@ def _sort_rel_file_data(xml_elements):
             ret = xmlstr.decode("utf-8")
         except ET.ParseError:
             ret = xml
-        LOGGER.info(ret)
         return ret
 
     xml_elements = sorted([sort_attributes(xml) for xml in xml_elements])
@@ -251,6 +250,7 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files, ignore_elements):
         # Ignore test specific XML elements for defined filenames.
         if filename in ignore_elements:
             patterns = ignore_elements[filename]
+            print(patterns)
 
             for pattern in patterns:
                 exp_xml = [tag for tag in exp_xml if not re.match(pattern, tag)]

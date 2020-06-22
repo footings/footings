@@ -19,14 +19,14 @@ from .xlsx_helpers import compare_xlsx_files
 
 def test_audit_xlsx(tmp_path):
     test_integer_out = os.path.join(tmp_path, "test-integers.xlsx")
-    expected_integer_out = os.path.join("tests", "data", "expected-integers.xlsx")
+    expected_integer_out = os.path.join("tests", "core", "data", "expected-integers.xlsx")
     integer_model = create_model("IntegerModel", steps=STEPS_USING_INTEGERS)
     loaded_integer_model = integer_model(a=1, b=1, c=1)
     loaded_integer_model.audit(output_type="xlsx", file=test_integer_out)
     assert compare_xlsx_files(test_integer_out, expected_integer_out, [], {})
 
     test_pandas_out = os.path.join(tmp_path, "test-pandas.xlsx")
-    expected_pandas_out = os.path.join("tests", "data", "expected-pandas.xlsx")
+    expected_pandas_out = os.path.join("tests", "core", "data", "expected-pandas.xlsx")
     pandas_model = create_model("PandasModel", steps=STEPS_USING_PANDAS)
     loaded_pandas_model = pandas_model(n=5, add=1, subtract=1)
     loaded_pandas_model.audit(output_type="xlsx", file=test_pandas_out)

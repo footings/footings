@@ -1,6 +1,6 @@
 import pytest
 
-from footings.argument import (
+from footings.core.argument import (
     Argument,
     ArgumentTypeError,
     ArgumentAllowedError,

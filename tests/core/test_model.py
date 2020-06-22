@@ -4,8 +4,8 @@ import pytest
 import pandas as pd
 from pandas.testing import assert_series_equal
 
-from footings.footing import create_footing_from_list
-from footings.model import (
+from footings.core.footing import create_footing_from_list
+from footings.core.model import (
     create_model,
     create_dependency_index,
     create_attributes,
