@@ -28,10 +28,10 @@ def calculate_age(
     as_of_dt : date or pd.Timestamp or pd.Series
         The as of date to calculate age.
     method : str
-        Options are -
-        - ALB = Age last birthday
-        - ACB = Age closest birthday
-        - ANB = Age next birthday
+        Options are - \n
+        - ALB = Age last birthday \n
+        - ACB = Age closest birthday \n
+        - ANB = Age next birthday \n
 
     Returns
     -------
@@ -72,11 +72,11 @@ def calculate_age(
 def _series_calculate_age(birth_dt, as_of_dt, method):
     diff = (as_of_dt.year - birth_dt.year) * 12 + (as_of_dt.month - birth_dt.month)
     if method == "ALB":
-        return diff.floordiv(12)
+        return diff.floordiv(12).astype("int32")
     if method == "ANB":
-        return diff.floordiv(12).add(1)
+        return diff.floordiv(12).add(1).astype("int32")
     if method == "ACB":
-        return diff.div(12).round(0).astype(int)
+        return diff.div(12).round(0).astype("int32")
     raise ValueError(f"The method passed [{method}] is not known. See the documentation.")
 
 
