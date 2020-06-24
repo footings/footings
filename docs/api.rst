@@ -70,6 +70,7 @@ Library
    create_frame
    create_frame_from_record
    expand_frame_per_record
+   calculate_age
 
 |
 |
@@ -77,3 +78,4 @@ Library
 .. autofunction:: create_frame
 .. autofunction:: create_frame_from_record
 .. autofunction:: expand_frame_per_record
+.. autofunction:: calculate_age
