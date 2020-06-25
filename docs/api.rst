@@ -71,6 +71,7 @@ Library
    create_frame_from_record
    expand_frame_per_record
    calculate_age
+   post_drop_columns
 
 |
 |
@@ -79,3 +80,4 @@ Library
 .. autofunction:: create_frame_from_record
 .. autofunction:: expand_frame_per_record
 .. autofunction:: calculate_age
+.. autofunction:: post_drop_columns

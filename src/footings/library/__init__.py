@@ -4,3 +4,4 @@ from footings.library.frames import (
     expand_frame_per_record,
 )
 from footings.library.age import calculate_age
+from footings.library.helpers import post_drop_columns
