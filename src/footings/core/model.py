@@ -215,8 +215,20 @@ def create_model_docstring(description: str, arguments: dict, returns: str) -> s
     str
        The docstring with sections - Summary | Parameters | Returns
     """
-    arg_header = "Attributes\n---------\n"
-    args = "".join([f"{k}\n\t{v.description}\n" for k, v in arguments.items()])
+
+    def _clean_dtype(dtype):
+        dtype_str = str(dtype)
+        return dtype_str.replace("<class '", "").replace("'>", "")
+
+    arg_header = "Parameters\n----------\n"
+    args = "".join(
+        [
+            f"{k}\n\t{v.description}\n"
+            if v.dtype is None
+            else f"{k} : {_clean_dtype(v.dtype)}\n\t{v.description}\n"
+            for k, v in arguments.items()
+        ]
+    )
     ret_header = "Returns\n-------\n"
     docstring = f"{description}\n\n{arg_header}{args}\n{ret_header}{returns}"
     return docstring

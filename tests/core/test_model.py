@@ -60,8 +60,8 @@ def test_create_model_docstring():
     test_doc = [
         "This is a test\n",
         "\n",
-        "Attributes\n",
-        "---------\n",
+        "Parameters\n",
+        "----------\n",
         "a\n",
         "\tdescription for a\n",
         "b\n",
