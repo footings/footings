@@ -6,7 +6,7 @@ import pytest
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
-from footings.library.frames import (
+from footings.tools.frames import (
     freq_dispatcher,
     kwarg_dispatcher,
     create_frame,
@@ -14,7 +14,7 @@ from footings.library.frames import (
     expand_frame_per_record,
 )
 
-FILE = os.path.join("tests", "library", "data", "frame-examples.xlsx")
+FILE = os.path.join("tests", "tools", "data", "frame-examples.xlsx")
 TEST_PARAMS = [
     (
         "test-month-duration",

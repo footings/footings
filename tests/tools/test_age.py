@@ -3,7 +3,7 @@ from datetime import date
 import pandas as pd
 from pandas.testing import assert_series_equal
 
-from footings.library.age import calculate_age
+from footings.tools import calculate_age
 
 
 def test_calculate_age():

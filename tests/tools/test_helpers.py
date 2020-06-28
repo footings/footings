@@ -2,7 +2,7 @@ import pandas as pd
 from pandas.testing import assert_frame_equal
 
 from footings import create_loaded_function
-from footings.library import post_drop_columns
+from footings.tools import post_drop_columns
 
 
 def test_post_drop_columns():
