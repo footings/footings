@@ -11,6 +11,8 @@ from .footing import create_footing_from_list
 from .audit import run_model_audit
 from .visualize import visualize_model
 
+__all__ = ["create_model"]
+
 #########################################################################################
 # established errors
 #########################################################################################
@@ -178,22 +180,19 @@ def create_attributes(footing):
     }
 
 
-def get_returns(steps):
-    """Get return string from docstring of last step"""
-    last_func = steps[-1].get("function")
-    parsed_doc = FunctionDoc(last_func)
+def get_returns(function):
+    """Get return string from function docstring."""
+    parsed_doc = FunctionDoc(function)
     ret = parsed_doc["Returns"]
     if ret != []:
         ret = ret[0]
         nl = "\n"
         tab = "\t"
         ret_str = ""
-        if ret.name != "":
-            ret_str += f"{ret.name} : "
         if ret.type != "":
-            ret_str += f"{ret.type}"
+            ret_str += f"{nl}{tab}Returns{nl}{tab}-------{nl}{tab}{ret.type}"
         if ret.desc != []:
-            ret_str += f"{nl}{tab}{nl.join(ret.desc)}"
+            ret_str += "".join([f"{nl}{tab}{tab}{x}" for x in ret.desc])
         return ret_str
     return ""
 
@@ -220,7 +219,10 @@ def create_model_docstring(description: str, arguments: dict, returns: str) -> s
         dtype_str = str(dtype)
         return dtype_str.replace("<class '", "").replace("'>", "")
 
-    arg_header = "Parameters\n----------\n"
+    docstring = f"{description}\n\n"
+
+    # parameters
+    arg_header = "Arguments\n---------\n"
     args = "".join(
         [
             f"{k}\n\t{v.description}\n"
@@ -229,8 +231,12 @@ def create_model_docstring(description: str, arguments: dict, returns: str) -> s
             for k, v in arguments.items()
         ]
     )
-    ret_header = "Returns\n-------\n"
-    docstring = f"{description}\n\n{arg_header}{args}\n{ret_header}{returns}"
+    docstring += f"{arg_header}{args}\n"
+
+    #  methods
+    ret_header = "Methods\n-------\n"
+    run_method = f"run()\n\tExecutes the model.\n"
+    docstring += f"{ret_header}{run_method}{returns}"
     return docstring
 
 
@@ -271,7 +277,7 @@ def create_model(
         name, attrs=attributes, bases=(BaseModel,), slots=True, frozen=True, repr=False
     )
     model.__doc__ = create_model_docstring(
-        description, footing.arguments, get_returns(steps)
+        description, footing.arguments, get_returns(steps[-1].get("function"))
     )
     if scenarios is not None:
         for k, v in scenarios.items():

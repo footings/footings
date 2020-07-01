@@ -60,8 +60,8 @@ def test_create_model_docstring():
     test_doc = [
         "This is a test\n",
         "\n",
-        "Parameters\n",
-        "----------\n",
+        "Arguments\n",
+        "---------\n",
         "a\n",
         "\tdescription for a\n",
         "b\n",
@@ -69,9 +69,14 @@ def test_create_model_docstring():
         "c\n",
         "\tdescription for c\n",
         "\n",
-        "Returns\n",
+        "Methods\n",
         "-------\n",
-        "int",
+        "run()\n",
+        "\tExecutes the model.\n",
+        "\n",
+        "\tReturns\n",
+        "\t-------\n",
+        "\tint",
     ]
     assert model.__doc__ == "".join(test_doc)
 
