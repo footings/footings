@@ -108,7 +108,7 @@ class BaseModel:
     """BaseModel"""
 
     _scenarios = {}
-    arguments = attrib(init=False, repr=False)
+    parameters = attrib(init=False, repr=False)
     steps = attrib(init=False, repr=False)
     dependencies = attrib(init=False, repr=False)
     dependency_index = attrib(init=False, repr=False)
@@ -173,70 +173,81 @@ def create_attributes(footing):
     dep_index_attrib = attrib(init=False, repr=False, default=dep_index)
     return {
         **attributes,
-        "arguments": args_attrib,
+        "parameters": args_attrib,
         "steps": steps_attrib,
         "dependencies": dep_attrib,
         "dependency_index": dep_index_attrib,
     }
 
 
-def get_returns(function):
-    """Get return string from function docstring."""
+def _create_parameters_section(parameters):
+    def _clean_dtype(dtype):
+        dtype_str = str(dtype)
+        return dtype_str.replace("<class '", "").replace("'>", "")
+
+    ret_str = "Parameters\n----------\n"
+    for arg_k, arg_v in parameters.items():
+        if arg_v.dtype is None:
+            ret_str += f"{arg_k}\n\t{arg_v.description}\n"
+        else:
+            ret_str += f"{arg_k} : {_clean_dtype(arg_v.dtype)}\n\t{arg_v.description}\n"
+    return ret_str
+
+
+def _create_steps_section(steps):
+    ret_str = "Steps\n-----\n"
+    for idx, step in enumerate(steps):
+        docstring = FunctionDoc(step["function"])
+        ret_str += f"Step {idx} - {step['name']}\n"
+        ret_str += "".join(["\t" + x + "\n" for x in docstring.get("Summary")])
+    return ret_str
+
+
+def _get_returns(function):
     parsed_doc = FunctionDoc(function)
-    ret = parsed_doc["Returns"]
-    if ret != []:
-        ret = ret[0]
-        nl = "\n"
-        tab = "\t"
-        ret_str = ""
-        if ret.type != "":
-            ret_str += f"{nl}{tab}Returns{nl}{tab}-------{nl}{tab}{ret.type}"
-        if ret.desc != []:
-            ret_str += "".join([f"{nl}{tab}{tab}{x}" for x in ret.desc])
+    parameters = parsed_doc["Returns"]
+    if parameters != []:
+        ret_str = "\tReturns\n\t-------\n"
+        for param in parameters:
+            if param.type != "" and param.name == "":
+                ret_str += f"\t{param.type}\n"
+            if param.type != "" and param.name != "":
+                ret_str += f"\t{param.name} : {param.type}\n"
+            if param.desc != []:
+                ret_str += "".join([f"\t\t{x}\n" for x in param.desc])
         return ret_str
     return ""
 
 
-def create_model_docstring(description: str, arguments: dict, returns: str) -> str:
+def _create_methods_section(function):
+    ret_str = "Methods\n-------\n"
+    ret_str += "run()\n\tExecutes the model.\n\n"
+    ret_str += _get_returns(function)
+    return ret_str
+
+
+def create_model_docstring(description: str, parameters: dict, steps: list) -> str:
     """Create model docstring.
 
     Parameters
     ----------
     description : str
         A description of the model.
-    arguments : dict
+    parameters : dict
         A dict of the argument assocated with the model.
-    returns : str
-        The descripton of returns for the docstring.
+    steps : list
+        The steps in the model.
 
     Returns
     -------
     str
-       The docstring with sections - Summary | Parameters | Returns
+       The created docstring for the model.
     """
 
-    def _clean_dtype(dtype):
-        dtype_str = str(dtype)
-        return dtype_str.replace("<class '", "").replace("'>", "")
-
     docstring = f"{description}\n\n"
-
-    # parameters
-    arg_header = "Arguments\n---------\n"
-    args = "".join(
-        [
-            f"{k}\n\t{v.description}\n"
-            if v.dtype is None
-            else f"{k} : {_clean_dtype(v.dtype)}\n\t{v.description}\n"
-            for k, v in arguments.items()
-        ]
-    )
-    docstring += f"{arg_header}{args}\n"
-
-    #  methods
-    ret_header = "Methods\n-------\n"
-    run_method = f"run()\n\tExecutes the model.\n"
-    docstring += f"{ret_header}{run_method}{returns}"
+    docstring += _create_parameters_section(parameters) + "\n"
+    docstring += _create_steps_section(steps) + "\n"
+    docstring += _create_methods_section(steps[-1].get("function"))
     return docstring
 
 
@@ -245,7 +256,7 @@ def create_model(
 ):
     """A factory function to create a model.
 
-    A model is a sequential list of function calls. Defined Arguments will become model input arguments and
+    A model is a sequential list of function calls. Defined parameters will become model inputs and
     any defined Dependents will link output from  one step as input to another.
 
     A model is a child of the BaseModel class with the type equal to the passed name parameter.
@@ -276,9 +287,7 @@ def create_model(
     model = make_class(
         name, attrs=attributes, bases=(BaseModel,), slots=True, frozen=True, repr=False
     )
-    model.__doc__ = create_model_docstring(
-        description, footing.arguments, get_returns(steps[-1].get("function"))
-    )
+    model.__doc__ = create_model_docstring(description, footing.arguments, steps)
     if scenarios is not None:
         for k, v in scenarios.items():
             model.register_scenario(k, **v)

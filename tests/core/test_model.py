@@ -9,6 +9,9 @@ from footings.core.model import (
     create_model,
     create_dependency_index,
     create_attributes,
+    _create_parameters_section,
+    _create_steps_section,
+    _create_methods_section,
     ModelScenarioAlreadyExist,
     ModelScenarioDoesNotExist,
     ModelScenarioArgAlreadyExist,
@@ -44,7 +47,7 @@ def test_create_attributes():
         "a",
         "b",
         "c",
-        "arguments",
+        "parameters",
         "steps",
         "dependencies",
         "dependency_index",
@@ -53,32 +56,158 @@ def test_create_attributes():
     assert [k for k, v in attributes.items() if v.init is True] == keys[:3]
 
 
+def test_create_parameters_section():
+    footing = create_footing_from_list(name="test", steps=STEPS_USING_INTEGERS)
+    test = _create_parameters_section(footing.arguments)
+    expected = [
+        "Parameters",
+        "----------",
+        "a",
+        "\tdescription for a",
+        "b",
+        "\tdescription for b",
+        "c",
+        "\tdescription for c",
+        "",
+    ]
+    assert test == "\n".join(expected)
+
+
+def test_create_steps_section():
+    test = _create_steps_section(STEPS_USING_INTEGERS)
+    expected = [
+        "Steps",
+        "-----",
+        "Step 0 - step_1",
+        "\tRun step_1.",
+        "Step 1 - step_2",
+        "\tRun step_2.",
+        "Step 2 - step_3",
+        "\tRun step_3.",
+        "",
+    ]
+    assert test == "\n".join(expected)
+
+
+def test_create_methods_section():
+    def method_1():
+        """Test method 1
+
+        Returns
+        -------
+        int
+            An integer
+        """
+
+    expected_1 = [
+        "Methods",
+        "-------",
+        "run()",
+        "\tExecutes the model.",
+        "",
+        "\tReturns",
+        "\t-------",
+        "\tint",
+        "\t\tAn integer",
+        "",
+    ]
+    test_1 = _create_methods_section(method_1)
+    assert test_1 == "\n".join(expected_1)
+
+    def method_2():
+        """Test method 2
+
+        Returns
+        -------
+        int
+            An integer
+        float
+            A float
+        """
+
+    expected_2 = [
+        "Methods",
+        "-------",
+        "run()",
+        "\tExecutes the model.",
+        "",
+        "\tReturns",
+        "\t-------",
+        "\tint",
+        "\t\tAn integer",
+        "\tfloat",
+        "\t\tA float",
+        "",
+    ]
+    test_2 = _create_methods_section(method_2)
+    assert test_2 == "\n".join(expected_2)
+
+    def method_3():
+        """Test method 3
+
+        Returns
+        -------
+        x : int
+            An integer
+        y : float
+            A float
+        """
+
+    expected_3 = [
+        "Methods",
+        "-------",
+        "run()",
+        "\tExecutes the model.",
+        "",
+        "\tReturns",
+        "\t-------",
+        "\tx : int",
+        "\t\tAn integer",
+        "\ty : float",
+        "\t\tA float",
+        "",
+    ]
+    test_3 = _create_methods_section(method_3)
+    assert test_3 == "\n".join(expected_3)
+
+
 def test_create_model_docstring():
     model = create_model(
         "model", steps=STEPS_USING_INTEGERS, description="This is a test",
     )
     test_doc = [
-        "This is a test\n",
-        "\n",
-        "Arguments\n",
-        "---------\n",
-        "a\n",
-        "\tdescription for a\n",
-        "b\n",
-        "\tdescription for b\n",
-        "c\n",
-        "\tdescription for c\n",
-        "\n",
-        "Methods\n",
-        "-------\n",
-        "run()\n",
-        "\tExecutes the model.\n",
-        "\n",
-        "\tReturns\n",
-        "\t-------\n",
+        "This is a test",
+        "",
+        "Parameters",
+        "----------",
+        "a",
+        "\tdescription for a",
+        "b",
+        "\tdescription for b",
+        "c",
+        "\tdescription for c",
+        "",
+        "Steps",
+        "-----",
+        "Step 0 - step_1",
+        "\tRun step_1.",
+        "Step 1 - step_2",
+        "\tRun step_2.",
+        "Step 2 - step_3",
+        "\tRun step_3.",
+        "",
+        "Methods",
+        "-------",
+        "run()",
+        "\tExecutes the model.",
+        "",
+        "\tReturns",
+        "\t-------",
         "\tint",
+        "",
     ]
-    assert model.__doc__ == "".join(test_doc)
+
+    assert model.__doc__ == "\n".join(test_doc)
 
 
 def test_model():
