@@ -1,6 +1,7 @@
 """Utility classes and functions that support the footings library."""
 
 from typing import Callable, Dict, Tuple, Optional
+from inspect import signature
 from itertools import product
 from functools import partial
 from collections.abc import Hashable, Iterable
@@ -81,7 +82,34 @@ class DispatchFunction:
         validator=deep_iterable(instance_of(Hashable), instance_of(tuple))
     )
     default: Callable = attrib(default=None, validator=optional(is_callable()))
+    docstring = attrib(default=None, validator=optional(instance_of(str)))
     registry: Dict = attrib(init=False, repr=False, factory=dict)
+
+    @property
+    def __name__(self):
+        return self.name
+
+    @property
+    def __doc__(self):
+        def _as_key_val(params, keys):
+            return ", ".join([f"{p} = {k}" for p, k in zip(params, keys)])
+
+        def _dispatch_records(params, registry):
+            ret_str = ""
+            for reg_k, reg_v in registry.items():
+                ret_str += _as_key_val(params, reg_k) + "\n"
+                ret_str += f"\t{str(signature(reg_v))}\n"
+            return ret_str
+
+        if self.docstring is not None:
+            ret_str = self.docstring + "\n\n"
+        else:
+            ret_str = ""
+        ret_str += "Parameters\n----------\n"
+        ret_str += "\n".join(self.parameters) + "\n\n"
+        ret_str += "Dispatch\n--------\n"
+        ret_str += _dispatch_records(self.parameters, self.registry)
+        return ret_str
 
     def register(self, function=None, **kwargs):
         """Register a function using a key established by the required parameters.
@@ -92,7 +120,6 @@ class DispatchFunction:
             The function to register.
         **kwargs
             The parameter keys to register for the given function.
-
 
         Returns
         -------
@@ -139,17 +166,22 @@ class DispatchFunction:
 
 
 def create_dispatch_function(
-    name: str, parameters: tuple, default: Optional[Callable] = None
+    name: str,
+    parameters: tuple,
+    docstring: Optional[str],
+    default: Optional[Callable] = None,
 ) -> DispatchFunction:
     """A factory function to create a DispatchFunction
 
     Parameters
     ----------
-    name: str
+    name : str
         The name to assign the DispatchFunction
     parameters: tuple
         The parameters by which a key is established
-    default: callable, optional
+    docstring : str, optional
+        The docstring to use for the function.
+    default : callable, optional
         The default function to run if no key exists within the registry.
 
     Returns
@@ -178,7 +210,9 @@ def create_dispatch_function(
     >>>
     >>> assert single_key(key1="x1", key2="x2") == "x"
     """
-    return DispatchFunction(name=name, parameters=parameters, default=default)
+    return DispatchFunction(
+        name=name, parameters=parameters, docstring=docstring, default=default
+    )
 
 
 #########################################################################################
@@ -244,6 +278,20 @@ class LoadedFunction:
 
     def __attrs_post_init__(self):
         self.register(self.function)
+
+    @property
+    def __name__(self):
+        return self.name
+
+    @property
+    def __doc__(self):
+        if self.function.__doc__ is not None:
+            ret_str = self.function.__doc__ + "\n\n"
+        else:
+            ret_str = ""
+        ret_str += "Loaded\n------\n"
+        ret_str += "\n".join([f.__name__ for f in self.registry]) + "\n"
+        return ret_str
 
     def register(self, function=None, position="end"):
         """Register a function into the registry.
