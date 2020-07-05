@@ -55,19 +55,19 @@ def _get_dtype(dtype):
     return dtype.__class__.__name__
 
 
-def _create_argument_output(arguments):
+def _create_argument_output(parameters):
     """Create argument output"""
-    return {k: attr.asdict(v) for k, v in arguments.items()}
+    return {k: attr.asdict(v) for k, v in parameters.items()}
 
 
-def _create_argument_summary(arguments):
+def _create_argument_summary(parameters):
     return [
         {
-            "Argument": argument["name"],
+            "Parameter": argument["name"],
             "Type": _get_dtype(argument["dtype"]),
             "Description": argument["description"],
         }
-        for argument in arguments.values()
+        for argument in parameters.values()
     ]
 
 
@@ -102,8 +102,8 @@ class ModelAudit:
     """Container for model audit output."""
 
     model_name: dict = attrib()
-    arguments_summary: dict = attrib()
-    arguments: dict = attrib()
+    parameters_summary: dict = attrib()
+    parameters: dict = attrib()
     steps_summary: dict = attrib()
     steps: dict = attrib()
 
@@ -111,12 +111,12 @@ class ModelAudit:
     def create_audit(cls, model):
         """Create audit"""
         model_name = model.__class__.__name__
-        arguments = _create_argument_output(model.arguments)
-        arguments_summary = _create_argument_summary(arguments)
+        parameters = _create_argument_output(model.parameters)
+        parameters_summary = _create_argument_summary(parameters)
         output = _get_model_output(model)
         steps = _create_step_output(model.steps, output)
         steps_summary = _create_step_summary(steps)
-        return cls(model_name, arguments_summary, arguments, steps_summary, steps)
+        return cls(model_name, parameters_summary, parameters, steps_summary, steps)
 
 
 # def create_signature_string(step):
@@ -178,12 +178,12 @@ def create_xlsx_file(model_audit, file):
     wb.create_sheet(model_name, start_row=2, start_col=2)
 
     # write data
-    arg_summary = pd.DataFrame.from_records(model_audit.arguments_summary)
+    arg_summary = pd.DataFrame.from_records(model_audit.parameters_summary)
     step_summary = pd.DataFrame.from_records(model_audit.steps_summary)
     wb.write_obj(model_name, model_audit.model_name)
     wb.write_obj(model_name, arg_summary, add_rows=1)
     wb.write_obj(model_name, step_summary, add_rows=1)
-    # wb.write_obj(model_name, pd.DataFrame.from_records(model_audit.arguments))
+    # wb.write_obj(model_name, pd.DataFrame.from_records(model_audit.parameters))
 
     # format data
     wksht = wb.worksheets[model_name].obj
