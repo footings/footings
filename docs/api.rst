@@ -13,7 +13,7 @@ Functions
 .. autosummary::
    :nosignatures:
 
-   create_argument
+   create_parameter
    use
    create_model
    create_dispatch_function
@@ -22,7 +22,7 @@ Functions
 |
 |
 
-.. autofunction:: create_argument
+.. autofunction:: create_parameter
 .. autofunction:: use
 .. autofunction:: create_model
 .. autofunction:: create_dispatch_function
@@ -34,7 +34,7 @@ Classes
 .. autosummary::
    :nosignatures:
 
-   footings.core.argument.Argument
+   footings.core.parameter.Parameter
    footings.core.footing.Dependent
    footings.core.model.BaseModel
    footings.core.utils.DispatchFunction
@@ -44,7 +44,7 @@ Classes
 |
 
 
-.. autoclass:: footings.core.argument.Argument
+.. autoclass:: footings.core.parameter.Parameter
    :members:
 
 .. autoclass:: footings.core.footing.Dependent
