@@ -3,7 +3,7 @@ from typing import Callable, Dict, Any
 from attr import attrs, attrib
 from attr.validators import instance_of, is_callable
 
-from .argument import Argument
+from .parameter import Parameter
 
 
 #########################################################################################
@@ -24,7 +24,7 @@ class FootingStepNameDoesNotExist(Exception):
 
 
 class FootingReserveWordError(Exception):
-    """Argument name is a reserve word."""
+    """Parameter name is a reserve word."""
 
 
 #########################################################################################
@@ -34,7 +34,7 @@ class FootingReserveWordError(Exception):
 
 FOOTINGS_RESERVED_WORDS = [
     "scenarios",
-    "arguments",
+    "parameters",
     "steps",
     "dependencies",
     "dependency_index",
@@ -45,7 +45,7 @@ FOOTINGS_RESERVED_WORDS = [
 class Dependent:
     """A dependent marks an object as a child of an earlier computed step within a model.
 
-    When an argument within a defined step is set to a Dependent of another step, when the step is called,
+    When a parameter within a defined step is set to a Dependent of another step, when the step is called,
     the model will input the output of the dependent step.
 
     get_attr or get_key can be set to retrieve an attribute or a key from a dependent step.
@@ -53,7 +53,7 @@ class Dependent:
     Attributes
     ----------
     name : str
-        The name of the step within a Footing to use as an argument.
+        The name of the step within a Footing to use as a parameter.
     get_attr : Any
         Any attribute to get from named dependent.
     get_key : Any
@@ -102,7 +102,7 @@ def use(name: str, get_attr: Any = None, get_key: Any = None) -> Dependent:
     Parameters
     ----------
     name : str
-        The name of the step within a Footing to use as an argument.
+        The name of the step within a Footing to use as a parameter.
     get_attr : Any
         Any attribute(s) to get from listed step.
     get_key : Any
@@ -123,18 +123,18 @@ class FootingStep:
     ----------
     function: callable
         The callable for a step.
-    init_args: dict
-        Arguments to callable that will be pulled from the initialization of a Model.
-    dependent_args: dict
-        Arguments to callable that will be pulled from other steps within Footing.
-    defined_args: dict
-        Arguments to callable that have been defined when creating the Footing.
+    init_params: dict
+        Parameters to callable that will be pulled from the initialization of a Model.
+    dependent_params: dict
+        Parameters to callable that will be pulled from other steps within Footing.
+    defined_params: dict
+        Parameters to callable that have been defined when creating the Footing.
     """
 
     function: Callable = attrib(validator=is_callable())
-    init_args: Dict = attrib(validator=instance_of(dict))
-    dependent_args: Dict = attrib(validator=instance_of(dict))
-    defined_args: Dict = attrib(validator=instance_of(dict))
+    init_params: Dict = attrib(validator=instance_of(dict))
+    dependent_params: Dict = attrib(validator=instance_of(dict))
+    defined_params: Dict = attrib(validator=instance_of(dict))
 
 
 @attrs(slots=True, frozen=True, repr=False)
@@ -143,16 +143,16 @@ class Footing:
 
     A footing is a registry of function calls which records -
     - the function to be called,
-    - the arguments that will be part of the initilization of a model,
-    - the arguments to get values from other steps, and
-    - the arguments that are already defined.
+    - the parameters that will be part of the initilization of a model,
+    - the parameters to get values from other steps, and
+    - the parameters that are already defined.
 
     Attributes
     ----------
     name: str
         The name to assign to the footing.
-    arguments: dict
-        A dict that keeps record of arguments that will be used for initilization of a model.
+    parameters: dict
+        A dict that keeps record of parameters that will be used for initilization of a model.
     steps: dict
         A dict acting as a registry of steps where the values are FootingSteps.
     dependencies: dict
@@ -171,7 +171,7 @@ class Footing:
     """
 
     name: str = attrib(validator=instance_of(str))
-    arguments: Dict = attrib(factory=dict)
+    parameters: Dict = attrib(factory=dict)
     steps: Dict = attrib(factory=dict)
     dependencies: Dict = attrib(factory=dict)
 
@@ -185,7 +185,7 @@ class Footing:
         function : callable
             The function to call within a step.
         args : dict
-            The arguments to passed to the function.
+            The parameters to passed to the function.
 
         Returns
         -------
@@ -202,29 +202,29 @@ class Footing:
         if name in self.steps:
             raise FootingStepNameExist(f"The name [{name}] already exists as a step.")
         dependencies = set()
-        init_args = {}
-        dependent_args = {}
-        defined_args = {}
+        init_params = {}
+        dependent_params = {}
+        defined_params = {}
         if args is not None:
-            for arg_nm, arg_val in args.items():
-                if isinstance(arg_val, Argument):
-                    if arg_val.name in FOOTINGS_RESERVED_WORDS:
-                        msg = f"The [{arg_val.name}] is a reserve word."
-                        msg += "Use a different argument name."
+            for param_nm, param_val in args.items():
+                if isinstance(param_val, Parameter):
+                    if param_val.name in FOOTINGS_RESERVED_WORDS:
+                        msg = f"The [{param_val.name}] is a reserve word."
+                        msg += "Use a different parameter name."
                         raise FootingReserveWordError(msg)
-                    if arg_val.name not in self.arguments:
-                        self.arguments.update({arg_val.name: arg_val})
-                    init_args.update({arg_nm: arg_val.name})
-                elif isinstance(arg_val, Dependent):
-                    if arg_val.name not in self.steps:
-                        msg = f"The step [{arg_val.name}] does not exist."
+                    if param_val.name not in self.parameters:
+                        self.parameters.update({param_val.name: param_val})
+                    init_params.update({param_nm: param_val.name})
+                elif isinstance(param_val, Dependent):
+                    if param_val.name not in self.steps:
+                        msg = f"The step [{param_val.name}] does not exist."
                         raise FootingStepNameDoesNotExist(msg)
-                    dependent_args.update({arg_nm: arg_val})
-                    dependencies.add(arg_val.name)
+                    dependent_params.update({param_nm: param_val})
+                    dependencies.add(param_val.name)
                 else:
-                    defined_args.update({arg_nm: arg_val})
+                    defined_params.update({param_nm: param_val})
         self.dependencies.update({name: dependencies})
-        step = FootingStep(function, init_args, dependent_args, defined_args)
+        step = FootingStep(function, init_params, dependent_params, defined_params)
         self.steps.update({name: step})
 
 
@@ -253,17 +253,17 @@ def create_footing_from_list(name: str, steps: list):
         {
             "name": "step_1",
             "function": lambda a, add: a + add,
-            "args": {"arg_a": Argument("a"), "add": 1},
+            "args": {"arg_a": Parameter("a"), "add": 1},
         },
         {
             "name": "step_2",
             "function": lambda b, subtract: b - subtract,
-            "args": {"arg_b": Argument("b"), "subtract": 1},
+            "args": {"arg_b": Parameter("b"), "subtract": 1},
         },
         {
             "name": "step_3",
             "function": lambda a, b, c: a + b + c,
-            "args": {"a": Dependent("step_1"), "b": Dependent("step_2"), "arg_c": Argument("c")},
+            "args": {"a": Dependent("step_1"), "b": Dependent("step_2"), "arg_c": Parameter("c")},
         },
     ]
     footing = create_footing_from_list("footing", steps)

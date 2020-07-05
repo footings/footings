@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import pytest
 
-from footings.core.argument import Argument
+from footings.core.parameter import Parameter
 from footings.core.footing import (
     Dependent,
     Footing,
@@ -34,13 +34,15 @@ def test_footing():
     def step_1(a, add):
         return a + add
 
-    test.add_step(name="step_1", function=step_1, args={"arg_a": Argument("a"), "add": 1})
+    test.add_step(
+        name="step_1", function=step_1, args={"arg_a": Parameter("a"), "add": 1}
+    )
 
     def step_2(b, subtract):
         return b - subtract
 
     test.add_step(
-        name="step_2", function=step_2, args={"arg_b": Argument("b"), "subtract": 1}
+        name="step_2", function=step_2, args={"arg_b": Parameter("b"), "subtract": 1}
     )
 
     def step_3(a, b, c):
@@ -52,7 +54,7 @@ def test_footing():
         args={
             "a": Dependent("step_1"),
             "b": Dependent("step_2"),
-            "arg_c": Argument("c"),
+            "arg_c": Parameter("c"),
         },
     )
 
@@ -61,29 +63,29 @@ def test_footing():
         "step_2": set(),
         "step_3": set(["step_1", "step_2"]),
     }
-    assert test.arguments == {
-        "a": Argument("a"),
-        "b": Argument("b"),
-        "c": Argument("c"),
+    assert test.parameters == {
+        "a": Parameter("a"),
+        "b": Parameter("b"),
+        "c": Parameter("c"),
     }
     assert test.steps == {
         "step_1": FootingStep(
             function=step_1,
-            init_args={"arg_a": "a"},
-            defined_args={"add": 1},
-            dependent_args={},
+            init_params={"arg_a": "a"},
+            defined_params={"add": 1},
+            dependent_params={},
         ),
         "step_2": FootingStep(
             function=step_2,
-            init_args={"arg_b": "b"},
-            defined_args={"subtract": 1},
-            dependent_args={},
+            init_params={"arg_b": "b"},
+            defined_params={"subtract": 1},
+            dependent_params={},
         ),
         "step_3": FootingStep(
             function=step_3,
-            init_args={"arg_c": "c"},
-            defined_args={},
-            dependent_args={"a": Dependent("step_1"), "b": Dependent("step_2")},
+            init_params={"arg_c": "c"},
+            defined_params={},
+            dependent_params={"a": Dependent("step_1"), "b": Dependent("step_2")},
         ),
     }
 
@@ -102,12 +104,12 @@ def test_create_footing_from_list():
         {
             "name": "step_1",
             "function": step_1,
-            "args": {"arg_a": Argument("a"), "add": 1},
+            "args": {"arg_a": Parameter("a"), "add": 1},
         },
         {
             "name": "step_2",
             "function": step_2,
-            "args": {"arg_b": Argument("b"), "subtract": 1},
+            "args": {"arg_b": Parameter("b"), "subtract": 1},
         },
         {
             "name": "step_3",
@@ -115,7 +117,7 @@ def test_create_footing_from_list():
             "args": {
                 "a": Dependent("step_1"),
                 "b": Dependent("step_2"),
-                "arg_c": Argument("c"),
+                "arg_c": Parameter("c"),
             },
         },
     ]
@@ -125,29 +127,29 @@ def test_create_footing_from_list():
         "step_2": set(),
         "step_3": set(["step_1", "step_2"]),
     }
-    assert test.arguments == {
-        "a": Argument("a"),
-        "b": Argument("b"),
-        "c": Argument("c"),
+    assert test.parameters == {
+        "a": Parameter("a"),
+        "b": Parameter("b"),
+        "c": Parameter("c"),
     }
     assert test.steps == {
         "step_1": FootingStep(
             function=step_1,
-            init_args={"arg_a": "a"},
-            defined_args={"add": 1},
-            dependent_args={},
+            init_params={"arg_a": "a"},
+            defined_params={"add": 1},
+            dependent_params={},
         ),
         "step_2": FootingStep(
             function=step_2,
-            init_args={"arg_b": "b"},
-            defined_args={"subtract": 1},
-            dependent_args={},
+            init_params={"arg_b": "b"},
+            defined_params={"subtract": 1},
+            dependent_params={},
         ),
         "step_3": FootingStep(
             function=step_3,
-            init_args={"arg_c": "c"},
-            defined_args={},
-            dependent_args={"a": Dependent("step_1"), "b": Dependent("step_2")},
+            init_params={"arg_c": "c"},
+            defined_params={},
+            dependent_params={"a": Dependent("step_1"), "b": Dependent("step_2")},
         ),
     }
 
@@ -159,12 +161,12 @@ def test_footing_errors():
         {
             "name": "test-duplicate",
             "function": lambda x: x,
-            "args": {"arg_x": Argument("x")},
+            "args": {"arg_x": Parameter("x")},
         },
         {
             "name": "test-duplicate",
             "function": lambda y: y,
-            "args": {"arg_y": Argument("y")},
+            "args": {"arg_y": Parameter("y")},
         },
     ]
     with pytest.raises(FootingStepNameExist):
@@ -172,7 +174,7 @@ def test_footing_errors():
 
     # duplicate step error
     steps = [
-        {"name": "test-x", "function": lambda x: x, "args": {"arg_x": Argument("x")},},
+        {"name": "test-x", "function": lambda x: x, "args": {"arg_x": Parameter("x")},},
         {"name": "test-y", "function": lambda y: y, "args": {"arg_y": Dependent("y")},},
     ]
     with pytest.raises(FootingStepNameDoesNotExist):
@@ -183,7 +185,7 @@ def test_footing_errors():
         {
             "name": "test-reserve-word",
             "function": lambda scenario: scenario,
-            "args": {"arg_scenario": Argument("scenarios")},
+            "args": {"arg_scenario": Parameter("scenarios")},
         }
     ]
     with pytest.raises(FootingReserveWordError):

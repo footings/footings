@@ -14,8 +14,8 @@ from footings.core.model import (
     _create_methods_section,
     ModelScenarioAlreadyExist,
     ModelScenarioDoesNotExist,
-    ModelScenarioArgAlreadyExist,
-    ModelScenarioArgDoesNotExist,
+    ModelScenarioParamAlreadyExist,
+    ModelScenarioParamDoesNotExist,
     ModelRunError,
 )
 
@@ -58,7 +58,7 @@ def test_create_attributes():
 
 def test_create_parameters_section():
     footing = create_footing_from_list(name="test", steps=STEPS_USING_INTEGERS)
-    test = _create_parameters_section(footing.arguments)
+    test = _create_parameters_section(footing.parameters)
     expected = [
         "Parameters",
         "----------",
@@ -249,8 +249,8 @@ def test_model_scenarios():
     with pytest.raises(ModelScenarioDoesNotExist):
         model.using_scenario("test-not-exist")
 
-    with pytest.raises(ModelScenarioArgAlreadyExist):
+    with pytest.raises(ModelScenarioParamAlreadyExist):
         model.using_scenario("test", a=2)
 
-    with pytest.raises(ModelScenarioArgDoesNotExist):
+    with pytest.raises(ModelScenarioParamDoesNotExist):
         model.register_scenario("test-2", not_exist_a=1, b=1, c=1)

@@ -1,4 +1,4 @@
-from footings.core.argument import create_argument
+from footings.core.parameter import create_parameter
 from footings.core.footing import use
 from footings.core.utils import create_dispatch_function, create_loaded_function
 from footings.core.model import create_model

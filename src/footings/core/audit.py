@@ -35,16 +35,16 @@ def _get_model_output(model):
     output = {}
     for k, v in model.steps.items():
         if isinstance(v.function, LoadedFunction):
-            init_args = {k: getattr(model, v) for k, v in v.init_args.items()}
-            dependent_args = {k: output[v.name] for k, v in v.dependent_args.items()}
+            init_params = {k: getattr(model, v) for k, v in v.init_params.items()}
+            dependent_params = {k: output[v.name] for k, v in v.dependent_params.items()}
             output.update(
-                {k: v.function(**init_args, **dependent_args, **v.defined_args)}
+                {k: v.function(**init_params, **dependent_params, **v.defined_params)}
             )
         else:
-            init_args = {k: getattr(model, v) for k, v in v.init_args.items()}
-            dependent_args = {k: output[v.name] for k, v in v.dependent_args.items()}
+            init_params = {k: getattr(model, v) for k, v in v.init_params.items()}
+            dependent_params = {k: output[v.name] for k, v in v.dependent_params.items()}
             output.update(
-                {k: v.function(**init_args, **dependent_args, **v.defined_args)}
+                {k: v.function(**init_params, **dependent_params, **v.defined_params)}
             )
     return output
 
@@ -55,19 +55,19 @@ def _get_dtype(dtype):
     return dtype.__class__.__name__
 
 
-def _create_argument_output(parameters):
-    """Create argument output"""
+def _create_parameter_output(parameters):
+    """Create parameter output"""
     return {k: attr.asdict(v) for k, v in parameters.items()}
 
 
-def _create_argument_summary(parameters):
+def _create_parameter_summary(parameters):
     return [
         {
-            "Parameter": argument["name"],
-            "Type": _get_dtype(argument["dtype"]),
-            "Description": argument["description"],
+            "Parameter": parameter["name"],
+            "Type": _get_dtype(parameter["dtype"]),
+            "Description": parameter["description"],
         }
-        for argument in parameters.values()
+        for parameter in parameters.values()
     ]
 
 
@@ -111,8 +111,8 @@ class ModelAudit:
     def create_audit(cls, model):
         """Create audit"""
         model_name = model.__class__.__name__
-        parameters = _create_argument_output(model.parameters)
-        parameters_summary = _create_argument_summary(parameters)
+        parameters = _create_parameter_output(model.parameters)
+        parameters_summary = _create_parameter_summary(parameters)
         output = _get_model_output(model)
         steps = _create_step_output(model.steps, output)
         steps_summary = _create_step_summary(steps)
@@ -125,12 +125,12 @@ class ModelAudit:
 #     args = sig.args + sig.kwonlyargs
 #     sig_str = ""
 #     for idx, arg in enumerate(args, 1):
-#         if arg in step.init_args:
-#             sig_str += f"{arg}=argument({step.init_args.get(arg)})"
-#         elif arg in step.dependent_args:
-#             sig_str += f"{arg}=use({step.dependent_args.get(arg)})"
+#         if arg in step.init_params:
+#             sig_str += f"{arg}=parameter({step.init_params.get(arg)})"
+#         elif arg in step.dependent_params:
+#             sig_str += f"{arg}=use({step.dependent_params.get(arg)})"
 #         else:
-#             sig_str += f"{arg}={step.defined_args.get(arg)}"
+#             sig_str += f"{arg}={step.defined_params.get(arg)}"
 #         if idx < len(args):
 #             sig_str += ", "
 #         name = getattr(step.function, "name", None)

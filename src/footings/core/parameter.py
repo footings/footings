@@ -1,66 +1,64 @@
-"""Objects tied to creating Arguments"""
-
 from typing import Any, List, Union, Optional, Callable
 from datetime import date, datetime
 
 from attr import attrs, attrib
 
 
-class ArgumentTypeError(Exception):
+class ParameterTypeError(Exception):
     """Wrong type passed to parameter"""
 
 
 def _check_type(expected, value):
     if isinstance(value, expected) is False:
-        raise ArgumentTypeError(f"Expected type {value} but received {type(value)}")
+        raise ParameterTypeError(f"Expected type {value} but received {type(value)}")
 
 
-class ArgumentAllowedError(Exception):
+class ParameterAllowedError(Exception):
     """Value not allowed passed to parameter"""
 
 
 def _check_allowed(allowed, value):
     if value not in allowed:
-        raise ArgumentAllowedError(f"{value} is not in [{allowed}]")
+        raise ParameterAllowedError(f"{value} is not in [{allowed}]")
 
 
-class ArgumentMinValueError(Exception):
+class ParameterMinValueError(Exception):
     """Value below allowed minimum passed to parameter"""
 
 
 def _check_min_val(min_val, value):
     if value < min_val:
-        raise ArgumentMinValueError(f"{value} is less than {min_val}")
+        raise ParameterMinValueError(f"{value} is less than {min_val}")
 
 
-class ArgumentMaxValueError(Exception):
+class ParameterMaxValueError(Exception):
     """Value above allowed maximum passed to parameter"""
 
 
 def _check_max_val(max_val, value):
     if value > max_val:
-        raise ArgumentMaxValueError(f"{value} is greater than {max_val}")
+        raise ParameterMaxValueError(f"{value} is greater than {max_val}")
 
 
-class ArgumentMinLenError(Exception):
+class ParameterMinLenError(Exception):
     """Value with length below allowed minimum passed to parameter"""
 
 
 def _check_min_len(min_len, value):
     if len(value) < min_len:
-        raise ArgumentMinLenError(f"len {len(value)} is less than {min_len}")
+        raise ParameterMinLenError(f"len {len(value)} is less than {min_len}")
 
 
-class ArgumentMaxLenError(Exception):
+class ParameterMaxLenError(Exception):
     """Value with length above allowed maximum passed to parameter"""
 
 
 def _check_max_len(max_len, value):
     if len(value) > max_len:
-        raise ArgumentMaxLenError(f"len {len(value)} is greater than {max_len}")
+        raise ParameterMaxLenError(f"len {len(value)} is greater than {max_len}")
 
 
-class ArgumentCustomError(Exception):
+class ParameterCustomError(Exception):
     """Value fails custom test"""
 
 
@@ -69,7 +67,7 @@ def _check_custom(func, value):
         raise TypeError("the object passed to custom must be callable")
 
     if func(value) is False:
-        raise ArgumentCustomError(f"The custom test failed with {value}")
+        raise ParameterCustomError(f"The custom test failed with {value}")
 
 
 _PARAMS_CHECKS = {
@@ -105,22 +103,22 @@ def _convert_type(x):
 
 
 @attrs(frozen=True, slots=True, repr=False)
-class Argument:
-    """An argument is a representation of a parameter to be passed to a model.
+class Parameter:
+    """A parameter to be passed to a model.
 
-    An argument has built in validation that is called on instantiation of a model. The attributes dtype through
-    custom are validators that can be used to specify characteristics of the argument.
+    A parameter has built in validation that is called on instantiation of a model. The attributes dtype through
+    custom are validators that can be used to specify characteristics of the parameter.
 
     Attributes
     ----------
     name : str
-        Name to assign the argument. Will show in docstring of created models.
+        Name to assign the parameter. Will show in docstring of created models.
     description : str
-        A description of the argument. Will show in docstring of created models.
+        A description of the parameter. Will show in docstring of created models.
     default : Any, optional
-        The default value when a value is not passed to argument in a model.
+        The default value when a value is not passed to parameter in a model.
     dtype : str, type, optional
-        A validator for the expected type of the passed argument value.
+        A validator for the expected type of the passed parameter value.
     allowed : List[Any], optional
         A validator setting the allowed values to be passed.
     min_val : int, float, optional
@@ -164,32 +162,32 @@ class Argument:
         return validator
 
 
-def create_argument(name: str, **kwargs) -> Argument:
-    """A factory function to create an Argument.
+def create_parameter(name: str, **kwargs) -> Parameter:
+    """A factory function to create a Parameter.
 
-    An argument is a representation of a parameter to be passed to a model.
+    A parameter is used to construct models.
 
     Parameters
     ----------
     name : str
-        Name to assign the argument (appears in docstring of created model).
+        Name to assign the parameter (appears in docstring of created model).
     **kwargs
-        The keywords passed to Argument. See Argument attributes for details.
+        The keywords passed to a Parameter. See Parameter attributes for details.
 
     Returns
     -------
-    Argument
-        An instance of argument.
+    Parameter
+        An instance of parameter.
 
     See Also
     --------
-    footings.argument.Argument
+    footings.parameter.Parameter
 
     Examples
     --------
-    >>> from footings import create_argument
-    >>> arg = create_argument(name="arg", dtype=str)
+    >>> from footings import create_parameter
+    >>> arg = create_parameter(name="arg", dtype=str)
     >>> arg.valid("test") # returns True
     """
 
-    return Argument(name, **kwargs)
+    return Parameter(name, **kwargs)

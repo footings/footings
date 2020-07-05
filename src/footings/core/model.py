@@ -1,5 +1,3 @@
-"""model.py"""
-
 from typing import List, Dict
 from inspect import getfullargspec
 import sys
@@ -26,12 +24,12 @@ class ModelScenarioDoesNotExist(Exception):
     """The scenario does not exist."""
 
 
-class ModelScenarioArgAlreadyExist(Exception):
+class ModelScenarioParamAlreadyExist(Exception):
     """The arugment passed to scenario already exist."""
 
 
-class ModelScenarioArgDoesNotExist(Exception):
-    """The argument passed does not exist."""
+class ModelScenarioParamDoesNotExist(Exception):
+    """The parameter passed does not exist."""
 
 
 class ModelRunError(Exception):
@@ -87,12 +85,12 @@ def run_model(model):
     for k, v in steps.items():
         if k not in dependency_index[k]:
             continue
-        init_args = {k: getattr(model, v) for k, v in v.init_args.items()}
-        dependent_args = {
-            k: v.get_value(dict_[v.name]) for k, v in v.dependent_args.items()
+        init_params = {k: getattr(model, v) for k, v in v.init_params.items()}
+        dependent_params = {
+            k: v.get_value(dict_[v.name]) for k, v in v.dependent_params.items()
         }
         try:
-            out = v.function(**init_args, **dependent_args, **v.defined_args)
+            out = v.function(**init_params, **dependent_params, **v.defined_params)
         except:
             exc_type, exc_value, _ = sys.exc_info()
             msg = f"At step [{k}], an error occured.\n"
@@ -121,7 +119,7 @@ class BaseModel:
         args = getfullargspec(cls).kwonlyargs
         unknown = [k for k in kwargs if k not in args]
         if len(unknown) > 0:
-            raise ModelScenarioArgDoesNotExist(
+            raise ModelScenarioParamDoesNotExist(
                 f"The parameter(s) [{unknown}] do not exist."
             )
         cls._scenarios.update({name: kwargs})
@@ -135,7 +133,7 @@ class BaseModel:
         duplicate = [k for k in defined_kwargs if k in kwargs]
         if len(duplicate) > 0:
             msg = f"The following kwarg(s) are already defined in the scenario [{duplicate}]."
-            raise ModelScenarioArgAlreadyExist(msg)
+            raise ModelScenarioParamAlreadyExist(msg)
         return cls(**defined_kwargs, **kwargs)
 
     @property
@@ -159,14 +157,14 @@ class BaseModel:
 def create_attributes(footing):
     """Create attributes"""
     attributes = {}
-    for arg_key, arg_val in footing.arguments.items():
+    for arg_key, arg_val in footing.parameters.items():
         kwargs = {}
         if arg_val.default is not None:
             kwargs.update({"default": arg_val.default})
         kwargs.update({"kw_only": True, "validator": arg_val._create_validator()})
         attributes.update({arg_key: attrib(**kwargs)})
 
-    args_attrib = attrib(init=False, repr=False, default=footing.arguments)
+    args_attrib = attrib(init=False, repr=False, default=footing.parameters)
     steps_attrib = attrib(init=False, repr=False, default=footing.steps)
     dep_attrib = attrib(init=False, repr=False, default=footing.dependencies)
     dep_index = create_dependency_index(footing.dependencies)
@@ -234,7 +232,7 @@ def create_model_docstring(description: str, parameters: dict, steps: list) -> s
     description : str
         A description of the model.
     parameters : dict
-        A dict of the argument assocated with the model.
+        A dict of the parameter assocated with the model.
     steps : list
         The steps in the model.
 
@@ -287,7 +285,7 @@ def create_model(
     model = make_class(
         name, attrs=attributes, bases=(BaseModel,), slots=True, frozen=True, repr=False
     )
-    model.__doc__ = create_model_docstring(description, footing.arguments, steps)
+    model.__doc__ = create_model_docstring(description, footing.parameters, steps)
     if scenarios is not None:
         for k, v in scenarios.items():
             model.register_scenario(k, **v)
