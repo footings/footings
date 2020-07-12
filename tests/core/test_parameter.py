@@ -9,7 +9,7 @@ from footings.core.parameter import (
     ParameterMinLenError,
     ParameterMaxLenError,
     ParameterCustomError,
-    create_parameter,
+    define_parameter,
 )
 
 
@@ -63,7 +63,7 @@ def test_argument():
     )
 
 
-def test_create_parameter():
+def test_define_parameter():
     as_arg = Parameter("a")
-    arg = create_parameter("a")
+    arg = define_parameter("a")
     assert arg == as_arg
