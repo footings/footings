@@ -9,7 +9,7 @@ from .footing import create_footing_from_list
 from .audit import run_model_audit
 from .visualize import visualize_model
 
-__all__ = ["create_model"]
+__all__ = ["build_model"]
 
 #########################################################################################
 # established errors
@@ -147,7 +147,7 @@ class BaseModel:
 
     def audit(self, **kwargs):
         """Audit model"""
-        return run_model_audit(self, **kwargs)
+        return run_model_audit(model=self, **kwargs)
 
     def run(self):
         """Run model"""
@@ -249,10 +249,10 @@ def create_model_docstring(description: str, parameters: dict, steps: list) -> s
     return docstring
 
 
-def create_model(
+def build_model(
     name: str, steps: List[Dict], description: str = None, scenarios: dict = None,
 ):
-    """A factory function to create a model.
+    """A factory function to build a model.
 
     A model is a sequential list of function calls. Defined parameters will become model inputs and
     any defined Dependents will link output from  one step as input to another.

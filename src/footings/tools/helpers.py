@@ -1,13 +1,10 @@
 from typing import Callable, List
+from functools import partial
 
-from toolz import curry
-
-from footings import create_loaded_function
-from footings.core.utils import LoadedFunction
+from footings import loaded_function
 
 
-@curry
-def post_drop_columns(function: Callable, columns: List[str]):
+def post_drop_columns(columns: List[str], function: Callable = None):
     """
     A loaded function that can be used to drop column from a table.
 
@@ -52,10 +49,13 @@ def post_drop_columns(function: Callable, columns: List[str]):
     >>> # 1	    8
     >>> # 2	    9
     """
-    if isinstance(function, LoadedFunction) is False:
-        function = create_loaded_function(function=function)
+    if function is None:
+        return partial(post_drop_columns, columns)
 
-    @function.register
+    if hasattr(function, "loaded") is False:
+        function = loaded_function(function=function)
+
+    @function.register(position="end")
     def drop_columns(tbl):
         return tbl.drop(columns, axis=1)
 

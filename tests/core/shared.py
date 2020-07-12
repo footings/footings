@@ -1,7 +1,7 @@
 """Shared objects to use across testing"""
 
 import pandas as pd
-from footings import create_parameter, use
+from footings import define_parameter, use
 
 
 def step_1(a, add):
@@ -139,13 +139,13 @@ STEPS_USING_INTEGERS = [
     {
         "name": "step_1",
         "function": step_1,
-        "args": {"a": create_parameter("a", description="description for a"), "add": 1,},
+        "args": {"a": define_parameter("a", description="description for a"), "add": 1,},
     },
     {
         "name": "step_2",
         "function": step_2,
         "args": {
-            "b": create_parameter("b", description="description for b"),
+            "b": define_parameter("b", description="description for b"),
             "subtract": 1,
         },
     },
@@ -155,7 +155,7 @@ STEPS_USING_INTEGERS = [
         "args": {
             "a": use("step_1"),
             "b": use("step_2"),
-            "c": create_parameter("c", description="description for c"),
+            "c": define_parameter("c", description="description for c"),
         },
     },
 ]
@@ -165,14 +165,14 @@ STEPS_USING_PANDAS = [
     {
         "name": "create_frame",
         "function": create_frame,
-        "args": {"n": create_parameter("n", description="N rows of frame.")},
+        "args": {"n": define_parameter("n", description="N rows of frame.")},
     },
     {
         "name": "frame_add_column",
         "function": frame_add_column,
         "args": {
             "frame": use("create_frame"),
-            "add": create_parameter("add", description="Amount to add."),
+            "add": define_parameter("add", description="Amount to add."),
         },
     },
     {
@@ -180,7 +180,7 @@ STEPS_USING_PANDAS = [
         "function": frame_subtract_column,
         "args": {
             "frame": use("frame_add_column"),
-            "subtract": create_parameter("subtract", description="Amount to subtract."),
+            "subtract": define_parameter("subtract", description="Amount to subtract."),
         },
     },
 ]
@@ -201,8 +201,8 @@ STEPS_USING_KEY_LOOKUP = [
         "name": "create_dict",
         "function": create_dict,
         "args": {
-            "a": create_parameter("a", description="description for a"),
-            "b": create_parameter("b", description="description for b"),
+            "a": define_parameter("a", description="description for a"),
+            "b": define_parameter("b", description="description for b"),
         },
     },
     {

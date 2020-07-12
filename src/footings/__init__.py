@@ -1,7 +1,7 @@
-from footings.core.parameter import create_parameter
+from footings.core.parameter import define_parameter
 from footings.core.footing import use
-from footings.core.utils import create_dispatch_function, create_loaded_function
-from footings.core.model import create_model
+from footings.core.utils import dispatch_function, loaded_function
+from footings.core.model import build_model
 
 from ._version import get_versions
 

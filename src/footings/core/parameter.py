@@ -162,8 +162,8 @@ class Parameter:
         return validator
 
 
-def create_parameter(name: str, **kwargs) -> Parameter:
-    """A factory function to create a Parameter.
+def define_parameter(name: str, **kwargs) -> Parameter:
+    """A factory function to define a Parameter.
 
     A parameter is used to construct models.
 
@@ -186,7 +186,7 @@ def create_parameter(name: str, **kwargs) -> Parameter:
     Examples
     --------
     >>> from footings import create_parameter
-    >>> arg = create_parameter(name="arg", dtype=str)
+    >>> arg = define_parameter(name="arg", dtype=str)
     >>> arg.valid("test") # returns True
     """
 

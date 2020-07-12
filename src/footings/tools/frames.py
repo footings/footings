@@ -2,7 +2,7 @@ import math
 
 import pandas as pd
 
-from footings import create_dispatch_function
+from footings import dispatch_function
 
 
 def _month_diff(start, end):
@@ -16,7 +16,12 @@ def _day_diff(start, end):
     return (end - start).days
 
 
-freq_dispatcher = create_dispatch_function("freq_dispatcher", parameters=("frequency",))
+@dispatch_function(key_parameters=("frequency",))
+def freq_dispatcher(
+    start_dt: pd.Timestamp, end_dt: pd.Timestamp, col_date_nm: str, frequency: str
+):
+    msg = "No registered function based on passed paramters and no default function."
+    raise NotImplementedError(msg)
 
 
 @freq_dispatcher.register(frequency="Y")
@@ -64,13 +69,28 @@ def _(start_dt: pd.Timestamp, end_dt: pd.Timestamp, col_date_nm: str):
     return pd.DataFrame({col_date_nm: dates})
 
 
-kwarg_dispatcher = create_dispatch_function("kwarg_dispatcher", parameters=("kw",))
+@dispatch_function(key_parameters=("kw",))
+def kwarg_dispatcher(
+    tbl: pd.DataFrame,
+    col_date_nm: str,
+    col_nm: str,
+    start_dt: pd.Timestamp,
+    kw: str,
+    **kwargs,
+):
+    msg = "No registered function based on passed paramters and no default function."
+    raise NotImplementedError(msg)
 
 
 @kwarg_dispatcher.register(kw="duration_year")
 def _(tbl: pd.DataFrame, col_date_nm: str, col_nm: str, start_dt: pd.Timestamp, **kwargs):
     tbl = kwarg_dispatcher(
-        tbl, col_date_nm, col_nm, start_dt, kw="duration_month", **kwargs
+        tbl=tbl,
+        col_date_nm=col_date_nm,
+        col_nm=col_nm,
+        start_dt=start_dt,
+        kw="duration_month",
+        **kwargs,
     )
     tbl[col_nm] = tbl[col_nm].add(-1).floordiv(12).add(1)
     return tbl
@@ -79,7 +99,12 @@ def _(tbl: pd.DataFrame, col_date_nm: str, col_nm: str, start_dt: pd.Timestamp, 
 @kwarg_dispatcher.register(kw="duration_quarter")
 def _(tbl: pd.DataFrame, col_date_nm: str, col_nm: str, start_dt: pd.Timestamp, **kwargs):
     tbl = kwarg_dispatcher(
-        tbl, col_date_nm, col_nm, start_dt, kw="duration_month", **kwargs
+        tbl=tbl,
+        col_date_nm=col_date_nm,
+        col_nm=col_nm,
+        start_dt=start_dt,
+        kw="duration_month",
+        **kwargs,
     )
     tbl[col_nm] = tbl[col_nm].add(-1).floordiv(3).add(1)
     return tbl
@@ -233,7 +258,9 @@ def create_frame(
     >>> # 4	2020-05-10	5
     >>> # 5	2020-06-10	6
     """
-    tbl = freq_dispatcher(start_dt, end_dt, col_date_nm, frequency=frequency)
+    tbl = freq_dispatcher(
+        start_dt=start_dt, end_dt=end_dt, col_date_nm=col_date_nm, frequency=frequency
+    )
     for k, v in kwargs.items():
         tbl = kwarg_dispatcher(
             tbl=tbl, col_date_nm=col_date_nm, col_nm=v, start_dt=start_dt, kw=k
@@ -328,9 +355,14 @@ def create_frame_from_record(
     record.pop(col_start_dt)
     end_dt = record[col_end_dt]
     record.pop(col_end_dt)
-    return create_frame(start_dt, end_dt, frequency, col_date_nm, **kwargs).assign(
-        **record
-    )
+
+    return create_frame(
+        start_dt=start_dt,
+        end_dt=end_dt,
+        frequency=frequency,
+        col_date_nm=col_date_nm,
+        **kwargs,
+    ).assign(**record)
 
 
 def expand_frame_per_record(

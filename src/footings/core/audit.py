@@ -1,5 +1,3 @@
-"""Function and classes for auditing models."""
-
 import json
 
 from attr import attrs, attrib
@@ -8,7 +6,7 @@ import pandas as pd
 from numpydoc.docscrape import FunctionDoc
 from openpyxl.styles import NamedStyle, Font
 
-from .utils import LoadedFunction, DispatchFunction
+from .utils import dispatch_function
 from .to_xlsx import XlsxWorkbook
 
 
@@ -34,7 +32,7 @@ def _step_to_audit_format(step):
 def _get_model_output(model):
     output = {}
     for k, v in model.steps.items():
-        if isinstance(v.function, LoadedFunction):
+        if hasattr(v.function, "loaded"):
             init_params = {k: getattr(model, v) for k, v in v.init_params.items()}
             dependent_params = {k: output[v.name] for k, v in v.dependent_params.items()}
             output.update(
@@ -142,7 +140,12 @@ class ModelAudit:
 # to json
 #########################################################################################
 
-json_serializer = DispatchFunction("json_serializer", parameters=("dtype",))
+
+@dispatch_function(key_parameters=("dtype",))
+def json_serializer(dtype, obj):
+    """ """
+    msg = "No registered function based on passed paramters and no default function."
+    raise NotImplementedError(msg)
 
 
 PANDAS_JSON_KWARGS = {"orient": "records"}
@@ -224,7 +227,12 @@ def create_xlsx_file(model_audit, file):
 # run_model_audit
 #########################################################################################
 
-run_model_audit = DispatchFunction("run_model_audit", parameters=("output_type",))
+
+@dispatch_function(key_parameters=("output_type",))
+def run_model_audit(model, file, **kwargs):
+    """test run_model audit"""
+    msg = "No registered function based on passed paramters and no default function."
+    raise NotImplementedError(msg)
 
 
 @run_model_audit.register(output_type="json")

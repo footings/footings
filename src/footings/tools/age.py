@@ -3,10 +3,13 @@ from typing import Union
 
 import pandas as pd
 
-from footings import create_dispatch_function
+from footings import dispatch_function
 
-_PARAMS = ("type_birth_dt", "type_as_of_dt")
-_calculate_age = create_dispatch_function("calculate_age", parameters=_PARAMS)
+
+@dispatch_function(key_parameters=("type_birth_dt", "type_as_of_dt",))
+def _calculate_age(type_birth_dt, type_as_of_dt, birth_dt, as_of_dt, method):
+    msg = "No registered function based on passed paramters and no default function."
+    raise NotImplementedError(msg)
 
 
 def calculate_age(
