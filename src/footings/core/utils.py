@@ -1,117 +1,66 @@
-"""Utility classes and functions that support the footings library."""
-
-from typing import Callable, Dict, Tuple, Optional
-from inspect import signature
+import inspect
+import types
 from itertools import product
-from functools import partial
-from collections.abc import Hashable, Iterable
-
-from attr import attrs, attrib
-from attr.validators import optional, is_callable, instance_of, deep_iterable
-
-#########################################################################################
-# established errors
-#########################################################################################
+from functools import partial, update_wrapper
+from collections.abc import Iterable
+from typing import Callable, Tuple
 
 
-class DispatchFunctionKeyError(Exception):
-    """Key does not exist within dispatch function registry."""
+class DispatchMissingArgumentError(ValueError):
+    """Missing Argument to dispatch_function.register"""
 
 
-class DispatchFunctionRegisterParameterError(Exception):
-    """Parameter does not belong to DispatchFunction."""
+def dispatch_function(key_parameters: Tuple, default_function: Callable = None):
+    """Transform a function into a generic dispatch function.
 
+    A dispatch function operates similar to `functools.singledispatch` where a generic function
+    is recorded and additional functions can be registered and called based on passed arguments.
+    However, `functools.singledispatch` calls a registered function based on the type of the first
+    argument. Dispatch function calls a registered function based on the key word arguments assigned
+    when registering a function. If a registered function does not exist for the passed parameters,
+    the default functions is called. To force only registerd functions to be used, have the
+    default function `raise NotImplementedError`.
 
-#########################################################################################
-# DispatchFunction
-#########################################################################################
+    A dispatch_function is a useful function to replace a block of if else statements that call
+    different functions.
 
-
-def _update_dispatch_registry(registry, keys, function):
-    for key in keys:
-        registry.update({key: function})
-    return registry
-
-
-@attrs(slots=True, frozen=True, repr=False)
-class DispatchFunction:
-    """A function that dispatches other functions based on set parameters.
-
-    Attributes
+    Parameters
     ----------
-    name: str
-        The name to assign the DispatchFunction
-    parameters: tuple
-        The parameters by which a key is established
-    default: callable, optional
-        The default function to run if no key exists within the registry.
+    key_parameters : tuple
+        A tuple of the paramters to use as
+    default_function : callable
+        The default function to use when the function is called and a regestered function cannot be
+        found. function docstring and signature sourced.
 
-    Raises
-    ------
-    DispatchFunctionRegisterParameterError
-        Parameter does not belong to DispatchFunction.
-    DispatchFunctionKeyError
-        Key does not exist within dispatch function registry.
-
-    Notes
-    -----
-    The class uses the registry pattern. On initilization of the class, a dict called
-    registry is created which keeps track of the registered keys to dispatch functions on.
+    See Also
+    --------
+    functools.singledispatch
 
     Examples
     --------
-    >>> single_key = DispatchFunction(name="single_key", parameters=("key",))
+    >>> @dispatch_function(key_parameters=("key",))
+    >>> def dispatch(key):
+    >>>     return "default"
     >>>
-    >>> @single_key.register(key="x")
+    >>> @dispatch.register(key="x")
     >>> def _():
     >>>     return "x"
     >>>
-    >>> assert single_key(key="x") == "x"
-    >>>
-    >>> multi_key = DispatchFunction(name="multi_key", parameters=("key1", "key2"))
-    >>>
-    >>> @multi_key.register(key1="x1", key2="x2")
+    >>> @dispatch.register(key="y")
     >>> def _():
-            return "x"
+    >>>     return "y"
     >>>
-    >>> assert single_key(key1="x1", key2="x2") == "x"
+    >>> assert dispatch(key="x") == "x"
+    >>> assert dispatch(key="y") == "y"
+    >>> assert dispatch(key="z") == "default"
+    >>> assert dispatch(key=None) == "default"
     """
+    if default_function is None:
+        return partial(dispatch_function, key_parameters)
 
-    name: str = attrib(validator=instance_of(str))
-    parameters: Tuple = attrib(
-        validator=deep_iterable(instance_of(Hashable), instance_of(tuple))
-    )
-    default: Callable = attrib(default=None, validator=optional(is_callable()))
-    docstring = attrib(default=None, validator=optional(instance_of(str)))
-    registry: Dict = attrib(init=False, repr=False, factory=dict)
+    registry = {}
 
-    @property
-    def __name__(self):
-        return self.name
-
-    @property
-    def __doc__(self):
-        def _as_key_val(params, keys):
-            return ", ".join([f"{p} = {k}" for p, k in zip(params, keys)])
-
-        def _dispatch_records(params, registry):
-            ret_str = ""
-            for reg_k, reg_v in registry.items():
-                ret_str += _as_key_val(params, reg_k) + "\n"
-                ret_str += f"\t{str(signature(reg_v))}\n"
-            return ret_str
-
-        if self.docstring is not None:
-            ret_str = self.docstring + "\n\n"
-        else:
-            ret_str = ""
-        ret_str += "Parameters\n----------\n"
-        ret_str += "\n".join(self.parameters) + "\n\n"
-        ret_str += "Dispatch\n--------\n"
-        ret_str += _dispatch_records(self.parameters, self.registry)
-        return ret_str
-
-    def register(self, function=None, **kwargs):
+    def register(function: Callable = None, **kwargs):
         """Register a function using a key established by the required parameters.
 
         Parameters
@@ -119,181 +68,106 @@ class DispatchFunction:
         function : callable
             The function to register.
         **kwargs
-            The parameter keys to register for the given function.
-
-        Returns
-        -------
-        None
+            The key_parameters to register for the given function.
 
         Raises
         ------
-        DispatchFunctionRegisterParameterError
-            Parameter does not belong to DispatchFunction.
-        DispatchFunctionRegisterValueError
-            The value passed is not a String or Iterable.
+        DispatchMissingArgumentError
+            Missing Argument to dispatch_function.register.
         """
+        if function is None:
+            return partial(register, **kwargs)
+
         items = []
-        for param in self.parameters:
-            value = kwargs.get(param, None)
+        for key in key_parameters:
+            value = kwargs.get(key, None)
             if value is None:
-                msg = f"The parameter [{param}] is not a parameter of the instance."
-                raise DispatchFunctionRegisterParameterError(msg)
+                msg = f"The parameter [{key}] is not a parameter of the instance."
+                raise DispatchMissingArgumentError(msg)
             if isinstance(value, str):
                 items.append([value])
             elif isinstance(value, Iterable):
                 items.append(value)
             else:
                 items.append([value])
-
         keys = list(product(*items))
-        if function is None:
-            return partial(_update_dispatch_registry, self.registry, keys)
-        return _update_dispatch_registry(self.registry, keys, function)
+        for key in keys:
+            registry.update({key: function})
 
-    def __call__(self, *args, **kwargs):
-        key = []
-        for param in self.parameters:
-            key.append(kwargs.get(param))
-            kwargs.pop(param)
-        key = tuple(key)
-        func = self.registry.get(key, None)
-        if func is None:
-            if self.default is None:
-                msg = f"The key {key} does not exist within registry and no default."
-                raise DispatchFunctionKeyError(msg)
-            return self.default(*args, **kwargs)
-        return func(*args, **kwargs)
+    def wrapper(**kwargs):
+        orig_kwargs = kwargs.copy()
+        key_args = []
+        for key in key_parameters:
+            try:
+                key_args.append(kwargs.get(key))
+                kwargs.pop(key)
+            except KeyError:
+                pass
+        key_args = tuple(key_args)
+        registry_function = registry.get(key_args, None)
+        if registry_function is None:
+            return default_function(**orig_kwargs)
+        return registry_function(**kwargs)
+
+    wrapper.register = register
+    wrapper.registry = types.MappingProxyType(registry)
+    wrapper.__signature__ = inspect.signature(default_function)
+    update_wrapper(wrapper, default_function)
+    return wrapper
 
 
-def create_dispatch_function(
-    name: str,
-    parameters: tuple,
-    docstring: Optional[str] = None,
-    default: Optional[Callable] = None,
-) -> DispatchFunction:
-    """A factory function to create a DispatchFunction
+def loaded_function(function: Callable = None):
+    """Transform a function into a generic loaded function.
+
+    A loaded function is an object that allows hooks to be registered and called either before
+    or after the function is called. Hooks are registered as functions and need a positional
+    argument of 'start' to call before the function or 'end' to be call after the function.
+
+    This is a useful object to add validation of inputs before the function is called or validation
+    of output after the function has been called.
 
     Parameters
     ----------
-    name : str
-        The name to assign the DispatchFunction
-    parameters: tuple
-        The parameters by which a key is established
-    docstring : str, optional
-        The docstring to use for the function.
-    default : callable, optional
-        The default function to run if no key exists within the registry.
-
-    Returns
-    -------
-    DispatchFunction
-
-    See Also
-    --------
-    footings.utils.DispatchFunction
-
-    Examples
-    --------
-    >>> single_key = create_dispatch_function(name="single_key", parameters=("key",))
-    >>>
-    >>> @single_key.register(key="x")
-    >>> def _():
-    >>>     return "x"
-    >>>
-    >>> assert single_key(key="x") == "x"
-    >>>
-    >>> multi_key = create_dispatch_function(name="multi_key", parameters=("key1", "key2"))
-    >>>
-    >>> @multi_key.register(key1="x1", key2="x2")
-    >>> def _():
-    >>>     return "x"
-    >>>
-    >>> assert single_key(key1="x1", key2="x2") == "x"
-    """
-    return DispatchFunction(
-        name=name, parameters=parameters, docstring=docstring, default=default
-    )
-
-
-#########################################################################################
-# LoadedFunction
-#########################################################################################
-
-
-def _update_loaded_registry(registry, position, function):
-    if position == "end":
-        registry.append(function)
-    elif position == "start":
-        registry.insert(0, function)
-    else:
-        msg = f"The position {position} is not known. Please use 'start' or 'end'."
-        raise ValueError(msg)
-
-
-@attrs(slots=True, frozen=True, repr=False)
-class LoadedFunction:
-    """A function that can be loaded with additional functions to be called all at once.
-
-    The initial function is the primary function and any added functions can be though of as
-    pre hooks if added before primary (i.e., position=start) and post hooks if added after
-    the primary function (i.e., position=end).
-
-    A LoadedFunction has the added benefit of being recognized when auditing models as
-    a function with multiple internal calls.
-
-    Attributes
-    ----------
-    name: str
-        The name to assign the LoadedFunction.
     function: callable
         The primary function.
 
-    Notes
-    -----
-    The class uses the registry pattern. On initilization of the class, a list called
-    registry is created which records and orders the functions to be called.
-
     Examples
     --------
-    >>> def test_primary(x):
-    >>>     return x
+    >>> @loaded_function
+    >>> def loaded(a, b):
+    >>>     '''Main function'''
+    >>>     return a + b
     >>>
-    >>> test = LoadedFunction(name="single_key", function=test_primary)
+    >>> @loaded.register(position="start")
+    >>> def _(a, b):
+    >>>     b += 1
+    >>>     return a, b
     >>>
-    >>> @test.register
-    >>> def _(x):
-    >>>     return x > 3
-    >>>
-    >>> @test.register(position="start")
+    >>> @loaded.register(position="end")
     >>> def _(x):
     >>>     return x + 1
     >>>
-    >>> assert test(2) == False
-    >>> assert test(3) == True
+    >>> with pytest.raises(ValueError):
+    >>>
+    >>>     @loaded.register(position="zzz")
+    >>>     def _(x):
+    >>>         pass
+    >>>
+    >>> assert loaded(a=1, b=1) == 4
+    >>> assert loaded(1, 1) == 4
     """
+    if function is None:
+        return partial(loaded_function)
 
-    name: str = attrib(validator=instance_of(str))
-    function: Callable = attrib(validator=is_callable())
-    registry: list = attrib(init=False, repr=False, factory=list)
+    # test if function is already loaded
+    if hasattr(function, "loaded"):
+        loaded = function.loaded
+        need_to_register = False
+    else:
+        loaded = []
+        need_to_register = True
 
-    def __attrs_post_init__(self):
-        self.register(self.function)
-
-    @property
-    def __name__(self):
-        return self.name
-
-    @property
-    def __doc__(self):
-        if self.function.__doc__ is not None:
-            ret_str = self.function.__doc__ + "\n\n"
-        else:
-            ret_str = ""
-        ret_str += "Loaded\n------\n"
-        ret_str += "\n".join([f.__name__ for f in self.registry]) + "\n"
-        return ret_str
-
-    def register(self, function=None, position="end"):
+    def register(position: str, function: Callable = None):
         """Register a function into the registry.
 
         Parameters
@@ -301,60 +175,37 @@ class LoadedFunction:
         function : callable
             The function to register.
         position : str
-            Use end if adding to the end of the registry or start to add to the begining.
+            Use 'end' if adding to the end of the registry or 'start' to add to the begining.
 
-        Returns
-        -------
-        None
+        Raises
+        ------
+        ValueError
+            If position is not 'end' or 'start'.
         """
         if function is None:
-            return partial(_update_loaded_registry, self.registry, position)
-        return _update_loaded_registry(self.registry, position, function)
+            return partial(register, position)
+        if position == "end":
+            loaded.append(function)
+        elif position == "start":
+            loaded.insert(0, function)
+        else:
+            msg = f"The position {position} is not known. Please use 'start' or 'end'."
+            raise ValueError(msg)
 
-    def __call__(self, *args, **kwargs):
-        ret = self.registry[0](*args, **kwargs)
-        if len(self.registry) > 1:
-            for func in self.registry[1:]:
+    def wrapper(*args, **kwargs):
+        ret = loaded[0](*args, **kwargs)
+        if len(loaded) > 1:
+            for func in loaded[1:]:
                 if isinstance(ret, tuple):
                     ret = func(*ret)
                 else:
                     ret = func(ret)
         return ret
 
-
-def create_loaded_function(function: callable) -> LoadedFunction:
-    """A factory function to create a LoadedFunction
-
-    Parameters
-    ----------
-    function: callable
-        The primary function.
-
-    Returns
-    -------
-    LoadedFunction
-
-    See Also
-    --------
-    footings.utils.LoadedFunction
-
-    Examples
-    --------
-    >>> def test_primary(x):
-    >>>     return x
-    >>>
-    >>> test = LoadedFunction(name="single_key", function=test_primary)
-    >>>
-    >>> @test.register
-    >>> def _(x):
-    >>>     return x > 3
-    >>>
-    >>> @test.register(position="start")
-    >>> def _(x):
-    >>>     return x + 1
-    >>>
-    >>> assert test(2) == False
-    >>> assert test(3) == True
-    """
-    name = function.__name__
-    return LoadedFunction(name=name, function=function)
+    wrapper.register = register
+    wrapper.loaded = loaded
+    wrapper.__signature__ = inspect.signature(function)
+    update_wrapper(wrapper, function)
+    if need_to_register is True:
+        wrapper.register(position="end", function=function)
+    return wrapper
