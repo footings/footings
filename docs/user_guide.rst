@@ -152,40 +152,40 @@ Below is what the list would look like using our DLR example -
 
 .. code-block:: python
 
-    from footings import create_argument, use
+    from footings import define_parameter, use
 
     # first define arguments
-    arg_valuation_date = create_argument(
+    param_valuation_date = define_parameter(
         name="valuation_date",
         description="The valuation date.",
         dtype=pd.Timestamp
     )
-    arg_disabled_age = create_argument(
+    param_disabled_age = define_parameter(
         name="disabled_age",
         description="The age the policy holder became disabled.",
         dtype=int,
         min_val=20,
         max_val=100
     )
-    arg_gender = create_argument(
+    param_gender = define_parameter(
         name="gender",
         description="The gender of the policy holder.",
         dtype=str,
         allowed=["M", "F"]
     )
-    arg_occ_class = create_argument(
+    param_occ_class = define_parameter(
         name="occ_class",
         description="The occupation class of the policy holder.",
         dtype=int,
         allowed=[1, 2, 3, 4]
     )
-    arg_elim_period = create_argument(
+    param_elim_period = define_parameter(
         name="elim_period",
         description="The elimination period for the policy.",
         dtype=int,
         allowed=[0, 7, 14, 30, 60, 90, 180]
     )
-    arg_interest_rate = create_argument(
+    param_interest_rate = define_parameter(
         name="interest_rate",
         description="The valuation interest rate.",
         dtype=float,
@@ -198,7 +198,7 @@ Below is what the list would look like using our DLR example -
         {
             "name": "create-projected-frame",
             "function": create_projected_frame,
-            "args": {"valuation_date": arg_valuation_date, "periods": 10}
+            "args": {"valuation_date": param_valuation_date, "periods": 10}
         },
         {
             "name": "add-expected-benefit",
@@ -210,10 +210,10 @@ Below is what the list would look like using our DLR example -
             "function": add_ctr,
             "args": {
                 "frame": use("add-expected-benefit"),
-                "disabled_age": arg_disabled_age,
-                "gender": arg_gender,
-                "occ_class": arg_occ_class,
-                "elim_period": arg_elim_period,
+                "disabled_age": param_disabled_age,
+                "gender": param_gender,
+                "occ_class": param_occ_class,
+                "elim_period": param_elim_period,
             }
         },
         {
@@ -226,7 +226,7 @@ Below is what the list would look like using our DLR example -
             "function": add_discount_factor,
             "args": {
                 "frame": use("calculate-lives-inforce"),
-                "interest_rate": arg_interest_rate
+                "interest_rate": param_interest_rate
             }
         },
         {
@@ -250,9 +250,9 @@ To create the model run -
 
 .. code-block:: python
 
-    from footings import create_model
+    from footings import build_model
 
-    DLRModel = create_model(
+    DLRModel = build_model(
         name = "DLRModel",
         description = "This model calculates a disabled life reserve (DLR).",
         steps = steps
@@ -299,7 +299,7 @@ In addition, note the starting * in the signature. All arguments passed to DLRMo
 arguments. Positional arguments are not accepted. When running models, it is better to be explicit
 vs implicit especially as some models might have many arguments to pass.
 
-All models created by the factory function, create_model, return a new class object that is a subclass
+All models created by the factory function, build_model, return a new class object that is a subclass
 of the BaseModel. The BaseModel has a few important methods including -
 
 - run - to run the model (i.e., trigger the computations)
@@ -308,7 +308,7 @@ of the BaseModel. The BaseModel has a few important methods including -
 
 **Instantiate the Model**
 
-The factory function create_model only creates the class DLRModel. To run the DLR model, we must
+The factory function build_model only creates the class DLRModel. To run the DLR model, we must
 first instantiate the model. To do this, pass the necessary arguments to the object.
 
 .. code-block:: python

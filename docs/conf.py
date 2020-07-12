@@ -34,6 +34,7 @@ release = version
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
     "numpydoc",
     "sphinx_rtd_theme",
 ]

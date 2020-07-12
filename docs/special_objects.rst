@@ -8,8 +8,8 @@ models. They are -
 - DispatchFunction
 - LoadedFunction
 
-These can be created with their representative factory functions - *create_dispatch_function* and
-*create_loaded_function*.
+These can be created with their representative factory functions - *dispatch_function* and
+*loaded_function*.
 
 DispatchFunction
 ----------------
@@ -32,9 +32,11 @@ the reporting needs -
 .. code-block:: python
 
     import pandas as pd
-    from footings import create_dispatch_function
+    from footings import dispatch_function
 
-    add_ctr = create_dispatch_function(name="add_ctr", parameters=("reporting_type",))
+    @dispatch_function(key_parameters=("reporting_type",))
+    def add_ctr(reporting_type, frame):
+        raise NotImplementedError("No default function is implemented")
 
     @add_ctr.register(reporting_type="STAT")
     def _(frame):
@@ -79,7 +81,7 @@ In addition, the step list would need to be modified to expose the *reporting_ty
 .. code-block:: python
 
     # create agrument
-    arg_reporting_type = create_argument(
+    param_reporting_type = define_parameter(
         name="reporting_type",
         dtype=str,
         allowed=["GAAP", "STAT", "BEST-ESTIMATE"]
@@ -91,7 +93,7 @@ In addition, the step list would need to be modified to expose the *reporting_ty
         "function": add_ctr,
         "args": {
             "frame": use("add-expected-benefit"),
-            "reporting_type": arg_reporting_type,
+            "reporting_type": param_reporting_type,
             # ...
         }
     },

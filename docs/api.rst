@@ -13,20 +13,20 @@ Functions
 .. autosummary::
    :nosignatures:
 
-   create_parameter
+   define_parameter
    use
-   create_model
-   create_dispatch_function
-   create_loaded_function
+   build_model
+   dispatch_function
+   loaded_function
 
 |
 |
 
-.. autofunction:: create_parameter
+.. autofunction:: define_parameter
 .. autofunction:: use
-.. autofunction:: create_model
-.. autofunction:: create_dispatch_function
-.. autofunction:: create_loaded_function
+.. autofunction:: build_model
+.. autofunction:: dispatch_function
+.. autofunction:: loaded_function
 
 
 Classes
@@ -37,8 +37,6 @@ Classes
    footings.core.parameter.Parameter
    footings.core.footing.Dependent
    footings.core.model.BaseModel
-   footings.core.utils.DispatchFunction
-   footings.core.utils.LoadedFunction
 
 |
 |
@@ -53,16 +51,10 @@ Classes
 .. autoclass:: footings.core.model.BaseModel
    :members:
 
-.. autoclass:: footings.core.utils.DispatchFunction
-   :members:
+Tools
+-----
 
-.. autoclass:: footings.core.utils.LoadedFunction
-   :members:
-
-Library
--------
-
-.. currentmodule:: footings.library
+.. currentmodule:: footings.tools
 
 .. autosummary::
    :nosignatures:
