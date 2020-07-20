@@ -1,5 +1,5 @@
 from typing import List, Dict
-from inspect import getfullargspec
+from inspect import getfullargspec, signature
 import sys
 
 from attr import attrs, attrib, make_class
@@ -161,6 +161,8 @@ def create_attributes(footing):
         kwargs = {}
         if arg_val.default is not None:
             kwargs.update({"default": arg_val.default})
+        if arg_val.dtype is not None:
+            kwargs.update({"type": arg_val.dtype})
         kwargs.update({"kw_only": True, "validator": arg_val._create_validator()})
         attributes.update({arg_key: attrib(**kwargs)})
 
@@ -286,6 +288,9 @@ def build_model(
         name, attrs=attributes, bases=(BaseModel,), slots=True, frozen=True, repr=False
     )
     model.__doc__ = create_model_docstring(description, footing.parameters, steps)
+    old_sig = signature(model)
+    new_sig = old_sig.replace(return_annotation=f"{name}")
+    model.__signature__ = new_sig
     if scenarios is not None:
         for k, v in scenarios.items():
             model.register_scenario(k, **v)
