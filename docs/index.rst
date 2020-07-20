@@ -41,4 +41,4 @@ The Footings library was designed as framework library using the below princples
    special_objects.rst
    api.rst
    license.rst
-   changelog.rst
+   changelog.md

@@ -36,6 +36,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "numpydoc",
+    "recommonmark",
     "sphinx_rtd_theme",
 ]
 
@@ -68,4 +69,10 @@ html_static_path = ["_static"]
 # Added options
 html_context = {
     "css_files": ["_static/theme_overrides.css"]  # override wide tables in RTD theme
+}
+
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".txt": "markdown",
+    ".md": "markdown",
 }
