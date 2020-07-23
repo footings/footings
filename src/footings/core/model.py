@@ -149,7 +149,7 @@ class BaseModel:
     def audit(self, file: str, **kwargs):
         """Audit model"""
         _, file_ext = os.path.splitext(file)
-        return run_model_audit(model=self, output_type=file_ext[1:], **kwargs)
+        return run_model_audit(model=self, output_type=file_ext[1:], file=file, **kwargs)
 
     def run(self):
         """Run model"""
