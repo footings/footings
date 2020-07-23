@@ -1,6 +1,7 @@
 from typing import List, Dict
 from inspect import getfullargspec, signature
 import sys
+import os
 
 from attr import attrs, attrib, make_class
 from numpydoc.docscrape import FunctionDoc
@@ -145,9 +146,10 @@ class BaseModel:
         """Visualize model"""
         return visualize_model(self)
 
-    def audit(self, **kwargs):
+    def audit(self, file: str, **kwargs):
         """Audit model"""
-        return run_model_audit(model=self, **kwargs)
+        _, file_ext = os.path.splitext(file)
+        return run_model_audit(model=self, output_type=file_ext[1:], **kwargs)
 
     def run(self):
         """Run model"""
