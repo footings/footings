@@ -1,0 +1,22 @@
+name: footings
+channels:
+  - conda-forge
+dependencies:
+  # required
+  - attrs
+  - pandas
+  - numpydoc
+  - openpyxl
+
+  # testing
+  - pytest
+
+#
+#  # development
+#  - flake8
+#  - black
+#  - pre-commit
+#  - sphinx
+#
+#  # other
+#  - pip
