@@ -7,7 +7,7 @@ from numpydoc.docscrape import FunctionDoc
 from openpyxl.styles import NamedStyle, Font
 
 from .utils import dispatch_function
-from .to_xlsx import XlsxWorkbook
+from .xlsx import FootingsXlsxWb
 
 
 def _step_to_audit_format(step):
@@ -172,7 +172,7 @@ XLSX_FORMATS = {"title": _STYLE_TITLE}
 
 def create_xlsx_file(model_audit, file):
     """Create xlsx file."""
-    wb = XlsxWorkbook.create()
+    wb = FootingsXlsxWb.create()
     for format_nm, format_val in XLSX_FORMATS.items():
         wb.add_named_style(format_nm, format_val)
 
@@ -183,9 +183,9 @@ def create_xlsx_file(model_audit, file):
     # write data
     arg_summary = pd.DataFrame.from_records(model_audit.parameters_summary)
     step_summary = pd.DataFrame.from_records(model_audit.steps_summary)
-    wb.write_obj(model_name, model_audit.model_name)
-    wb.write_obj(model_name, arg_summary, add_rows=1)
-    wb.write_obj(model_name, step_summary, add_rows=1)
+    wb.write_obj(model_name, model_audit.model_name, add_rows=2)
+    wb.write_obj(model_name, arg_summary, add_rows=2)
+    wb.write_obj(model_name, step_summary, add_rows=2)
     # wb.write_obj(model_name, pd.DataFrame.from_records(model_audit.parameters))
 
     # format data
