@@ -27,6 +27,8 @@ def _obj_to_xlsx_cell(obj, worksheet, row, col, **kwargs):
     cell.value = obj
     if "style" in kwargs:
         cell.style = kwargs.get("style")
+    if "hyperlink" in kwargs:
+        cell.hyperlink = f"#{kwargs.get('hyperlink')}"
 
 
 def _obj_to_xlsx_builtins(obj, worksheet, **kwargs):

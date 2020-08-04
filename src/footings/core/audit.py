@@ -3,7 +3,7 @@ import json
 from attr import attrs, attrib
 import attr
 import pandas as pd
-from numpydoc.docscrape import FunctionDoc
+from numpydoc.docscrape import FunctionDoc, ClassDoc
 from openpyxl.styles import NamedStyle, Font
 
 from .utils import dispatch_function
@@ -100,6 +100,8 @@ class ModelAudit:
     """Container for model audit output."""
 
     model_name: dict = attrib()
+    model_doc: str = attrib()
+    model_sig: str = attrib()
     parameters_summary: dict = attrib()
     parameters: dict = attrib()
     steps_summary: dict = attrib()
@@ -109,32 +111,23 @@ class ModelAudit:
     def create_audit(cls, model):
         """Create audit"""
         model_name = model.__class__.__name__
+        model_doc = model.__doc__
+        model_sig = f"{model_name}{str(model.__signature__)}"
         parameters = _create_parameter_output(model.parameters)
         parameters_summary = _create_parameter_summary(parameters)
         output = _get_model_output(model)
         steps = _create_step_output(model.steps, output)
         steps_summary = _create_step_summary(steps)
-        return cls(model_name, parameters_summary, parameters, steps_summary, steps)
+        return cls(
+            model_name,
+            model_doc,
+            model_sig,
+            parameters_summary,
+            parameters,
+            steps_summary,
+            steps,
+        )
 
-
-# def create_signature_string(step):
-#     """Create signature"""
-#     sig = getfullargspec(step.function)
-#     args = sig.args + sig.kwonlyargs
-#     sig_str = ""
-#     for idx, arg in enumerate(args, 1):
-#         if arg in step.init_params:
-#             sig_str += f"{arg}=parameter({step.init_params.get(arg)})"
-#         elif arg in step.dependent_params:
-#             sig_str += f"{arg}=use({step.dependent_params.get(arg)})"
-#         else:
-#             sig_str += f"{arg}={step.defined_params.get(arg)}"
-#         if idx < len(args):
-#             sig_str += ", "
-#         name = getattr(step.function, "name", None)
-#         if name is None:
-#             name = step.function.__name__
-#     return f"{name}({sig_str})"
 
 #########################################################################################
 # to json
@@ -161,9 +154,13 @@ def json_serialize(obj):
     return json_serializer(dtype=type(obj), obj=obj)
 
 
-_STYLE_TITLE = NamedStyle(name="bold")
-_STYLE_TITLE.font = Font(bold=True)
-XLSX_FORMATS = {"title": _STYLE_TITLE}
+XLSX_FORMATS = {
+    "title": NamedStyle(name="bold", font=Font(name="Calibri", bold=True)),
+    "underline": NamedStyle("underline", font=Font(name="Calibri", underline="single")),
+    "hyperlink": NamedStyle(
+        "hyperlink", font=Font(name="Calibri", italic=True, bold=True)
+    ),
+}
 
 #########################################################################################
 # to xlsx
@@ -176,49 +173,89 @@ def create_xlsx_file(model_audit, file):
     for format_nm, format_val in XLSX_FORMATS.items():
         wb.add_named_style(format_nm, format_val)
 
-    # create worksheet
     model_name = model_audit.model_name
+    class_headings = list(ClassDoc.sections.keys()) + ["Steps"]
+    function_headings = list(FunctionDoc.sections.keys())
+    steps = list(model_audit.steps.keys())
+
+    # create sheets
     wb.create_sheet(model_name, start_row=2, start_col=2)
+    for step_name in steps:
+        wb.create_sheet(step_name, start_row=2, start_col=2)
 
-    # write data
-    arg_summary = pd.DataFrame.from_records(model_audit.parameters_summary)
-    step_summary = pd.DataFrame.from_records(model_audit.steps_summary)
-    wb.write_obj(model_name, model_audit.model_name, add_rows=2)
-    wb.write_obj(model_name, arg_summary, add_rows=2)
-    wb.write_obj(model_name, step_summary, add_rows=2)
-    # wb.write_obj(model_name, pd.DataFrame.from_records(model_audit.parameters))
+    # populate model sheet
+    wb.write_obj(model_name, "Model Name:", add_cols=1, style=XLSX_FORMATS["title"])
+    wb.write_obj(model_name, model_name, add_rows=2, add_cols=-1)
+    wb.write_obj(model_name, "Signature:", add_cols=1, style=XLSX_FORMATS["title"])
+    wb.write_obj(model_name, model_audit.model_sig, add_rows=2, add_cols=-1)
+    wb.write_obj(model_name, "Docstring:", add_cols=1, style=XLSX_FORMATS["title"])
 
-    # format data
+    in_steps_zone = False
+    for line in model_audit.model_doc.split("\n"):
+        if line in class_headings:
+            wb.write_obj(model_name, line, add_rows=1, style=XLSX_FORMATS["underline"])
+            if in_steps_zone:
+                in_steps_zone = False
+            if line == "Steps":
+                in_steps_zone = True
+        elif "---" in line:
+            pass
+        elif in_steps_zone and line in steps:
+            wb.write_obj(
+                model_name,
+                line,
+                add_rows=1,
+                hyperlink=line,
+                style=XLSX_FORMATS["hyperlink"],
+            )
+        else:
+            wb.write_obj(model_name, line, add_rows=1)
+
+    # format model sheet
     wksht = wb.worksheets[model_name].obj
     wksht.sheet_view.showGridLines = False
     wksht.column_dimensions["A"].width = 2.14
-    # wksht.set_row(1, None, wb.formats["title"])
-    # wksht.set_column(0, 0, 2.14, wb.formats["title"])
+    wksht.column_dimensions["B"].width = 14
+    wksht.column_dimensions["C"].width = 1
 
-    # write steps
     for step_name, step_value in model_audit.steps.items():
 
-        # create worksheet
-        wb.create_sheet(step_name, start_row=2, start_col=2)
+        # populate step sheets
+        wb.write_obj(step_name, "Step Name:", add_cols=1, style=XLSX_FORMATS["title"])
+        wb.write_obj(step_name, step_name, add_rows=2, add_cols=-1)
+        wb.write_obj(step_name, "Signature:", add_cols=1, style=XLSX_FORMATS["title"])
+        wb.write_obj(step_name, step_value["Signature"], add_rows=2, add_cols=-1)
+        wb.write_obj(step_name, "Docstring:", add_cols=1, style=XLSX_FORMATS["title"])
+        for line in step_value["Docstring"].split("\n"):
+            if line in function_headings:
+                wb.write_obj(step_name, line, add_rows=1, style=XLSX_FORMATS["underline"])
+            elif "---" in line:
+                pass
+            else:
+                wb.write_obj(step_name, line, add_rows=1)
+        wb.write_obj(step_name, "", add_rows=1, add_cols=-1)
+        wb.write_obj(step_name, "Output:", add_cols=2, style=XLSX_FORMATS["title"])
+        wb.write_obj(step_name, step_value["Output"])
 
-        # write data
-        wb.write_obj(step_name, {"Name:": step_name})
-        wb.write_obj(
-            step_name, {"Signature:": step_value["Signature"]},
-        )
-        wb.write_obj(
-            step_name, {"Docstring:": step_value["Docstring"]},
-        )
-        wb.write_obj(step_name, {"Output:": step_value["Output"]})
-
-        # format data
+        # format step sheets
         wksht = wb.worksheets[step_name].obj
         wksht.sheet_view.showGridLines = False
-        # wksht.set_row(1, None, wb.formats["title"])
         wksht.column_dimensions["A"].width = 2.14
-        wksht.column_dimensions["B"].width = 12
-        # wksht.set_column(0, 0, 2.14, wb.formats["title"])
-        # wksht.set_column(1, 1, 12, wb.formats["title"])
+        wksht.column_dimensions["B"].width = 14
+        wksht.column_dimensions["C"].width = 1
+        for col in list(wksht.columns)[3:]:
+            max_length = 0
+            for cell in col:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(cell.value)
+                except:
+                    pass
+            if max_length <= 3:
+                adj_width = (max_length + 1) * 1.2
+            else:
+                adj_width = max_length + 1
+            wksht.column_dimensions[col[0].column_letter].width = adj_width
 
     wb.save(file)
 

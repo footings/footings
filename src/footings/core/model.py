@@ -190,18 +190,18 @@ def _create_parameters_section(parameters):
     ret_str = "Parameters\n----------\n"
     for arg_k, arg_v in parameters.items():
         if arg_v.dtype is None:
-            ret_str += f"{arg_k}\n\t{arg_v.description}\n"
+            ret_str += f"{arg_k}\n    {arg_v.description}\n"
         else:
-            ret_str += f"{arg_k} : {_clean_dtype(arg_v.dtype)}\n\t{arg_v.description}\n"
+            ret_str += f"{arg_k} : {_clean_dtype(arg_v.dtype)}\n    {arg_v.description}\n"
     return ret_str
 
 
 def _create_steps_section(steps):
     ret_str = "Steps\n-----\n"
-    for idx, step in enumerate(steps):
+    for step in steps:
         docstring = FunctionDoc(step["function"])
-        ret_str += f"Step {idx} - {step['name']}\n"
-        ret_str += "".join(["\t" + x + "\n" for x in docstring.get("Summary")])
+        ret_str += f"{step['name']}\n"
+        ret_str += "".join([f"    {x}\n" for x in docstring.get("Summary")])
     return ret_str
 
 
@@ -209,22 +209,24 @@ def _get_returns(function):
     parsed_doc = FunctionDoc(function)
     parameters = parsed_doc["Returns"]
     if parameters != []:
-        ret_str = "\tReturns\n\t-------\n"
+        ret_str = "    Returns\n    -------\n"
         for param in parameters:
             if param.type != "" and param.name == "":
-                ret_str += f"\t{param.type}\n"
+                ret_str += f"    {param.type}\n"
             if param.type != "" and param.name != "":
-                ret_str += f"\t{param.name} : {param.type}\n"
+                ret_str += f"    {param.name} : {param.type}\n"
             if param.desc != []:
-                ret_str += "".join([f"\t\t{x}\n" for x in param.desc])
+                ret_str += "".join([f"        {x}\n" for x in param.desc])
         return ret_str
     return ""
 
 
 def _create_methods_section(function):
     ret_str = "Methods\n-------\n"
-    ret_str += "run()\n\tExecutes the model.\n\n"
-    ret_str += _get_returns(function)
+    ret_str += "run()\n    Executes the model.\n\n"
+    ret_str += f"{_get_returns(function)}\n"
+    ret_str += "audit(file, **kwargs)\n"
+    ret_str += "    Creates an audit xlsx or json file."
     return ret_str
 
 

@@ -128,19 +128,23 @@ def _compare_footings_xlsx_files(result: dict, expected: dict, **kwargs):
     for key in keys:
         temp = True
         try:
-            res_val = result.get(key)
+            res_val = result[key]
         except KeyError:
             msg = "The result workbook is missing the entry."
             temp = False
 
         try:
-            exp_val = expected.get(key)
+            exp_val = expected[key]
         except KeyError:
             msg = "The expected workbook is missing the entry."
             temp = False
 
         if temp:
-            temp, msg = compare_values(res_val, exp_val)
+            if type(res_val) != type(exp_val):
+                temp = False
+                msg = "The workbook types are different"
+            else:
+                temp, msg = compare_values(res_val, exp_val)
 
         if temp is False:
             test = False
