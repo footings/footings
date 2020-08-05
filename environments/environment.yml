@@ -5,18 +5,8 @@ dependencies:
   # required
   - attrs
   - pandas
-  - numpydoc
+  - numpydoc=1.0.*
   - openpyxl
 
   # testing
   - pytest
-
-#
-#  # development
-#  - flake8
-#  - black
-#  - pre-commit
-#  - sphinx
-#
-#  # other
-#  - pip
