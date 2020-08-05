@@ -64,6 +64,8 @@ Tools
    expand_frame_per_record
    calculate_age
    post_drop_columns
+   assert_footings_audit_xlsx_equal
+   load_footings_audit_xlsx
 
 |
 |
@@ -73,3 +75,5 @@ Tools
 .. autofunction:: expand_frame_per_record
 .. autofunction:: calculate_age
 .. autofunction:: post_drop_columns
+.. autofunction:: assert_footings_audit_xlsx_equal
+.. autofunction:: load_footings_audit_xlsx

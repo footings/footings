@@ -25,7 +25,7 @@ def _make_key(x: pd.Series):
 
 
 def load_footings_audit_xlsx(file_path: str, **kwargs):
-    """Read footings xlsx file.
+    """Read footings audit xlsx file.
 
     Parameters
     ----------
