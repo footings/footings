@@ -35,3 +35,16 @@ def docs(session):
     )
     session.install("-e", ".", "--no-deps")
     session.run("sphinx-build", "-E", "-b", "html", "docs", "docs/_build")
+
+
+@nox.session(python="3.7", venv_backend="none")
+def changelog(session):
+    session.run(
+        "auto-changelog",
+        "--output",
+        "docs/changelog.md",
+        "--unreleased",
+        "true",
+        "--commit-limit",
+        "false",
+    )
