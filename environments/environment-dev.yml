@@ -16,3 +16,5 @@ dependencies:
   - black
   - pre-commit
   - sphinx
+  - recommonmark
+  - sphinx_rtd_theme
