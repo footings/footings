@@ -12,14 +12,26 @@ def tests(session):
         "--prefix",
         session.virtualenv.location,
         "--file",
-        "environment.yml",
+        "environments/environment-test.yml",
         # options
         silent=False,
     )
-    session.install(".[testing]")
-    session.run("pytest")
+    session.install("-e", ".", "--no-deps")
+    session.run("pytest", "-vv")
 
 
 @nox.session(python="3.7", venv_backend="conda")
 def docs(session):
-    session.install(".[docs]")
+    session.run(
+        "conda",
+        "env",
+        "update",
+        "--prefix",
+        session.virtualenv.location,
+        "--file",
+        "environments/environment-dev.yml",
+        # options
+        silent=False,
+    )
+    session.install("-e", ".", "--no-deps")
+    session.run("sphinx-build", "-E", "-b", "html", "docs", "docs/_build")
