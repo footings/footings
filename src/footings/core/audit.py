@@ -167,6 +167,12 @@ XLSX_FORMATS = {
 #########################################################################################
 
 
+def _get_indent_value(lines):
+    sections = [line for line in lines if "---" in line]
+    section = sections[0]
+    return len(section) - len(section.lstrip(" "))
+
+
 def create_xlsx_file(model_audit, file):
     """Create xlsx file."""
     wb = FootingsXlsxWb.create()
@@ -191,7 +197,12 @@ def create_xlsx_file(model_audit, file):
     wb.write_obj(model_name, "Docstring:", add_cols=1, style=XLSX_FORMATS["title"])
 
     in_steps_zone = False
-    for line in model_audit.model_doc.split("\n"):
+    lines = model_audit.model_doc.split("\n")
+    indent_len = _get_indent_value(lines)
+    for line in lines:
+        if indent_len > 0:
+            if line[:indent_len] == "".join([" " for x in range(0, indent_len)]):
+                line = line[indent_len:]
         if line in class_headings:
             wb.write_obj(model_name, line, add_rows=1, style=XLSX_FORMATS["underline"])
             if in_steps_zone:
@@ -226,7 +237,13 @@ def create_xlsx_file(model_audit, file):
         wb.write_obj(step_name, "Signature:", add_cols=1, style=XLSX_FORMATS["title"])
         wb.write_obj(step_name, step_value["Signature"], add_rows=2, add_cols=-1)
         wb.write_obj(step_name, "Docstring:", add_cols=1, style=XLSX_FORMATS["title"])
-        for line in step_value["Docstring"].split("\n"):
+
+        lines = step_value["Docstring"].split("\n")
+        indent_len = _get_indent_value(lines)
+        for line in lines:
+            if indent_len > 0:
+                if line[:indent_len] == "".join([" " for x in range(0, indent_len)]):
+                    line = line[indent_len:]
             if line in function_headings:
                 wb.write_obj(step_name, line, add_rows=1, style=XLSX_FORMATS["underline"])
             elif "---" in line:
