@@ -8,16 +8,18 @@ class ParameterTypeError(Exception):
     """Wrong type passed to parameter"""
 
 
-def _check_type(expected, value):
+def _check_type(expected, value, name):
     if isinstance(value, expected) is False:
-        raise ParameterTypeError(f"Expected type {value} but received {type(value)}")
+        raise ParameterTypeError(
+            f"For parameter {name}, expected type {expected} but received {type(value)}"
+        )
 
 
 class ParameterAllowedError(Exception):
     """Value not allowed passed to parameter"""
 
 
-def _check_allowed(allowed, value):
+def _check_allowed(allowed, value, name):
     if value not in allowed:
         raise ParameterAllowedError(f"{value} is not in [{allowed}]")
 
@@ -26,7 +28,7 @@ class ParameterMinValueError(Exception):
     """Value below allowed minimum passed to parameter"""
 
 
-def _check_min_val(min_val, value):
+def _check_min_val(min_val, value, name):
     if value < min_val:
         raise ParameterMinValueError(f"{value} is less than {min_val}")
 
@@ -35,7 +37,7 @@ class ParameterMaxValueError(Exception):
     """Value above allowed maximum passed to parameter"""
 
 
-def _check_max_val(max_val, value):
+def _check_max_val(max_val, value, name):
     if value > max_val:
         raise ParameterMaxValueError(f"{value} is greater than {max_val}")
 
@@ -44,7 +46,7 @@ class ParameterMinLenError(Exception):
     """Value with length below allowed minimum passed to parameter"""
 
 
-def _check_min_len(min_len, value):
+def _check_min_len(min_len, value, name):
     if len(value) < min_len:
         raise ParameterMinLenError(f"len {len(value)} is less than {min_len}")
 
@@ -53,7 +55,7 @@ class ParameterMaxLenError(Exception):
     """Value with length above allowed maximum passed to parameter"""
 
 
-def _check_max_len(max_len, value):
+def _check_max_len(max_len, value, name):
     if len(value) > max_len:
         raise ParameterMaxLenError(f"len {len(value)} is greater than {max_len}")
 
@@ -62,7 +64,7 @@ class ParameterCustomError(Exception):
     """Value fails custom test"""
 
 
-def _check_custom(func, value):
+def _check_custom(func, value, name):
     if callable(func) is False:
         raise TypeError("the object passed to custom must be callable")
 
@@ -152,7 +154,7 @@ class Parameter:
         """Test to see if value is valid as a parameter"""
         for k, v in _PARAMS_CHECKS.items():
             if getattr(self, k) is not None:
-                v(getattr(self, k), value)
+                v(getattr(self, k), value, self.name)
         return True
 
     def _create_validator(self):
