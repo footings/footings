@@ -2,6 +2,7 @@ from typing import List, Dict
 from inspect import getfullargspec, signature
 import sys
 import os
+from traceback import extract_tb, format_list
 
 from attr import attrs, attrib, make_class
 from numpydoc.docscrape import FunctionDoc
@@ -75,13 +76,21 @@ def update_dict_(dict_, dependency_index, step, output):
             del dict_[key]
 
 
-def run_model(model):
+def run_model(model, to_step: str):
     """Generic function to run a model"""
     if not issubclass(type(model), BaseModel):
         raise TypeError(f"The model passed must be a subclass of {BaseModel}.")
 
     dict_ = {}
-    steps = model.steps
+    if to_step is None:
+        steps = model.steps
+    else:
+        if to_step not in model.steps:
+            raise KeyError()
+        else:
+            step_list = list(model.steps.keys())
+            step_list = step_list[: step_list.index(to_step) + 1]
+            steps = {k: v for k, v in model.steps.items() if k in step_list}
     dependency_index = model.dependency_index
     for k, v in steps.items():
         if k not in dependency_index[k]:
@@ -93,10 +102,11 @@ def run_model(model):
         try:
             out = v.function(**init_params, **dependent_params, **v.defined_params)
         except:
-            exc_type, exc_value, _ = sys.exc_info()
+            exc_type, exc_value, exc_trace = sys.exc_info()
             msg = f"At step [{k}], an error occured.\n"
             msg += f"  Error Type = {exc_type}\n"
-            msg += f"  Error Message = {exc_value}"
+            msg += f"  Error Message = {exc_value}\n"
+            msg += f"  Error Trace = {format_list(extract_tb(exc_trace))}\n"
             raise ModelRunError(msg)
         update_dict_(dict_, dependency_index[k], k, out)
     return dict_[list(steps.keys())[-1]]
@@ -151,9 +161,9 @@ class BaseModel:
         _, file_ext = os.path.splitext(file)
         return run_model_audit(model=self, output_type=file_ext[1:], file=file, **kwargs)
 
-    def run(self):
+    def run(self, to_step=None):
         """Run model"""
-        return run_model(self)
+        return run_model(self, to_step=to_step)
 
 
 def create_attributes(footing):
