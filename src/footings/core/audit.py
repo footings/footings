@@ -1,4 +1,5 @@
 import json
+from copy import copy
 
 from attr import attrs, attrib
 import attr
@@ -14,11 +15,22 @@ def _step_to_audit_format(step):
     """To audit format"""
 
     def _format_docstring(docstring):
-        doc_split = docstring.split("\n")
-        if doc_split[0].strip() == "":
-            doc_split = doc_split[1:]
-        indent = len(doc_split[0]) - len(doc_split[0].lstrip())
-        return "\n".join([line[indent:] for line in doc_split])
+        def _format_line(line, indent_len):
+            if line[:indent_len] == "".join([" " for x in range(0, indent_len)]):
+                return line[indent_len:]
+            else:
+                return line
+
+        lines = docstring.split("\n")
+        sections = [line for line in lines if "---" in line]
+        if sections != []:
+            section = sections[0]
+            indent_len = len(section) - len(section.lstrip(" "))
+        else:
+            indent_len = 0
+        return "\n".join(
+            [_format_line(line, indent_len) if indent_len > 0 else line for line in lines]
+        )
 
     step_dict = {}
     docstring = FunctionDoc(step.function)
@@ -34,13 +46,17 @@ def _get_model_output(model):
     for k, v in model.steps.items():
         if hasattr(v.function, "loaded"):
             init_params = {k: getattr(model, v) for k, v in v.init_params.items()}
-            dependent_params = {k: output[v.name] for k, v in v.dependent_params.items()}
+            dependent_params = {
+                k: copy(output[v.name]) for k, v in v.dependent_params.items()
+            }
             output.update(
                 {k: v.function(**init_params, **dependent_params, **v.defined_params)}
             )
         else:
             init_params = {k: getattr(model, v) for k, v in v.init_params.items()}
-            dependent_params = {k: output[v.name] for k, v in v.dependent_params.items()}
+            dependent_params = {
+                k: copy(output[v.name]) for k, v in v.dependent_params.items()
+            }
             output.update(
                 {k: v.function(**init_params, **dependent_params, **v.defined_params)}
             )
@@ -167,12 +183,6 @@ XLSX_FORMATS = {
 #########################################################################################
 
 
-def _get_indent_value(lines):
-    sections = [line for line in lines if "---" in line]
-    section = sections[0]
-    return len(section) - len(section.lstrip(" "))
-
-
 def create_xlsx_file(model_audit, file):
     """Create xlsx file."""
     wb = FootingsXlsxWb.create()
@@ -197,12 +207,7 @@ def create_xlsx_file(model_audit, file):
     wb.write_obj(model_name, "Docstring:", add_cols=1, style=XLSX_FORMATS["title"])
 
     in_steps_zone = False
-    lines = model_audit.model_doc.split("\n")
-    indent_len = _get_indent_value(lines)
-    for line in lines:
-        if indent_len > 0:
-            if line[:indent_len] == "".join([" " for x in range(0, indent_len)]):
-                line = line[indent_len:]
+    for line in model_audit.model_doc.split("\n"):
         if line in class_headings:
             wb.write_obj(model_name, line, add_rows=1, style=XLSX_FORMATS["underline"])
             if in_steps_zone:
@@ -238,12 +243,7 @@ def create_xlsx_file(model_audit, file):
         wb.write_obj(step_name, step_value["Signature"], add_rows=2, add_cols=-1)
         wb.write_obj(step_name, "Docstring:", add_cols=1, style=XLSX_FORMATS["title"])
 
-        lines = step_value["Docstring"].split("\n")
-        indent_len = _get_indent_value(lines)
-        for line in lines:
-            if indent_len > 0:
-                if line[:indent_len] == "".join([" " for x in range(0, indent_len)]):
-                    line = line[indent_len:]
+        for line in step_value["Docstring"].split("\n"):
             if line in function_headings:
                 wb.write_obj(step_name, line, add_rows=1, style=XLSX_FORMATS["underline"])
             elif "---" in line:
@@ -265,13 +265,13 @@ def create_xlsx_file(model_audit, file):
             for cell in col:
                 try:
                     if len(str(cell.value)) > max_length:
-                        max_length = len(cell.value)
+                        max_length = len(str(cell.value))
                 except:
                     pass
             if max_length <= 3:
                 adj_width = (max_length + 1) * 1.2
             else:
-                adj_width = max_length + 1
+                adj_width = max_length + 3
             wksht.column_dimensions[col[0].column_letter].width = adj_width
 
     wb.save(file)

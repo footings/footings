@@ -23,6 +23,11 @@ class FootingsXlsxEntry:
 
 
 def _obj_to_xlsx_cell(obj, worksheet, row, col, **kwargs):
+    if isinstance(obj, pd.Timestamp):
+        if all([x == 0 for x in [obj.hour, obj.minute, obj.second]]):
+            obj = str(obj.date())
+        else:
+            obj = str(obj)
     cell = worksheet.cell(row=row, column=col)
     cell.value = obj
     if "style" in kwargs:
@@ -100,7 +105,7 @@ def _obj_to_xlsx_mapping(obj, worksheet, **kwargs):
         worksheet.col += 1
         val_entries = obj_to_xlsx(v, worksheet, **kwargs)
         ret.extend(val_entries)
-        worksheet.row = max([entry.row_start for entry in key_entries]) + 1
+        worksheet.row = max([entry.row_end for entry in val_entries]) + 1
         worksheet.col -= 1
 
     return ret
@@ -122,7 +127,7 @@ def _obj_to_xlsx_iterable(obj, worksheet, **kwargs):
 
 def obj_to_xlsx(obj, worksheet, **kwargs):
     """Object to xlsx"""
-    builtins = [int, float, str, datetime.date, datetime.datetime]
+    builtins = [int, float, str, datetime.date, datetime.datetime, pd.Timestamp]
     if isinstance(obj, bool):
         ret = obj_to_xlsx(str(obj), worksheet, **kwargs)
     elif isinstance(obj, str) and "\n" in obj:
@@ -140,6 +145,9 @@ def obj_to_xlsx(obj, worksheet, **kwargs):
         else:
             ret = _obj_to_xlsx_builtins("{}", worksheet, **kwargs)
     elif isinstance(obj, Iterable):
+        if hasattr(obj, "__iter__") and not hasattr(obj, "__len__"):
+            obj = list(obj)
+
         if len(obj) > 0:
             ret = _obj_to_xlsx_iterable(obj, worksheet, **kwargs)
         else:
