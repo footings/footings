@@ -1,17 +1,20 @@
-from typing import List, Dict
-from inspect import getfullargspec, signature
-import sys
+from functools import partial
+from inspect import signature
 import os
+import sys
 from traceback import extract_tb, format_list
+from typing import List
+import warnings
 
-from attr import attrs, attrib, make_class
-from numpydoc.docscrape import FunctionDoc
+from attr import attrs, attrib
+from attr._make import _CountingAttr
+from attr.setters import frozen
+from numpydoc.docscrape import ClassDoc, FunctionDoc, Parameter
 
-from .footing import create_footing_from_list
+from .attributes import _Asset, _Meta, _Modifier, _Parameter
 from .audit import run_model_audit
 from .visualize import visualize_model
 
-__all__ = ["build_model"]
 
 #########################################################################################
 # established errors
@@ -38,119 +41,46 @@ class ModelRunError(Exception):
     """Error occured during model run."""
 
 
-#########################################################################################
-# model
-#########################################################################################
-
-
-def create_dependency_index(dependencies):
-    """Create dependency index"""
-    store = set()
-    store_dict = {}
-    keys = list(dependencies.keys())
-    keys_reverse = keys[::-1]
-    for key in keys_reverse:
-        if dependencies[key] != set():
-            store.update(dependencies[key])
-        store_dict.update({key: store.copy()})
-
-    ret = {
-        prior: store_dict[current]
-        for prior, current in zip(keys_reverse[1:][::-1], keys_reverse[:-1][::-1])
-    }
-    ret.update({keys[-1]: set([keys[-1]])})
-
-    ret = {
-        v[0]: v[1].intersection(set(keys[: (idx + 1)]))
-        for idx, v in enumerate(ret.items())
-    }
-    return ret
-
-
-def update_dict_(dict_, dependency_index, step, output):
-    """Update store"""
-    dict_.update({step: output})
-    keys = list(dict_.keys())
-    for key in keys:
-        if key not in dependency_index:
-            del dict_[key]
-
-
-def run_model(model, to_step: str):
-    """Generic function to run a model"""
-    if not issubclass(type(model), BaseModel):
-        raise TypeError(f"The model passed must be a subclass of {BaseModel}.")
-
-    dict_ = {}
+def _run(self, to_step):
     if to_step is None:
-        steps = model.steps
+        steps = self.steps
     else:
-        if to_step not in model.steps:
-            raise KeyError()
-        else:
-            step_list = list(model.steps.keys())
-            step_list = step_list[: step_list.index(to_step) + 1]
-            steps = {k: v for k, v in model.steps.items() if k in step_list}
-    dependency_index = model.dependency_index
-    for k, v in steps.items():
-        if k not in dependency_index[k]:
-            continue
-        init_params = {k: getattr(model, v) for k, v in v.init_params.items()}
-        dependent_params = {
-            k: v.get_value(dict_[v.name]) for k, v in v.dependent_params.items()
-        }
         try:
-            out = v.function(**init_params, **dependent_params, **v.defined_params)
+            position = self.steps.index(to_step)
+            steps = self.steps[: (position + 1)]
+        except ValueError:
+            msg = f"The step passed to to_step '{to_step}' does not exist as a step."
+            raise ValueError(msg)
+
+    def _run_step(step):
+        try:
+            return getattr(self, step)()
         except:
             exc_type, exc_value, exc_trace = sys.exc_info()
-            msg = f"At step [{k}], an error occured.\n"
+            msg = f"At step [{step}], an error occured.\n"
             msg += f"  Error Type = {exc_type}\n"
             msg += f"  Error Message = {exc_value}\n"
             msg += f"  Error Trace = {format_list(extract_tb(exc_trace))}\n"
             raise ModelRunError(msg)
-        update_dict_(dict_, dependency_index[k], k, out)
-    return dict_[list(steps.keys())[-1]]
+
+    for step in steps:
+        _run_step(step)
+
+    if hasattr(self, "_return") is False:
+        raise AttributeError("Missing method _return(self) for Footings object.")
+    return self._return()
 
 
-@attrs(slots=True, frozen=True, repr=False)
-class BaseModel:
-    """BaseModel"""
+@attrs(slots=True, repr=False)
+class Footing:
 
-    _scenarios = {}
-    parameters = attrib(init=False, repr=False)
-    steps = attrib(init=False, repr=False)
-    dependencies = attrib(init=False, repr=False)
-    dependency_index = attrib(init=False, repr=False)
+    steps: list = attrib(init=False, repr=False)
+    assets: list = attrib(init=False, repr=False)
 
-    @classmethod
-    def register_scenario(cls, name, **kwargs):
-        """Register scenario"""
-        if name in cls._scenarios:
-            raise ModelScenarioAlreadyExist(f"The scenario [{name}] already exists.")
-        args = getfullargspec(cls).kwonlyargs
-        unknown = [k for k in kwargs if k not in args]
-        if len(unknown) > 0:
-            raise ModelScenarioParamDoesNotExist(
-                f"The parameter(s) [{unknown}] do not exist."
-            )
-        cls._scenarios.update({name: kwargs})
-
-    @classmethod
-    def using_scenario(cls, name, **kwargs):
-        """Using scenario"""
-        defined_kwargs = cls._scenarios.get(name, None)
-        if defined_kwargs is None:
-            raise ModelScenarioDoesNotExist(f"The scenario [{name}] does not exist.")
-        duplicate = [k for k in defined_kwargs if k in kwargs]
-        if len(duplicate) > 0:
-            msg = f"The following kwarg(s) are already defined in the scenario [{duplicate}]."
-            raise ModelScenarioParamAlreadyExist(msg)
-        return cls(**defined_kwargs, **kwargs)
-
-    @property
-    def scenarios(self):
-        """List of scenarios"""
-        return self._scenarios
+    def _return(self):
+        if len(self.assets) > 1:
+            return tuple(getattr(self, asset) for asset in self.assets)
+        return getattr(self, self.assets[0])
 
     def visualize(self):
         """Visualize model"""
@@ -163,149 +93,256 @@ class BaseModel:
 
     def run(self, to_step=None):
         """Run model"""
-        return run_model(self, to_step=to_step)
+        return _run(self, to_step=to_step)
 
 
-def create_attributes(footing):
-    """Create attributes"""
-    attributes = {}
-    for arg_key, arg_val in footing.parameters.items():
-        kwargs = {}
-        if arg_val.default is not None:
-            kwargs.update({"default": arg_val.default})
-        if arg_val.dtype is not None:
-            kwargs.update({"type": arg_val.dtype})
-        kwargs.update({"kw_only": True, "validator": arg_val._create_validator()})
-        attributes.update({arg_key: attrib(**kwargs)})
+def step(
+    function: callable = None,
+    *,
+    uses: List[str],
+    impacts: List[str],
+    wrap: callable = None,
+):
+    """[summary]
 
-    args_attrib = attrib(init=False, repr=False, default=footing.parameters)
-    steps_attrib = attrib(init=False, repr=False, default=footing.steps)
-    dep_attrib = attrib(init=False, repr=False, default=footing.dependencies)
-    dep_index = create_dependency_index(footing.dependencies)
-    dep_index_attrib = attrib(init=False, repr=False, default=dep_index)
-    return {
-        **attributes,
-        "parameters": args_attrib,
-        "steps": steps_attrib,
-        "dependencies": dep_attrib,
-        "dependency_index": dep_index_attrib,
+    Parameters
+    ----------
+    uses : List[str]
+        [description]
+    impacts : List[str]
+        [description]
+    function : callable, optional
+        [description], by default None
+    wrap : callable, optional
+        [description], by default None
+
+    Returns
+    -------
+    [type]
+        [description]
+    """
+    if function is None:
+        return partial(step, uses=uses, impacts=impacts, wrap=wrap)
+
+    def wrapper(*args, **kwargs):
+        return function(*args, **kwargs)
+
+    wrapper.uses = uses
+    wrapper.impacts = impacts
+    if wrap is not None:
+        wrapper.__doc__ = wrap.__doc__
+    else:
+        wrapper.__doc__ = function.__doc__
+    return wrapper
+
+
+class FootingsDoc(ClassDoc):
+    sections = {
+        "Signature": "",
+        "Summary": [""],
+        "Extended Summary": [],
+        "Parameters": [],
+        "Modifiers": [],
+        "Meta": [],
+        "Assets": [],
+        "Steps": [],
+        "Returns": [],
+        "Yields": [],
+        "Receives": [],
+        "Raises": [],
+        "Warns": [],
+        "Other Parameters": [],
+        "Attributes": [],
+        "Methods": [],
+        "See Also": [],
+        "Notes": [],
+        "Warnings": [],
+        "References": "",
+        "Examples": "",
+        "index": {},
     }
 
+    def _parse(self):
+        self._doc.reset()
+        self._parse_summary()
 
-def _create_parameters_section(parameters):
-    def _clean_dtype(dtype):
-        dtype_str = str(dtype)
-        return dtype_str.replace("<class '", "").replace("'>", "")
+        sections = list(self._read_sections())
+        section_names = set([section for section, content in sections])
 
-    ret_str = "Parameters\n----------\n"
-    for arg_k, arg_v in parameters.items():
-        if arg_v.dtype is None:
-            ret_str += f"{arg_k}\n    {arg_v.description}\n"
-        else:
-            ret_str += f"{arg_k} : {_clean_dtype(arg_v.dtype)}\n    {arg_v.description}\n"
-    return ret_str
+        has_returns = "Returns" in section_names
+        has_yields = "Yields" in section_names
+        # We could do more tests, but we are not. Arbitrarily.
+        if has_returns and has_yields:
+            msg = "Docstring contains both a Returns and Yields section."
+            raise ValueError(msg)
+        if not has_yields and "Receives" in section_names:
+            msg = "Docstring contains a Receives section but not Yields."
+            raise ValueError(msg)
+
+        for (section, content) in sections:
+            if not section.startswith(".."):
+                section = (s.capitalize() for s in section.split(" "))
+                section = " ".join(section)
+                if self.get(section):
+                    self._error_location(
+                        "The section %s appears twice in  %s"
+                        % (section, "\n".join(self._doc._str))
+                    )
+
+            if section in (
+                "Parameters",
+                "Modifiers",
+                "Meta",
+                "Assets",
+                "Steps",
+                "Other Parameters",
+                "Attributes",
+                "Methods",
+            ):
+                self[section] = self._parse_param_list(content)
+            elif section in ("Returns", "Yields", "Raises", "Warns", "Receives"):
+                self[section] = self._parse_param_list(
+                    content, single_element_is_type=True
+                )
+            elif section.startswith(".. index::"):
+                self["index"] = self._parse_index(section, content)
+            elif section == "See Also":
+                self["See Also"] = self._parse_see_also(content)
+            else:
+                self[section] = content
+
+    def __str__(self, func_role=""):
+        out = []
+        out += self._str_signature()
+        out += self._str_summary()
+        out += self._str_extended_summary()
+        for param_list in (
+            "Parameters",
+            "Modifiers",
+            "Meta",
+            "Assets",
+            "Steps",
+            "Returns",
+            "Yields",
+            "Receives",
+            "Other Parameters",
+            "Raises",
+            "Warns",
+        ):
+            out += self._str_param_list(param_list)
+        out += self._str_section("Warnings")
+        out += self._str_see_also(func_role)
+        for s in ("Notes", "References", "Examples"):
+            out += self._str_section(s)
+        for param_list in ("Methods",):
+            out += self._str_param_list(param_list)
+        out += self._str_index()
+        return "\n".join(out)
 
 
-def _create_steps_section(steps):
-    ret_str = "Steps\n-----\n"
-    for step in steps:
-        docstring = FunctionDoc(step["function"])
-        ret_str += f"{step['name']}\n"
-        ret_str += "".join([f"    {x}\n" for x in docstring.get("Summary")])
-    return ret_str
+_FOOTING_GROUP_MAP = {
+    _Asset: "Assets",
+    _Meta: "Meta",
+    _Modifier: "Modifiers",
+    _Parameter: "Parameters",
+}
 
 
-def _get_returns(function):
-    parsed_doc = FunctionDoc(function)
-    parameters = parsed_doc["Returns"]
-    if parameters != []:
-        ret_str = "    Returns\n    -------\n"
-        for param in parameters:
-            if param.type != "" and param.name == "":
-                ret_str += f"    {param.type}\n"
-            if param.type != "" and param.name != "":
-                ret_str += f"    {param.name} : {param.type}\n"
-            if param.desc != []:
-                ret_str += "".join([f"        {x}\n" for x in param.desc])
-        return ret_str
-    return ""
+def _attr_doc(cls, steps):
+    """
+    """
+    doc = FootingsDoc(cls)
+
+    def add_doc(x):
+        str_type = str(x.type) if x.type is not None else ""
+        return Parameter(x.name, str_type, [x.metadata.get("description", "")])
+
+    def add_step_summary(x):
+        doc = FunctionDoc(x)
+        return doc["Summary"]
+
+    sections = ["Parameters", "Modifiers", "Meta", "Assets"]
+    parsed_meta = {section: [] for section in sections}
+
+    for attribute in cls.__attrs_attrs__:
+        section = _FOOTING_GROUP_MAP.get(attribute.metadata.get("footing_group"), None)
+        if section is not None:
+            if section not in sections:
+                msg = f"The footing_group {section} is not one of the known groups [{str(sections)}]."
+                warnings.warn(msg)
+            else:
+                parsed_meta[section].append(add_doc(attribute))
+
+    if len(parsed_meta["Parameters"]) > 0:
+        doc["Parameters"] = parsed_meta["Parameters"]
+    if len(parsed_meta["Modifiers"]) > 0:
+        doc["Modifiers"] = parsed_meta["Modifiers"]
+    if len(parsed_meta["Meta"]) > 0:
+        doc["Meta"] = parsed_meta["Meta"]
+    if len(parsed_meta["Assets"]) > 0:
+        doc["Assets"] = parsed_meta["Assets"]
+    if len(steps) > 0:
+        doc["Steps"] = [
+            Parameter(step, "", add_step_summary(getattr(cls, step))) for step in steps
+        ]
+    cls.__doc__ = str(doc)
+    return cls
 
 
-def _create_methods_section(function):
-    ret_str = "Methods\n-------\n"
-    ret_str += "run()\n    Executes the model.\n\n"
-    ret_str += f"{_get_returns(function)}\n"
-    ret_str += "audit(file, **kwargs)\n"
-    ret_str += "    Creates an audit xlsx or json file."
-    return ret_str
-
-
-def create_model_docstring(description: str, parameters: dict, steps: list) -> str:
-    """Create model docstring.
-
-    Parameters
-    ----------
-    description : str
-        A description of the model.
-    parameters : dict
-        A dict of the parameter assocated with the model.
-    steps : list
-        The steps in the model.
-
-    Returns
-    -------
-    str
-       The created docstring for the model.
+def model(steps: List[str] = None):
+    """
     """
 
-    docstring = f"{description}\n\n"
-    docstring += _create_parameters_section(parameters) + "\n"
-    docstring += _create_steps_section(steps) + "\n"
-    docstring += _create_methods_section(steps[-1].get("function"))
-    return docstring
+    def inner(cls):
+        # test if is subclass of Footing
+        if issubclass(cls, Footing) is False:
+            msg = "The object is not a child of the Footing class."
+            raise TypeError(msg)
 
+        # analyze attributes
+        exclude = [x for x in dir(Footing) if x[0] != "_"]
+        attributes = [x for x in dir(cls) if x[0] != "_" and x not in exclude]
+        assets = []
+        for attribute in attributes:
+            attr = getattr(cls, attribute)
+            if isinstance(attr, _CountingAttr) is False:
+                msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
+                msg += "Use one of define_parameter, define_meta, define_modifier or define_asset "
+                msg += "when building a model."
+                raise AttributeError(msg)
+            footing_group = attr.metadata.get("footing_group", None)
+            if footing_group is None:
+                msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
+                msg += "Use one of define_parameter, define_meta, define_modifier or define_asset "
+                msg += "when building a model."
+                raise AttributeError(msg)
+            if footing_group is _Asset:
+                assets.append(attribute)
 
-def build_model(
-    name: str, steps: List[Dict], description: str = None, scenarios: dict = None,
-):
-    """A factory function to build a model.
+        # make sure at least one asset
+        if len(assets) == 0:
+            msg = "No assets registered to model. At least one asset needs to be registered."
+            raise AttributeError(msg)
 
-    A model is a sequential list of function calls. Defined parameters will become model inputs and
-    any defined Dependents will link output from  one step as input to another.
+        # analyze steps
+        missing = []
+        for step in steps:
+            if getattr(cls, step, None) is None:
+                missing.append(step)
+        if len(missing) > 0:
+            msg = f"The following steps listed are missing - {str(missing)} from the object."
+            raise AttributeError(msg)
 
-    A model is a child of the BaseModel class with the type equal to the passed name parameter.
+        # update steps and assets with known values as defaults
+        cls.steps = attrib(default=steps, init=False, repr=False)
+        cls.assets = attrib(default=assets, init=False, repr=False)
 
-    Parameters
-    ----------
-    name : str
-        The name to assign the model.
-    steps : list[Dict]
-        The list of steps the model will perform.
-    description : str, optional
-        A description of the model, by default None.
-    scenarios : dict, optional
-        Defined scenarios to pass to the  model, by default None.
+        cls = attrs(
+            maybe_cls=cls, kw_only=True, on_setattr=frozen, repr=False, slots=True
+        )
+        old_sig = signature(cls)
+        new_sig = old_sig.replace(return_annotation=f"{cls.__name__}")
+        cls.__signature__ = new_sig
+        return _attr_doc(cls, steps)
 
-    Returns
-    -------
-    name
-        An object with type equal to the passed parameter name.
-
-    See Also
-    --------
-    footings.model.BaseModel
-
-    """
-    footing = create_footing_from_list(name=name, steps=steps)
-    attributes = create_attributes(footing)
-    model = make_class(
-        name, attrs=attributes, bases=(BaseModel,), slots=True, frozen=True, repr=False
-    )
-    model.__doc__ = create_model_docstring(description, footing.parameters, steps)
-    old_sig = signature(model)
-    new_sig = old_sig.replace(return_annotation=f"{name}")
-    model.__signature__ = new_sig
-    if scenarios is not None:
-        for k, v in scenarios.items():
-            model.register_scenario(k, **v)
-    return model
+    return inner

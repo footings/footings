@@ -1,7 +1,11 @@
-from footings.core.parameter import define_parameter
-from footings.core.footing import use
+from footings.core.attributes import (
+    define_asset,
+    define_meta,
+    define_modifier,
+    define_parameter,
+)
 from footings.core.utils import dispatch_function, loaded_function
-from footings.core.model import build_model
+from footings.core.model import Footing, model
 
 from ._version import get_versions
 
