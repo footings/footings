@@ -34,11 +34,17 @@ class IntegerModel(Footing):
         self.ret_3 = self.ret_1 + self.ret_2
 
     def _return(self):
-        """Return override"""
+        """Return override
+
+        Returns
+        -------
+        ret_3
+        """
         return self.ret_3
 
 
 def test_audit_xlsx(tmp_path):
+
     test_integer_out = os.path.join(tmp_path, "test-integers.xlsx")
     expected_integer_out = os.path.join("tests", "core", "data", "expected-integers.xlsx")
     loaded_integer_model = IntegerModel(a=1, b=1, c=2, d=2)

@@ -83,16 +83,29 @@ class Footing:
         return getattr(self, self.assets[0])
 
     def visualize(self):
-        """Visualize model"""
+        """Visualize the model to get an understanding of what model attributes are used and when."""
         return visualize_model(self)
 
     def audit(self, file: str, **kwargs):
-        """Audit model"""
+        """Audit the model which returns copies of the object as it is modified across each step.
+
+        Parameters
+        ----------
+        file : str
+            The name of the audit file.
+        kwargs
+            Additional key words passed to audit.
+        """
         _, file_ext = os.path.splitext(file)
         return run_model_audit(model=self, output_type=file_ext[1:], file=file, **kwargs)
 
     def run(self, to_step=None):
-        """Run model"""
+        """Run the model.
+
+        Parameters
+        ----------
+        to_step : str
+        """
         return _run(self, to_step=to_step)
 
 
@@ -134,6 +147,107 @@ def step(
     else:
         wrapper.__doc__ = function.__doc__
     return wrapper
+
+
+class FootingsFuncDoc(FunctionDoc):
+    def __str__(self, func_role=""):
+        out = []
+        out += self._str_summary()
+        out += self._str_extended_summary()
+        for param_list in (
+            "Parameters",
+            "Returns",
+            "Yields",
+            "Receives",
+            "Other Parameters",
+            "Raises",
+            "Warns",
+        ):
+            out += self._str_param_list(param_list)
+        out += self._str_section("Warnings")
+        out += self._str_see_also(func_role)
+        for s in ("Notes", "References", "Examples"):
+            out += self._str_section(s)
+        for param_list in ("Attributes", "Methods"):
+            out += self._str_param_list(param_list)
+        out += self._str_index()
+        return "\n".join(out)
+
+
+class FootingsStepDoc(FunctionDoc):
+    sections = {
+        "Signature": "",
+        "Summary": [""],
+        "Extended Summary": [],
+        "Uses": [],
+        "Impacts": [],
+        "Raises": [],
+        "Warns": [],
+        "See Also": [],
+        "Notes": [],
+        "Warnings": [],
+        "References": "",
+        "Examples": "",
+        "index": {},
+    }
+
+    def _parse(self):
+        self._doc.reset()
+        self._parse_summary()
+
+        sections = list(self._read_sections())
+        section_names = set([section for section, content in sections])
+
+        has_returns = "Returns" in section_names
+        has_yields = "Yields" in section_names
+        # We could do more tests, but we are not. Arbitrarily.
+        if has_returns and has_yields:
+            msg = "Docstring contains both a Returns and Yields section."
+            raise ValueError(msg)
+        if not has_yields and "Receives" in section_names:
+            msg = "Docstring contains a Receives section but not Yields."
+            raise ValueError(msg)
+
+        for (section, content) in sections:
+            if not section.startswith(".."):
+                section = (s.capitalize() for s in section.split(" "))
+                section = " ".join(section)
+                if self.get(section):
+                    self._error_location(
+                        "The section %s appears twice in  %s"
+                        % (section, "\n".join(self._doc._str))
+                    )
+
+            if section in ("Uses"):
+                self[section] = self._parse_param_list(content)
+            elif section in ("Returns", "Yields", "Raises", "Warns"):
+                self[section] = self._parse_param_list(
+                    content, single_element_is_type=True
+                )
+            elif section.startswith(".. index::"):
+                self["index"] = self._parse_index(section, content)
+            elif section == "See Also":
+                self["See Also"] = self._parse_see_also(content)
+            else:
+                self[section] = content
+
+    def __str__(self, func_role=""):
+        out = []
+        out += self._str_summary()
+        out += self._str_extended_summary()
+        for param_list in (
+            "Uses",
+            "Impacts",
+            "Raises",
+            "Warns",
+        ):
+            out += self._str_param_list(param_list)
+        out += self._str_section("Warnings")
+        out += self._str_see_also(func_role)
+        for s in ("Notes", "References", "Examples"):
+            out += self._str_section(s)
+        out += self._str_index()
+        return "\n".join(out)
 
 
 class FootingsDoc(ClassDoc):
@@ -248,18 +362,22 @@ _FOOTING_GROUP_MAP = {
 }
 
 
-def _attr_doc(cls, steps):
-    """
-    """
-    doc = FootingsDoc(cls)
+def _update_run_return(cls, assets):
+    run_doc = FootingsFuncDoc(cls.run)
 
+    if cls._return.__doc__ is not None:
+        return_doc = FootingsFuncDoc(cls._return)
+        run_doc["Returns"] = return_doc["Returns"]
+    else:
+        run_doc["Returns"] = assets
+
+    return str(run_doc)
+
+
+def _attr_doc(cls, steps):
     def add_doc(x):
         str_type = str(x.type) if x.type is not None else ""
         return Parameter(x.name, str_type, [x.metadata.get("description", "")])
-
-    def add_step_summary(x):
-        doc = FunctionDoc(x)
-        return doc["Summary"]
 
     sections = ["Parameters", "Modifiers", "Meta", "Assets"]
     parsed_meta = {section: [] for section in sections}
@@ -273,6 +391,10 @@ def _attr_doc(cls, steps):
             else:
                 parsed_meta[section].append(add_doc(attribute))
 
+    cls.run.__doc__ = _update_run_return(cls, parsed_meta["Assets"])
+
+    doc = FootingsDoc(cls)
+
     if len(parsed_meta["Parameters"]) > 0:
         doc["Parameters"] = parsed_meta["Parameters"]
     if len(parsed_meta["Modifiers"]) > 0:
@@ -282,8 +404,20 @@ def _attr_doc(cls, steps):
     if len(parsed_meta["Assets"]) > 0:
         doc["Assets"] = parsed_meta["Assets"]
     if len(steps) > 0:
+
+        attributes = {
+            attribute.name: add_doc(attribute) for attribute in cls.__attrs_attrs__
+        }
+
+        def add_step_summary(step_func, attributes):
+            doc = FootingsStepDoc(step_func)
+            doc["Uses"] = [attributes[x] for x in step_func.uses]
+            doc["Impacts"] = [attributes[x] for x in step_func.impacts]
+            return str(doc)
+
         doc["Steps"] = [
-            Parameter(step, "", add_step_summary(getattr(cls, step))) for step in steps
+            Parameter(step, "", [add_step_summary(getattr(cls, step), attributes)])
+            for step in steps
         ]
     cls.__doc__ = str(doc)
     return cls
