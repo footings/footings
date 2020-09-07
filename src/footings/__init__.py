@@ -5,7 +5,7 @@ from footings.core.attributes import (
     define_parameter,
 )
 from footings.core.utils import dispatch_function, loaded_function
-from footings.core.model import Footing, model
+from footings.core.model import Footing, model, step
 
 from ._version import get_versions
 

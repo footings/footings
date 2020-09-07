@@ -76,7 +76,7 @@ class ModelAudit:
     def create_audit(cls, model):
         """Create audit"""
         model_name = model.__class__.__name__
-        model_doc = model.__doc__
+        model_doc = str(model.__doc__)
         model_sig = f"{model_name}{str(model.__signature__)}"
         output = _get_model_output(model)
         steps = _create_step_output(model, output)
@@ -208,8 +208,4 @@ def run_model_audit(model, file, **kwargs):
 def _(model, file, **kwargs):
     """Run model audit"""
     audit = ModelAudit.create_audit(model)
-    print(audit.model_name)
-    print(audit.model_sig)
-    print(audit.model_doc)
-    print(audit.steps)
     create_xlsx_file(audit, file, **kwargs)
