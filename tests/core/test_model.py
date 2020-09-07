@@ -8,39 +8,74 @@ from footings.core.attributes import (
     define_modifier,
     define_parameter,
 )
-from footings.core.model import Footing, FootingsDoc, model, step
+
+from footings.core.model import Footing, FootingsDoc, model, step, ModelCreationError
 
 
 def test_model_instantiation():
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ModelCreationError):
 
-        @model(steps=[])
+        # fails due to not subclass of Footing
+        @model(steps=["_add"])  # noqa: F841
         class MissingFooting:
-            x = 1
+            parameter = define_parameter(dtype=int)
+            asset = define_asset(default=0)
 
-    with pytest.raises(AttributeError):
+            @step(uses=["parameter"], impacts=["assets"])
+            def _add(self):
+                self.asset = self.asset + self.parameter
 
         # fails due to using a value vs using one of define_[assets, meta, modifier, parameter]
-        @model(steps=["add"])
+        @model(steps=["_add"])
         class FailUsingValue(Footing):
-            x = 1
+            parameter = define_parameter(dtype=int)
+            asset = 0
 
-        # fails due to using attriv() vs using one of define_[assets, meta, modifier, parameter]
-        @model(steps=["add"])
+            @step(uses=["parameter"], impacts=["assets"])
+            def _add(self):
+                self.asset = self.asset + self.parameter
+
+        # fails due to using attrib() vs using one of define_[assets, meta, modifier, parameter]
+        @model(steps=["_add"])
         class FailUsingAttrib(Footing):
-            x = attrib()
+            parameter = define_parameter(dtype=int)
+            asset = attrib(default=0)
+
+            @step(uses=["parameter"], impacts=["assets"])
+            def _add(self):
+                self.asset = self.asset + self.parameter
 
         # fail due to missing at least one attribute defined using define_asset()
-        @model(steps=["add"])
+        @model(steps=["_add"])
         class FailMissingAsset:
-            x = define_parameter()
+            parameter = define_parameter(dtype=int)
+            asset = define_parameter(default=0)
+
+            @step(uses=["parameter"], impacts=["assets"])
+            def _add(self):
+                self.asset = self.asset + self.parameter
 
         # fail due to missing step as method
-        @model(steps=["add"])
-        class FailMissingStep:
+        @model(steps=[])
+        class FailZeroSteps(Footing):
             x = define_parameter()
             y = define_asset()
+
+        # fail due to missing step as method
+        @model(steps=["_add"])
+        class FailMissingStep(Footing):
+            parameter = define_parameter(dtype=int)
+            asset = define_asset(default=0)
+
+        # fail due to step not decorated
+        @model(steps=["_add"])  # noqa: F841
+        class FailStepNotDecorated(Footing):
+            parameter = define_parameter(dtype=int)
+            asset = define_asset(default=0)
+
+            def _add(self):
+                self.asset = self.asset + self.parameter
 
 
 def test_model_documentation():
@@ -49,12 +84,14 @@ def test_model_documentation():
         asset = define_asset(dtype="int", description="This is an asset.")
         meta = define_meta(meta="meta", description="This is meta.")
         modifier = define_modifier(default=1, description="This is a modifier.")
-        parameter = define_parameter(description="This is a parameter.")
+        pmeter = define_parameter(description="This is a parameter.")
 
+        @step(uses=["pmeter"], impacts=["asset"])
         def _add(self):
             """Do addition."""
             pass
 
+        @step(uses=["asset", "modifier"], impacts=["asset"])
         def _subtract(self):
             """Do subtraction."""
             pass
