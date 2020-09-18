@@ -1,6 +1,7 @@
 from distutils.version import LooseVersion
 import os.path as op
 import shutil
+import re
 
 import pytest
 import sphinx
@@ -66,8 +67,8 @@ def test_html(sphinx_app):
     skip_lines = ["http://sphinx-doc.org", "https://github.com/bitprophet/alabaster"]
     diff = []
     for idx, lines in enumerate(zip(generated.split("\n"), expected.split("\n"))):
-        gen = lines[0].strip()
-        exp = lines[1].strip()
+        gen = re.sub("in Python v3.\\d", "", lines[0].strip())
+        exp = re.sub("in Python v3.\\d", "", lines[1].strip())
         if gen != exp:
             if not any([x in gen for x in skip_lines]):
                 diff.append((idx, gen, exp))

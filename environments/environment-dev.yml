@@ -13,7 +13,7 @@ dependencies:
 
   # development
   - flake8
-  - black
+  - black==19.*
   - pre-commit
   - sphinx
   - recommonmark

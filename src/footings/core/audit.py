@@ -81,7 +81,7 @@ class ModelAudit:
         output = _get_model_output(model)
         steps = _create_step_output(model, output)
 
-        return cls(model_name, model_doc, model_sig, steps,)
+        return cls(model_name, model_doc, model_sig, steps)
 
 
 #########################################################################################
