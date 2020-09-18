@@ -4,54 +4,43 @@ API
 
 .. currentmodule:: footings
 
-Core
+The footings library is made up of three sub-libraries -
+
+- core
+- tools
+- doctolls
+
+
+core
 ----
 
-Functions
-~~~~~~~~~
-
 .. autosummary::
    :nosignatures:
 
+   Footing
+   model
+   step
    define_parameter
-   use
-   build_model
+   define_modifier
+   define_meta
+   define_placeholder
+   define_asset
    dispatch_function
-   loaded_function
 
 |
-|
 
+.. autoclass:: Footing
+.. autofunction:: model
+.. autofunction:: step
 .. autofunction:: define_parameter
-.. autofunction:: use
-.. autofunction:: build_model
+.. autofunction:: define_modifier
+.. autofunction:: define_meta
+.. autofunction:: define_placeholder
+.. autofunction:: define_asset
 .. autofunction:: dispatch_function
-.. autofunction:: loaded_function
 
 
-Classes
-~~~~~~~
-.. autosummary::
-   :nosignatures:
-
-   footings.core.parameter.Parameter
-   footings.core.footing.Dependent
-   footings.core.model.BaseModel
-
-|
-|
-
-
-.. autoclass:: footings.core.parameter.Parameter
-   :members:
-
-.. autoclass:: footings.core.footing.Dependent
-   :members:
-
-.. autoclass:: footings.core.model.BaseModel
-   :members:
-
-Tools
+tools
 -----
 
 .. currentmodule:: footings.tools
@@ -68,7 +57,6 @@ Tools
    load_footings_audit_xlsx
 
 |
-|
 
 .. autofunction:: create_frame
 .. autofunction:: create_frame_from_record
@@ -77,3 +65,18 @@ Tools
 .. autofunction:: post_drop_columns
 .. autofunction:: assert_footings_audit_xlsx_equal
 .. autofunction:: load_footings_audit_xlsx
+
+
+doctools
+--------
+
+.. currentmodule:: footings.doctools
+
+.. autosummary::
+   :nosignatures:
+
+   docscrape.FootingsDoc
+
+|
+
+.. autoclass:: footings.doctools.docscrape.FootingsDoc

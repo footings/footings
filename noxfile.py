@@ -20,21 +20,10 @@ def tests(session):
     session.run("pytest", "-vv")
 
 
-@nox.session(python="3.7", venv_backend="conda")
+@nox.session(python="3.7", venv_backend="none")
 def docs(session):
-    session.run(
-        "conda",
-        "env",
-        "update",
-        "--prefix",
-        session.virtualenv.location,
-        "--file",
-        "environments/environment-dev.yml",
-        # options
-        silent=False,
-    )
-    session.install("-e", ".", "--no-deps")
-    session.run("sphinx-build", "-E", "-b", "html", "docs", "docs/_build")
+    session.install(".")
+    session.run("sphinx-build", "-E", "-v", "-b", "html", "docs", "docs/_build")
 
 
 @nox.session(python="3.7", venv_backend="none")

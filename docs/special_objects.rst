@@ -2,14 +2,12 @@
 Special Objects
 ===============
 
-Two special objects exist within the footings framework that were created to assist in building
+Special objects exist within the footings framework that were created to assist in building
 models. They are -
 
 - DispatchFunction
-- LoadedFunction
 
-These can be created with their representative factory functions - *dispatch_function* and
-*loaded_function*.
+These can be created with their representative factory functions - *dispatch_function*.
 
 DispatchFunction
 ----------------
@@ -76,34 +74,6 @@ the reporting needs -
     # 2	3	    0.01
     # 3	4	    0.01
 
-In addition, the step list would need to be modified to expose the *reporting_type* argument.
-
-.. code-block:: python
-
-    # create agrument
-    param_reporting_type = define_parameter(
-        name="reporting_type",
-        dtype=str,
-        allowed=["GAAP", "STAT", "BEST-ESTIMATE"]
-    )
-
-    # modified step from user guide
-    {
-        "name": "add-ctr",
-        "function": add_ctr,
-        "args": {
-            "frame": use("add-expected-benefit"),
-            "reporting_type": param_reporting_type,
-            # ...
-        }
-    },
-
-
 A developer could build this same pattern using an ifelse block within a single function. Though,
 using the above pattern is preferable because when the need arises to add a new function, a developer
-only needs to register a new function which will minimize the need to change existing code.
-
-LoadedFunction
---------------
-
-Needs to be completed ...
+only needs to register a new function which will minimize the need to change existing blocks of code.

@@ -37,7 +37,7 @@ The Footings library was designed as framework library using the below princples
 
    self
    installation.rst
-   user_guide.rst
+   user_guide.ipynb
    special_objects.rst
    api.rst
    license.rst
