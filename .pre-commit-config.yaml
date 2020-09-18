@@ -12,7 +12,9 @@ repos:
       - id: check-yaml
       - id: check-toml
       - id: trailing-whitespace
+        exclude: ^tests/doctools/output/
       - id: end-of-file-fixer
+        exclude: ^tests/doctools/output/
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.7.9
     hooks:
