@@ -3,8 +3,9 @@ from footings.core.attributes import (
     define_meta,
     define_modifier,
     define_parameter,
+    define_placeholder,
 )
-from footings.core.utils import dispatch_function, loaded_function
+from footings.core.utils import dispatch_function
 from footings.core.model import Footing, model, step
 
 from ._version import get_versions

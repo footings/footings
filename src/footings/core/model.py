@@ -9,11 +9,11 @@ import warnings
 from attr import attrs, attrib
 from attr._make import _CountingAttr
 from attr.setters import frozen
-from numpydoc.docscrape import Parameter
+from numpydoc.docscrape import Parameter, FunctionDoc
 
 from .attributes import _Asset, _Meta, _Modifier, _Parameter
 from .audit import run_model_audit
-from .docscrape import FootingsDoc, FootingsFuncDoc, FootingsStepDoc
+from ..doctools.docscrape import FootingsDoc
 from .visualize import visualize_model
 
 
@@ -26,15 +26,16 @@ class ModelCreationError(Exception):
 
 
 def _run(self, to_step):
+
     if to_step is None:
         steps = self.steps
     else:
         try:
             position = self.steps.index(to_step)
             steps = self.steps[: (position + 1)]
-        except ValueError:
+        except ValueError as e:
             msg = f"The step passed to to_step '{to_step}' does not exist as a step."
-            raise ValueError(msg)
+            raise e(msg)
 
     def _run_step(step):
         try:
@@ -50,21 +51,17 @@ def _run(self, to_step):
     for step in steps:
         _run_step(step)
 
-    if hasattr(self, "_return") is False:
-        raise AttributeError("Missing method _return(self) for Footings object.")
-    return self._return()
+    if len(self.assets) > 1:
+        return tuple(getattr(self, asset) for asset in self.assets)
+    return getattr(self, self.assets[0])
 
 
 @attrs(slots=True, repr=False)
 class Footing:
+    """The parent modeling class providing the key methods of run, audit, and visualize."""
 
     steps: list = attrib(init=False, repr=False)
     assets: list = attrib(init=False, repr=False)
-
-    def _return(self):
-        if len(self.assets) > 1:
-            return tuple(getattr(self, asset) for asset in self.assets)
-        return getattr(self, self.assets[0])
 
     def visualize(self):
         """Visualize the model to get an understanding of what model attributes are used and when."""
@@ -89,57 +86,54 @@ class Footing:
         return run_model_audit(model=self, output_type=file_ext[1:], file=file, **kwargs)
 
     def run(self, to_step=None):
-        """Run the model.
+        """Runs the model and returns any assets defined.
 
         Parameters
         ----------
         to_step : str
             The name of the step to run model to.
 
-        Returns
-        -------
-        The model ran up to the step.
         """
         return _run(self, to_step=to_step)
 
 
 def step(
-    function: callable = None,
+    method: callable = None,
     *,
     uses: List[str],
     impacts: List[str],
     wrap: callable = None,
 ):
-    """[summary]
+    """Turn a method into a step within the footings framework.
 
     Parameters
     ----------
+    method : callable, optional
+        The method to decorate, by default None.
     uses : List[str]
-        [description]
+        A list of the object names used by the step.
     impacts : List[str]
-        [description]
-    function : callable, optional
-        [description], by default None
+        A list of the object names that are impacted by the step (i.e., the assets and placeholders).
     wrap : callable, optional
-        [description], by default None
+        Wrap or source the docstring from another object, by default None.
 
     Returns
     -------
-    [type]
-        [description]
+    callable
+        The decorated method with a attributes for uses and impacts and updated docstring if wrap passed.
     """
-    if function is None:
+    if method is None:
         return partial(step, uses=uses, impacts=impacts, wrap=wrap)
 
     def wrapper(*args, **kwargs):
-        return function(*args, **kwargs)
+        return method(*args, **kwargs)
 
     wrapper.uses = uses
     wrapper.impacts = impacts
     if wrap is not None:
         wrapper.__doc__ = wrap.__doc__
     else:
-        wrapper.__doc__ = function.__doc__
+        wrapper.__doc__ = method.__doc__
     return wrapper
 
 
@@ -174,10 +168,10 @@ def _make_doc_parameter(attribute):
 
 
 def _update_run_return(cls, assets):
-    run_doc = FootingsFuncDoc(cls.run)
+    run_doc = FunctionDoc(cls.run)
 
     if cls._return.__doc__ is not None:
-        return_doc = FootingsFuncDoc(cls._return)
+        return_doc = FunctionDoc(cls._return)
         run_doc["Returns"] = return_doc["Returns"]
     else:
         run_doc["Returns"] = assets
@@ -186,28 +180,19 @@ def _update_run_return(cls, assets):
 
 
 def _generate_steps_sections(cls, steps):
-    def add_step_summary(step_func, attributes):
-        doc = FootingsStepDoc(step_func)
-        doc["Uses"] = [attributes[x] for x in step_func.uses]
-        doc["Impacts"] = [attributes[x] for x in step_func.impacts]
-        return str(doc)
-
-    attributes = {
-        attribute.name: _make_doc_parameter(attribute)
-        for attribute in cls.__attrs_attrs__
-    }
+    def add_step_summary(step_func):
+        doc = FunctionDoc(step_func)
+        return "\n".join(doc["Summary"])
 
     return [
-        Parameter(step, "", [add_step_summary(getattr(cls, step), attributes)])
-        for step in steps
+        f"{idx}. {step} - {add_step_summary(getattr(cls, step))}"
+        for idx, step in enumerate(steps, start=1)
     ]
 
 
 def _attr_doc(cls, steps):
 
     parsed_attributes = _parse_attriubtes(cls)
-
-    cls.run.__doc__ = _update_run_return(cls, parsed_attributes["Assets"])
 
     doc = FootingsDoc(cls)
 
@@ -216,8 +201,9 @@ def _attr_doc(cls, steps):
     doc["Meta"] = parsed_attributes["Meta"]
     doc["Assets"] = parsed_attributes["Assets"]
     doc["Steps"] = _generate_steps_sections(cls, steps)
+    doc["Methods"] = []
 
-    cls.__doc__ = doc
+    cls.__doc__ = str(doc)
     return cls
 
 
@@ -226,10 +212,23 @@ def _prepare_signature(cls):
     return old_sig.replace(return_annotation=f"{cls.__name__}")
 
 
-def model(steps: List[str]):
-    """
+def model(cls: type = None, *, steps: List[str]):
+    """Turn a class into a model within the footings framework.
 
+    Parameters
+    ----------
+    cls : type
+        The class to turn into a model.
+    steps : List[str]
+        The list of steps to the model.
+
+    Returns
+    -------
+    cls
+        Returns cls as a model within footings framework.
     """
+    if cls is None:
+        return partial(model, steps=steps)
 
     def inner(cls):
         # In order to be instantiated as a model, need to pass the following test.
@@ -300,4 +299,4 @@ def model(steps: List[str]):
         cls.__signature__ = _prepare_signature(cls)
         return _attr_doc(cls, steps)
 
-    return inner
+    return inner(cls)

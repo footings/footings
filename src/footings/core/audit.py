@@ -1,11 +1,12 @@
-from copy import copy
+from copy import deepcopy
 
 from attr import attrs, attrib
-from numpydoc.docscrape import FunctionDoc, ClassDoc
+from numpydoc.docscrape import FunctionDoc
 from openpyxl.styles import NamedStyle, Font
 
 from .utils import dispatch_function
 from .xlsx import FootingsXlsxWb
+from ..doctools.docscrape import FootingsDoc
 
 
 def _format_docstring(docstring):
@@ -35,10 +36,9 @@ def _get_model_output(model):
     output = {}
     for step in model.steps:
         func = getattr(model, step)
-        assets = func.impacts
         func()
-        results = copy(model)
-        step_output = {asset: getattr(results, asset) for asset in assets}
+        results = deepcopy(model)
+        step_output = {item: getattr(results, item) for item in func.impacts}
         if hasattr(model, step + "_audit"):
             getattr(results, step + "_audit")()
         output.update({step: step_output})
@@ -104,7 +104,7 @@ def create_xlsx_file(model_audit, file):
         wb.add_named_style(format_nm, format_val)
 
     model_name = model_audit.model_name
-    class_headings = list(ClassDoc.sections.keys()) + ["Steps"]
+    footings_headings = list(FootingsDoc.sections.keys()) + ["Steps"]
     function_headings = list(FunctionDoc.sections.keys())
     steps = list(model_audit.steps.keys())
 
@@ -122,7 +122,7 @@ def create_xlsx_file(model_audit, file):
 
     in_steps_zone = False
     for line in model_audit.model_doc.split("\n"):
-        if line in class_headings:
+        if line in footings_headings:
             wb.write_obj(model_name, line, add_rows=1, style=XLSX_FORMATS["underline"])
             if in_steps_zone:
                 in_steps_zone = False

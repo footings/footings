@@ -1,6 +1,6 @@
 from typing import Any
 
-from attr import attrib
+from attr import attrib, Factory
 from attr._make import _CountingAttr
 from attr.validators import instance_of, in_
 from attr.setters import NO_OP
@@ -15,6 +15,10 @@ from footings.core.validators import (
 
 
 class _Asset:
+    pass
+
+
+class _Placeholder:
     pass
 
 
@@ -58,7 +62,7 @@ def _define(
 
     return attrib(
         init=init,
-        type=dtype,
+        type=dtype.__qualname__ if hasattr(dtype, "__qualname__") else dtype,
         repr=False,
         validator=validators,
         metadata=metadata,
@@ -70,7 +74,8 @@ def _define(
 def define_asset(
     *, dtype=None, description=None, default=None, **kwargs
 ) -> _CountingAttr:
-    """Define an asset to the model where an asset is a non-frozen attribute that is created by the model.
+    """Define an asset to the model where an asset is a non-frozen attribute that is
+    created by the model and when the model runs.
 
     Parameters
     ----------
@@ -90,6 +95,39 @@ def define_asset(
     """
     return _define(
         footing_group=_Asset,
+        init=False,
+        dtype=dtype,
+        description=description,
+        default=default,
+        frozen=False,
+        **kwargs,
+    )
+
+
+def define_placeholder(
+    *, dtype=None, description=None, default=None, **kwargs
+) -> _CountingAttr:
+    """Define a placeholder to the model where a placeholder is a non-frozen attribute that is
+    created by the model and not returned when the model runs.
+
+    Parameters
+    ----------
+    dtype : type
+        The expected type of the attribute. If not None, value will be validated on instantiation.
+    description : str
+        The description of the attribute.
+    default : Any
+        The default value of the attribute.
+    kwargs : dict
+        Any one of the following validators - allowed, custom, min_val, max_val, min_len, and max_len.
+
+    Returns
+    -------
+    _CoutningAttr
+        An attribute that is recognized by the model.
+    """
+    return _define(
+        footing_group=_Placeholder,
         init=False,
         dtype=dtype,
         description=description,
@@ -127,7 +165,7 @@ def define_meta(
         init=False,
         dtype=dtype,
         description=description,
-        default=meta,
+        default=Factory(meta) if callable(meta) else meta,
         frozen=True,
         **kwargs,
     )
