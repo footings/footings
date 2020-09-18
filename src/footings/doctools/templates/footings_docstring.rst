@@ -1,1 +1,21 @@
-{{index}} {{summary}} {{extended_summary}} {{parameters}} {{modifiers}} {{meta}} {{assets}} {{uses}} {{impacts}} {{returns}} {{yields}} {{receives}} {{other_parameters}} {{raises}} {{warns}} {{warnings}} {{see_also}} {{notes}} {{references}} {{examples}} {{attributes}} {{methods}}
+{{index}}
+{{summary}}
+{{extended_summary}}
+{{parameters}}
+{{modifiers}}
+{{meta}}
+{{placeholders}}
+{{assets}}
+{{steps}}
+{{returns}}
+{{yields}}
+{{receives}}
+{{other_parameters}}
+{{raises}}
+{{warns}}
+{{warnings}}
+{{see_also}}
+{{notes}}
+{{references}}
+{{examples}}
+{{methods}}

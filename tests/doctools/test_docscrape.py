@@ -9,13 +9,13 @@ def test_footings_doc():
     doc = FootingsDoc(DocModel)
 
     assert doc["Parameters"] == [
-        Parameter("param_1", str(int), ["This is parameter 1."]),
-        Parameter("param_2", str(int), ["This is parameter 2."]),
+        Parameter("param_1", int.__qualname__, ["This is parameter 1."]),
+        Parameter("param_2", int.__qualname__, ["This is parameter 2."]),
     ]
 
     assert doc["Modifiers"] == [
-        Parameter("modif_1", str(int), ["This is modifier 1."]),
-        Parameter("modif_2", str(int), ["This is modifier 2."]),
+        Parameter("modif_1", int.__qualname__, ["This is modifier 1."]),
+        Parameter("modif_2", int.__qualname__, ["This is modifier 2."]),
     ]
 
     assert doc["Meta"] == [
@@ -24,8 +24,8 @@ def test_footings_doc():
     ]
 
     assert doc["Assets"] == [
-        Parameter("asset_1", str(int), ["This is asset 1."]),
-        Parameter("asset_2", str(int), ["This is asset 2."]),
+        Parameter("asset_1", int.__qualname__, ["This is asset 1."]),
+        Parameter("asset_2", int.__qualname__, ["This is asset 2."]),
     ]
 
     assert doc["Steps"] == [

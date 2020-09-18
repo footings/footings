@@ -6,12 +6,46 @@ import os
 from jinja2 import FileSystemLoader
 from jinja2.sandbox import SandboxedEnvironment
 from sphinx.jinja2glue import BuiltinTemplateLoader
+from numpydoc.docscrape_sphinx import (
+    SphinxDocString,
+    SphinxClassDoc,
+    SphinxFunctionDoc,
+    SphinxObjDoc,
+)
+from .docscrape import FootingsDoc
 
-from numpydoc.docscrape_sphinx import SphinxDocString
-from numpydoc.docscrape import ClassDoc, FunctionDoc
 
+class SphinxFootingsDoc(SphinxDocString, FootingsDoc):
+    def __init__(self, obj, doc=None, func_doc=None, config={}):
+        self.load_config(config)
+        FootingsDoc.__init__(self, obj, doc=doc, func_doc=None, config=config)
 
-class SphinxFootingsDocString(SphinxDocString):
+    def load_config(self, config):
+        self.use_plots = config.get("use_plots", False)
+        self.use_blockquotes = config.get("use_blockquotes", False)
+        self.class_members_toctree = config.get("class_members_toctree", True)
+        self.attributes_as_param_list = config.get("attributes_as_param_list", True)
+        self.xref_param_type = config.get("xref_param_type", False)
+        self.xref_aliases = config.get("xref_aliases", dict())
+        self.xref_ignore = config.get("xref_ignore", set())
+        self.template = config.get("template", None)
+        if self.template is None:
+            template_dirs = [os.path.join(os.path.dirname(__file__), "templates")]
+            template_loader = FileSystemLoader(template_dirs)
+            template_env = SandboxedEnvironment(loader=template_loader)
+            self.template = template_env.get_template("footings_docstring.rst")
+
+    def _str_steps(self):
+        """Generate RST for steps"""
+        out = []
+        if self["Steps"]:
+            out += self._str_field_list("Steps")
+            out += [""]
+            for step in self["Steps"]:
+                out += self._str_indent([step])
+            out += [""]
+        return out
+
     def __str__(self, indent=0, func_role="obj"):
         ns = {
             "signature": self._str_signature(),
@@ -21,9 +55,9 @@ class SphinxFootingsDocString(SphinxDocString):
             "parameters": self._str_param_list("Parameters"),
             "modifiers": self._str_param_list("Modifiers"),
             "meta": self._str_param_list("Meta"),
+            "placeholders": self._str_param_list("Placeholders"),
             "assets": self._str_param_list("Assets"),
-            "uses": self._str_param_list("Uses"),
-            "impacts": self._str_param_list("Impacts"),
+            "steps": self._str_steps(),
             "returns": self._str_returns("Returns"),
             "yields": self._str_returns("Yields"),
             "receives": self._str_returns("Receives"),
@@ -35,37 +69,16 @@ class SphinxFootingsDocString(SphinxDocString):
             "notes": self._str_section("Notes"),
             "references": self._str_references(),
             "examples": self._str_examples(),
-            "attributes": self._str_param_list("Attributes", fake_autosummary=True)
-            if self.attributes_as_param_list
-            else self._str_member_list("Attributes"),
             "methods": self._str_member_list("Methods"),
         }
-        ns = dict((k, "\n".join(v)) for k, v in ns.items())
 
+        ns = dict((k, "\n".join(v)) for k, v in ns.items())
         rendered = self.template.render(**ns)
         return "\n".join(self._str_indent(rendered.split("\n"), indent))
 
 
-class SphinxFunctionDoc(SphinxFootingsDocString, FunctionDoc):
-    def __init__(self, obj, doc=None, config={}):
-        self.load_config(config)
-        FunctionDoc.__init__(self, obj, doc=doc, config=config)
-
-
-class SphinxClassDoc(SphinxFootingsDocString, ClassDoc):
-    def __init__(self, obj, doc=None, func_doc=None, config={}):
-        self.load_config(config)
-        ClassDoc.__init__(self, obj, doc=doc, func_doc=None, config=config)
-
-
-class SphinxObjDoc(SphinxFootingsDocString):
-    def __init__(self, obj, doc=None, config={}):
-        self._f = obj
-        self.load_config(config)
-        SphinxDocString.__init__(self, doc, config=config)
-
-
 def get_doc_object(obj, what=None, doc=None, config={}, builder=None):
+
     if what is None:
         if inspect.isclass(obj):
             what = "class"
@@ -76,23 +89,19 @@ def get_doc_object(obj, what=None, doc=None, config={}, builder=None):
         else:
             what = "object"
 
+    if what == "class" and hasattr(obj, "run") and hasattr(obj, "audit"):
+        what = "footing"
     template_dirs = [os.path.join(os.path.dirname(__file__), "templates")]
-    print("\n")
-    print(template_dirs)
-    print(os.listdir(template_dirs[0]))
-    print("\n")
     if builder is not None:
         template_loader = BuiltinTemplateLoader()
         template_loader.init(builder, dirs=template_dirs)
     else:
         template_loader = FileSystemLoader(template_dirs)
     template_env = SandboxedEnvironment(loader=template_loader)
-    print("\n")
-    print(template_loader)
-    print("\n")
     config["template"] = template_env.get_template("footings_docstring.rst")
-
-    if what == "class":
+    if what == "footing":
+        return SphinxFootingsDoc(obj, func_doc=SphinxFunctionDoc, doc=doc, config=config)
+    elif what == "class":
         return SphinxClassDoc(obj, func_doc=SphinxFunctionDoc, doc=doc, config=config)
     elif what in ("function", "method"):
         return SphinxFunctionDoc(obj, doc=doc, config=config)

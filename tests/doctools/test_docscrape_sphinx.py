@@ -14,18 +14,18 @@ This is a model to test documentation.
 
 :Parameters:
 
-    **param_1** : <class 'int'>
+    **param_1** : int
         This is parameter 1.
 
-    **param_2** : <class 'int'>
+    **param_2** : int
         This is parameter 2.
 
 :Modifiers:
 
-    **modif_1** : <class 'int'>
+    **modif_1** : int
         This is modifier 1.
 
-    **modif_2** : <class 'int'>
+    **modif_2** : int
         This is modifier 2.
 
 :Meta:
@@ -39,10 +39,10 @@ This is a model to test documentation.
 
 :Assets:
 
-    **asset_1** : <class 'int'>
+    **asset_1** : int
         This is asset 1.
 
-    **asset_2** : <class 'int'>
+    **asset_2** : int
         This is asset 2.
 
 :Steps:
