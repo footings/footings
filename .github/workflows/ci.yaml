@@ -39,12 +39,13 @@ jobs:
         with:
           miniconda-version: "latest"
           python-version: ${{ matrix.python-version }}
-          environment-file: environments/environment-dev.yml
           activate-environment: footings-dev
-          auto-activate-base: false
+          environment-file: environments/environment-dev.yml
       - name: Install nox
+        shell: bash -l {0}
         run: |
           python -m pip install --upgrade pip
           pip install nox
       - name: Run tests
+        shell: bash -l {0}
         run:  nox -s test_no_env_update-${{ matrix.python-version }}
