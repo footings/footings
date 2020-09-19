@@ -1,7 +1,7 @@
 from distutils.version import LooseVersion
+from html.parser import HTMLParser
 import os.path as op
 import shutil
-import re
 
 import pytest
 import sphinx
@@ -9,7 +9,7 @@ from sphinx.application import Sphinx
 from sphinx.util.docutils import docutils_namespace
 
 
-# Test framework adapted from sphinx-gallery (BSD 3-clause)
+# copied from https://github.com/numpy/numpydoc/blob/master/numpydoc/tests/test_full.py
 @pytest.fixture(scope="module")
 def sphinx_app(tmpdir_factory):
     temp_dir = (tmpdir_factory.getbasetemp() / "root").strpath
@@ -41,8 +41,54 @@ def sphinx_app(tmpdir_factory):
     return app
 
 
+class ParseSphinxHTML(HTMLParser):
+    sections = ["Parameters", "Modifiers", "Meta", "Assets", "Steps", "Methods"]
+
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.tag = False
+        self.collect = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "dt" or tag == "p":
+            self.tag = True
+
+    def handle_endtag(self, tag):
+        if tag == "dt":
+            self.tag = False
+
+    def handle_data(self, data):
+        if self.tag and "\n" not in data:
+            self.collect.append(data)
+
+
+def scrape_html(file):
+    with open(file, "r") as f:
+        collect = False
+        main = []
+        sub = []
+        for line in f.readlines():
+            if "py method" in line:
+                collect = False
+            if any(x in line for x in ["field-list"]):
+                if sub != []:
+                    main.append("".join(sub))
+                collect = True
+                sub = []
+            if collect:
+                sub.append(line)
+
+    ret = []
+    for item in main:
+        parser = ParseSphinxHTML()
+        parser.feed(item)
+        parser.close()
+        ret.extend(parser.collect)
+    return ret
+
+
 def test_rst(sphinx_app):
-    src_dir, _ = sphinx_app.srcdir, sphinx_app.outdir
+    src_dir = sphinx_app.srcdir
     generated_file = op.join(src_dir, "generated", "footings_test_module.DocModel.rst")
     with open(generated_file, "r") as fid:
         generated = fid.read()
@@ -55,23 +101,11 @@ def test_rst(sphinx_app):
 
 
 def test_html(sphinx_app):
-    _, out_dir = sphinx_app.srcdir, sphinx_app.outdir
-    generated_file = op.join(out_dir, "generated", "footings_test_module.DocModel.html")
-    with open(generated_file, "r") as fid:
-        generated = fid.read()
-    expected_file = op.join(
+    """Test that class documentation is reasonable."""
+    out_dir = sphinx_app.outdir
+    src_html = op.join(
         "tests", "doctools", "output", "footings_test_module.DocModel.html"
     )
-    with open(expected_file, "r") as fid:
-        expected = fid.read()
-    skip_lines = ["http://sphinx-doc.org", "https://github.com/bitprophet/alabaster"]
-    diff = []
-    for idx, lines in enumerate(zip(generated.split("\n"), expected.split("\n"))):
-        gen = re.sub("in Python v3.\\d", "", lines[0].strip())
-        exp = re.sub("in Python v3.\\d", "", lines[1].strip())
-        if gen != exp:
-            if not any([x in gen for x in skip_lines]):
-                diff.append((idx, gen, exp))
-    print("Differnce in html:")
-    print(diff)
-    assert len(diff) == 0
+    gen_html = op.join(out_dir, "generated", "footings_test_module.DocModel.html")
+
+    assert scrape_html(src_html) == scrape_html(gen_html)
