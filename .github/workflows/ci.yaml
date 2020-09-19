@@ -48,4 +48,4 @@ jobs:
           pip install nox
       - name: Run tests
         shell: bash -l {0}
-        run:  nox -s test_no_env_update-${{ matrix.python-version }}
+        run:  nox -s test_github-${{ matrix.python-version }}

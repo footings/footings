@@ -20,8 +20,8 @@ def test_with_env_update(session):
     session.run("pytest", "-vv")
 
 
-@nox.session(python=PYTHON_TEST_VERSIONS, venv_backend=None)
-def test_no_env_update(session):
+@nox.session(python=PYTHON_TEST_VERSIONS)
+def test_github(session):
     session.install("-e", ".", "--no-deps")
     session.run("pytest", "-vv")
 
