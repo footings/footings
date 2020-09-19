@@ -4,7 +4,7 @@ PYTHON_TEST_VERSIONS = ["3.7", "3.8"]
 
 
 @nox.session(python=PYTHON_TEST_VERSIONS, venv_backend="conda")
-def test_with_env_update(session):
+def test(session):
     session.run(
         "conda",
         "env",
@@ -16,12 +16,6 @@ def test_with_env_update(session):
         # options
         silent=False,
     )
-    session.install("-e", ".", "--no-deps")
-    session.run("pytest", "-vv")
-
-
-@nox.session(python=PYTHON_TEST_VERSIONS)
-def test_github(session):
     session.install("-e", ".", "--no-deps")
     session.run("pytest", "-vv")
 
