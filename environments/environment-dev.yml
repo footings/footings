@@ -2,8 +2,6 @@ name: footings-dev
 channels:
   - conda-forge
 dependencies:
-  - numpy
-
   # required
   - attrs
   - pandas
