@@ -1,6 +1,6 @@
 import nox
 
-PYTHON_TEST_VERSIONS = ["3.6", "3.7", "3.8"]
+PYTHON_TEST_VERSIONS = ["3.7", "3.8"]
 
 
 @nox.session(python=PYTHON_TEST_VERSIONS, venv_backend="conda")
