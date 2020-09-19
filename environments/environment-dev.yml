@@ -2,6 +2,8 @@ name: footings-dev
 channels:
   - conda-forge
 dependencies:
+  - numpy
+
   # required
   - attrs
   - pandas
@@ -12,7 +14,6 @@ dependencies:
   - pytest
 
   # development
-  - numpy
   - flake8
   - black==19.*
   - pre-commit
