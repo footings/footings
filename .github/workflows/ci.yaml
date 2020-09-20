@@ -47,4 +47,4 @@ jobs:
           python -m pip install --upgrade pip
           pip install nox
       - name: Run tests
-        run:  nox -s tests-${{ matrix.python-version }}
+        run:  nox -s test-${{ matrix.python-version }}
