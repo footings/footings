@@ -29,8 +29,17 @@ The Footings library was designed as framework library using the below principle
 
 ## Installation
 
+To install from PyPI run -
+
+```
+pip install footings
+```
+
+To install the latest version on github run -
+
+```
+pip install git+https://github.com/foootings/footings-core.git
+```
 
 ## License
 [BSD 3](LICENSE)
-
-## Contributing
