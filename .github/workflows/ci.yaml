@@ -39,8 +39,8 @@ jobs:
         with:
           miniconda-version: "latest"
           python-version: ${{ matrix.python-version }}
-          environment-file: environments/environment-test.yml
-          activate-environment: footings-test
+          environment-file: environments/environment-dev.yml
+          activate-environment: footings-dev
           auto-activate-base: false
       - name: Install nox
         run: |
