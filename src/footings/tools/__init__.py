@@ -1,3 +1,5 @@
+"""The provided objects under ``footings.tools`` assist users in building models using the Footings framework."""
+
 from .frames import (
     create_frame,
     create_frame_from_record,

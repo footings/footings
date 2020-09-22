@@ -41,7 +41,8 @@ extensions = [
     "recommonmark",
     "sphinx_rtd_theme",
 ]
-# autosummary_generate = True
+autosummary_generate = True
+autosummary_generate_overwrite = True
 add_module_names = False
 numpydoc_show_class_members = True
 
