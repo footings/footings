@@ -12,7 +12,7 @@ def test(session):
         "--prefix",
         session.virtualenv.location,
         "--file",
-        "environments/environment-test.yml",
+        "environments/environment-dev.yml",
         # options
         silent=False,
     )
