@@ -110,6 +110,3 @@ venv.bak/
 # dask
 dask-worker-space/
 mydask.png
-
-# other
-*.ipynb
