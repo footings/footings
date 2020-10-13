@@ -35,7 +35,7 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.TEST_PYPI_TOKEN }}
-        repository_url: https://test.pypi.org/
+        repository_url: https://test.pypi.org/legacy/
     - name: Publish distribution 📦 to PyPI
       if: github.ref == 'refs/heads/master'
       uses: pypa/gh-action-pypi-publish@master
