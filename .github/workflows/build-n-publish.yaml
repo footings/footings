@@ -3,7 +3,7 @@ name: Build and Publish Package
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]"
+      - "v*"
 
 jobs:
   build-n-publish:
