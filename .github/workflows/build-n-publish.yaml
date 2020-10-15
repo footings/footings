@@ -2,8 +2,11 @@ name: Build and Publish Package
 
 on:
   push:
-    tags:
-      - "v*"
+    tags: ["v*"]
+  workflow_run:
+    workflows: ["CI"]
+    branches: [master]
+    types: [completed]
 
 jobs:
   build-n-publish:
@@ -32,6 +35,7 @@ jobs:
         --out-dir dist/
         .
     - name: Publish distribution 📦 to Test PyPI
+      if: github.ref != 'refs/heads/master'
       uses: pypa/gh-action-pypi-publish@master
       with:
         user: __token__
