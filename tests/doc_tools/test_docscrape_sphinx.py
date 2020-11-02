@@ -1,4 +1,4 @@
-from footings.doctools.docscrape_sphinx import SphinxFootingsDoc, get_doc_object
+from footings.doc_tools.docscrape_sphinx import SphinxFootingsDoc, get_doc_object
 
 from .shared import DocModel
 

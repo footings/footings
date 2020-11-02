@@ -1,6 +1,6 @@
 from numpydoc.docscrape import Parameter
 
-from footings.doctools.docscrape import FootingsDoc
+from footings.doc_tools.docscrape import FootingsDoc
 
 from .shared import DocModel
 

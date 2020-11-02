@@ -5,7 +5,7 @@ from attr import attrs, attrib
 import pandas as pd
 
 from footings.core.xlsx import FootingsXlsxWb
-from footings.tools.testing import assert_footings_audit_xlsx_equal
+from footings.test_tools import assert_footings_audit_xlsx_equal
 
 
 def test_footings_xlsx_wb(tmp_path):

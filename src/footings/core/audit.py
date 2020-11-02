@@ -6,7 +6,7 @@ from openpyxl.styles import NamedStyle, Font
 
 from .utils import dispatch_function
 from .xlsx import FootingsXlsxWb
-from ..doctools.docscrape import FootingsDoc
+from ..doc_tools.docscrape import FootingsDoc
 
 
 def _format_docstring(docstring):
