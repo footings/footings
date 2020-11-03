@@ -14,15 +14,7 @@ from footings.core.validators import (
 )
 
 
-class _Asset:
-    pass
-
-
-class _Placeholder:
-    pass
-
-
-class _Meta:
+class _Parameter:
     pass
 
 
@@ -30,7 +22,15 @@ class _Modifier:
     pass
 
 
-class _Parameter:
+class _Meta:
+    pass
+
+
+class _Placeholder:
+    pass
+
+
+class _Asset:
     pass
 
 
