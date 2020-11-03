@@ -11,9 +11,9 @@ from attr._make import _CountingAttr
 from attr.setters import frozen
 from numpydoc.docscrape import Parameter, FunctionDoc
 
-from .attributes import _Asset, _Meta, _Modifier, _Parameter
+from .attributes import _Parameter, _Modifier, _Meta, _Placeholder, _Asset
 from .audit import run_model_audit
-from ..doctools.docscrape import FootingsDoc
+from ..doc_tools.docscrape import FootingsDoc
 from .visualize import visualize_model
 
 
@@ -51,6 +51,8 @@ def _run(self, to_step):
     for step in steps:
         _run_step(step)
 
+    if to_step is not None:
+        return self
     if len(self.assets) > 1:
         return tuple(getattr(self, asset) for asset in self.assets)
     return getattr(self, self.assets[0])
@@ -138,15 +140,16 @@ def step(
 
 
 _FOOTING_GROUP_MAP = {
-    _Asset: "Assets",
-    _Meta: "Meta",
-    _Modifier: "Modifiers",
     _Parameter: "Parameters",
+    _Modifier: "Modifiers",
+    _Meta: "Meta",
+    _Placeholder: "Placeholders",
+    _Asset: "Assets",
 }
 
 
 def _parse_attriubtes(cls):
-    sections = ["Parameters", "Modifiers", "Meta", "Assets"]
+    sections = ["Parameters", "Modifiers", "Meta", "Placeholders", "Assets"]
     parsed_attributes = {section: [] for section in sections}
 
     for attribute in cls.__attrs_attrs__:
@@ -199,6 +202,7 @@ def _attr_doc(cls, steps):
     doc["Parameters"] = parsed_attributes["Parameters"]
     doc["Modifiers"] = parsed_attributes["Modifiers"]
     doc["Meta"] = parsed_attributes["Meta"]
+    doc["Placeholders"] = parsed_attributes["Placeholders"]
     doc["Assets"] = parsed_attributes["Assets"]
     doc["Steps"] = _generate_steps_sections(cls, steps)
     doc["Methods"] = []
@@ -242,14 +246,19 @@ def model(cls: type = None, *, steps: List[str]):
         # 2. All attributes need to belong to a footings_group
         exclude = [x for x in dir(Footing) if x[0] != "_"]
         attributes = [x for x in dir(cls) if x[0] != "_" and x not in exclude]
+        if hasattr(cls, "__attrs_attrs__"):
+            attrs_attrs = {x.name: x for x in cls.__attrs_attrs__}
         assets = []
         for attribute in attributes:
             attr = getattr(cls, attribute)
-            if isinstance(attr, _CountingAttr) is False:
-                msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
-                msg += "Use one of define_parameter, define_meta, define_modifier or define_asset "
-                msg += "when building a model."
-                raise ModelCreationError(msg)
+            if attribute in attrs_attrs:
+                attr = attrs_attrs[attribute]
+            else:
+                if isinstance(attr, _CountingAttr) is False:
+                    msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
+                    msg += "Use one of define_parameter, define_meta, define_modifier, define_placeholder "
+                    msg += "or define_asset when building a model."
+                    raise ModelCreationError(msg)
             footing_group = attr.metadata.get("footing_group", None)
             if footing_group is None:
                 msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
