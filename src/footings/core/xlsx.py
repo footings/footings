@@ -158,6 +158,8 @@ def obj_to_xlsx(obj, worksheet, **kwargs):
     elif callable(obj):
         new_obj = "callable: " + obj.__module__ + "." + obj.__qualname__
         ret = _obj_to_xlsx_builtins(new_obj, worksheet, **kwargs)
+    elif hasattr(obj, "__str__"):
+        ret = _obj_to_xlsx_builtins(str(obj), worksheet, **kwargs)
     else:
         msg = f"Not able to output {type(obj)} to an xlsx worksheet."
         raise TypeError(msg)
