@@ -14,8 +14,12 @@ class FootingsXlsxEntry:
     """FootingsXlsxEntry"""
 
     worksheet: str = attrib()
-    name: str = attrib()
+    source: str = attrib()
+    mapping: str = attrib()
+    end_point: str = attrib()
+    column_name: str = attrib()
     dtype: str = attrib()
+    stable: str = attrib()
     row_start: int = attrib()
     col_start: int = attrib()
     row_end: int = attrib()
@@ -43,8 +47,12 @@ def _obj_to_xlsx_builtins(obj, worksheet, **kwargs):
     return [
         FootingsXlsxEntry(
             worksheet=worksheet.obj.title,
-            name=kwargs.get("name", None),
+            source=kwargs.get("source", None),
+            mapping=kwargs.get("mapping", None),
+            end_point=kwargs.get("end_point", None),
+            column_name=kwargs.get("column_name", None),
             dtype=str(type(obj)),
+            stable=kwargs.get("stable", None),
             row_start=row,
             col_start=col,
             row_end=row,
@@ -62,8 +70,12 @@ def _obj_to_xlsx_series(obj, worksheet, **kwargs):
     return [
         FootingsXlsxEntry(
             worksheet=worksheet.obj.title,
-            name=kwargs.get("name", None),
+            source=kwargs.get("source", None),
+            mapping=kwargs.get("mapping", None),
+            end_point=kwargs.get("end_point", None),
+            column_name=obj.name,
             dtype=str(pd.Series),
+            stable=kwargs.get("stable", None),
             row_start=row,
             col_start=col,
             row_end=row + obj.shape[0],
@@ -73,23 +85,14 @@ def _obj_to_xlsx_series(obj, worksheet, **kwargs):
 
 
 def _obj_to_xlsx_dataframe(obj, worksheet, **kwargs):
-    row = worksheet.row
-    col = worksheet.col
-    for cdx, col_nm in enumerate(obj):
-        _obj_to_xlsx_cell(obj[col_nm].name, worksheet.obj, row, col + cdx, **kwargs)
-        for rdx, row_val in enumerate(obj[col_nm], 1):
-            _obj_to_xlsx_cell(row_val, worksheet.obj, row + rdx, col + cdx)
-    return [
-        FootingsXlsxEntry(
-            worksheet=worksheet.obj.title,
-            name=kwargs.get("name", None),
-            dtype=str(pd.DataFrame),
-            row_start=row,
-            col_start=col,
-            row_end=row + obj.shape[0],
-            col_end=col + obj.shape[0] - 1,
-        )
-    ]
+    ret = []
+    start_col = worksheet.col
+    for col_nm in obj:
+        ret.extend(obj_to_xlsx(obj[col_nm], worksheet, **kwargs))
+        worksheet.col += 1
+    worksheet.col = start_col
+
+    return ret
 
 
 def _obj_to_xlsx_mapping(obj, worksheet, **kwargs):
@@ -100,10 +103,17 @@ def _obj_to_xlsx_mapping(obj, worksheet, **kwargs):
                 k = str(k)
             except:
                 raise ValueError("Converting key of mapping to string failed.")
-        key_entries = obj_to_xlsx(k, worksheet, **kwargs)
+        mapping = kwargs.pop("mapping", "")
+        mapping += f"[{k}]"
+        kwargs.pop("end_point", None)
+        key_entries = obj_to_xlsx(
+            k, worksheet, mapping=mapping, end_point="KEY", **kwargs
+        )
         ret.extend(key_entries)
         worksheet.col += 1
-        val_entries = obj_to_xlsx(v, worksheet, **kwargs)
+        val_entries = obj_to_xlsx(
+            v, worksheet, mapping=mapping, end_point="VALUE", **kwargs
+        )
         ret.extend(val_entries)
         worksheet.row = max([entry.row_end for entry in val_entries]) + 1
         worksheet.col -= 1

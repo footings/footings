@@ -12,11 +12,19 @@ from ..core.xlsx import FootingsXlsxEntry
 #########################################################################################
 
 
+class FootingsTestError(Exception):
+    """Error raised when testing xlsx files."""
+
+
 def _make_key(x: pd.Series):
     return FootingsXlsxEntry(
         worksheet=x.worksheet,
-        name=x.name,
+        source=x.source,
+        mapping=x.mapping,
+        end_point=x.end_point,
+        column_name=x.column_name,
         dtype=x.dtype,
+        stable=x.stable,
         row_start=x.row_start,
         col_start=x.col_start,
         row_end=x.row_end,
@@ -46,6 +54,7 @@ def load_footings_audit_xlsx(file_path: str, **kwargs):
         If the workbook does not contain a sheet called __footings__.
     """
     wb = load_workbook(file_path)
+    expected_cols = set([x for x in dir(FootingsXlsxEntry) if x[0] != "_"])
 
     if "__footings__" not in wb.sheetnames:
         msg = (
@@ -56,6 +65,10 @@ def load_footings_audit_xlsx(file_path: str, **kwargs):
     ws = wb["__footings__"]
     data = ws.values
     cols = next(data)
+    if set(cols) != expected_cols:
+        raise FootingsTestError(
+            "The __footings__tab does not contain the correct columns."
+        )
     data = list(data)
     df_log = pd.DataFrame(data, columns=cols)
 
@@ -121,12 +134,19 @@ def _(val1, val2):
     return result, msg
 
 
-def _compare_footings_xlsx_files(result: dict, expected: dict, **kwargs):
+def exclude_record(key, exclude):
+    return any([all([getattr(key, k) == v for k, v in e.items()]) for e in exclude])
+
+
+def _compare_footings_xlsx_files(result: dict, expected: dict, exclude: list, **kwargs):
     test = True
     log = {}
     keys = set(list(result.keys()) + list(expected.keys()))
     for key in keys:
         temp = True
+        if len(exclude) > 0:
+            if exclude_record(key, exclude):
+                continue
         try:
             res_val = result[key]
         except KeyError:
@@ -160,7 +180,9 @@ def _compare_footings_xlsx_files(result: dict, expected: dict, **kwargs):
     return test, message
 
 
-def assert_footings_audit_xlsx_equal(result: str, expected: str, **kwargs):
+def assert_footings_audit_xlsx_equal(
+    result: str, expected: str, exclude: list = [], **kwargs
+):
     """Test two audit xlsx files to determine if they are equal.
 
     This function is useful for unit testing models to ensure models stay true over time.
@@ -171,6 +193,8 @@ def assert_footings_audit_xlsx_equal(result: str, expected: str, **kwargs):
         The new workbook to test against an expected workbook.
     expected : str
         The baseline workbook to compare the result against.
+    exclude : dict
+        A dict of records to exclude.
     **kwargs
         Additional parameters to pass.
 
@@ -187,7 +211,9 @@ def assert_footings_audit_xlsx_equal(result: str, expected: str, **kwargs):
     wb_res = load_footings_audit_xlsx(result)
     wb_exp = load_footings_audit_xlsx(expected)
 
-    test, message = _compare_footings_xlsx_files(wb_res, wb_exp, **kwargs)
+    test, message = _compare_footings_xlsx_files(
+        wb_res, wb_exp, exclude=exclude, **kwargs
+    )
     if test is False:
         raise AssertionError(f"\n{message}")
     return True
