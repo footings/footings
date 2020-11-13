@@ -5,7 +5,7 @@ from footings.core.attributes import (
     define_asset,
     define_parameter,
 )
-from footings.tools.testing import assert_footings_audit_xlsx_equal
+from footings.test_tools import assert_footings_audit_xlsx_equal
 
 
 @model(steps=["_step_1", "_step_2", "_step_3"])

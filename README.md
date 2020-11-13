@@ -43,3 +43,8 @@ pip install git+https://github.com/foootings/footings-core.git
 
 ## License
 [BSD 3](LICENSE)
+
+
+## Changelog
+
+[File](./docs/changelog.md)

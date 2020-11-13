@@ -3,10 +3,6 @@ name: Build and Publish Package
 on:
   push:
     tags: ["v*"]
-  workflow_run:
-    workflows: ["CI"]
-    branches: [master]
-    types: [completed]
 
 jobs:
   build-n-publish:

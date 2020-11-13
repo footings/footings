@@ -9,7 +9,7 @@ import footings_test_module  # noqa
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
-    "footings.doctools",
+    "footings.doc_tools",
 ]
 project = "footings_test_module"
 autosummary_generate = True

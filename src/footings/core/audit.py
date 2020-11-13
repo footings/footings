@@ -6,7 +6,7 @@ from openpyxl.styles import NamedStyle, Font
 
 from .utils import dispatch_function
 from .xlsx import FootingsXlsxWb
-from ..doctools.docscrape import FootingsDoc
+from ..doc_tools.docscrape import FootingsDoc
 
 
 def _format_docstring(docstring):
@@ -114,16 +114,38 @@ def create_xlsx_file(model_audit, file):
         wb.create_sheet(step_name, start_row=2, start_col=2)
 
     # populate model sheet
-    wb.write_obj(model_name, "Model Name:", add_cols=1, style=XLSX_FORMATS["title"])
-    wb.write_obj(model_name, model_name, add_rows=2, add_cols=-1)
-    wb.write_obj(model_name, "Signature:", add_cols=1, style=XLSX_FORMATS["title"])
-    wb.write_obj(model_name, model_audit.model_sig, add_rows=2, add_cols=-1)
-    wb.write_obj(model_name, "Docstring:", add_cols=1, style=XLSX_FORMATS["title"])
+    wb.write_obj(
+        model_name, "Model Name:", add_cols=1, style=XLSX_FORMATS["title"], source="NAME"
+    )
+    wb.write_obj(model_name, model_name, add_rows=2, add_cols=-1, source="NAME")
+    wb.write_obj(
+        model_name,
+        "Signature:",
+        add_cols=1,
+        style=XLSX_FORMATS["title"],
+        source="SIGNATURE",
+    )
+    wb.write_obj(
+        model_name, model_audit.model_sig, add_rows=2, add_cols=-1, source="SIGNATURE"
+    )
+    wb.write_obj(
+        model_name,
+        "Docstring:",
+        add_cols=1,
+        style=XLSX_FORMATS["title"],
+        source="DOCSTRING",
+    )
 
     in_steps_zone = False
     for line in model_audit.model_doc.split("\n"):
         if line in footings_headings:
-            wb.write_obj(model_name, line, add_rows=1, style=XLSX_FORMATS["underline"])
+            wb.write_obj(
+                model_name,
+                line,
+                add_rows=1,
+                style=XLSX_FORMATS["underline"],
+                source="DOCSTRING",
+            )
             if in_steps_zone:
                 in_steps_zone = False
             if line == "Steps":
@@ -137,9 +159,10 @@ def create_xlsx_file(model_audit, file):
                 add_rows=1,
                 hyperlink=line,
                 style=XLSX_FORMATS["hyperlink"],
+                source="DOCSTRING",
             )
         else:
-            wb.write_obj(model_name, line, add_rows=1)
+            wb.write_obj(model_name, line, add_rows=1, source="DOCSTRING")
 
     # format model sheet
     wksht = wb.worksheets[model_name].obj
@@ -151,23 +174,43 @@ def create_xlsx_file(model_audit, file):
     for step_name, step_value in model_audit.steps.items():
 
         # populate step sheets
-        wb.write_obj(step_name, "Step Name:", add_cols=1, style=XLSX_FORMATS["title"])
-        wb.write_obj(step_name, step_name, add_rows=2, add_cols=-1)
-        wb.write_obj(step_name, "Docstring:", add_cols=1, style=XLSX_FORMATS["title"])
+        wb.write_obj(
+            step_name,
+            "Step Name:",
+            add_cols=1,
+            style=XLSX_FORMATS["title"],
+            source="NAME",
+        )
+        wb.write_obj(step_name, step_name, add_rows=2, add_cols=-1, source="NAME")
+        wb.write_obj(
+            step_name,
+            "Docstring:",
+            add_cols=1,
+            style=XLSX_FORMATS["title"],
+            source="DOCSTRING",
+        )
 
         step_docstring = (
             step_value["Docstring"] if step_value["Docstring"] is not None else ""
         )
         for line in step_docstring.split("\n"):
             if line in function_headings:
-                wb.write_obj(step_name, line, add_rows=1, style=XLSX_FORMATS["underline"])
+                wb.write_obj(
+                    step_name,
+                    line,
+                    add_rows=1,
+                    style=XLSX_FORMATS["underline"],
+                    source="DOCSTRING",
+                )
             elif "---" in line:
                 pass
             else:
                 wb.write_obj(step_name, line, add_rows=1)
         wb.write_obj(step_name, "", add_rows=1, add_cols=-1)
-        wb.write_obj(step_name, "Output:", add_cols=2, style=XLSX_FORMATS["title"])
-        wb.write_obj(step_name, step_value["Output"])
+        wb.write_obj(
+            step_name, "Output:", add_cols=2, style=XLSX_FORMATS["title"], source="OUTPUT"
+        )
+        wb.write_obj(step_name, step_value["Output"], source="OUTPUT")
 
         # format step sheets
         wksht = wb.worksheets[step_name].obj

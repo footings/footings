@@ -21,3 +21,4 @@ dependencies:
   - nbsphinx
   - ipython
   - ipykernel
+  - dask

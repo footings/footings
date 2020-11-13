@@ -1,12 +1,10 @@
-""""Test for frames.py"""
-
 import os
 
 import pytest
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
-from footings.tools.frames import (
+from footings.model_tools.frames import (
     freq_dispatcher,
     kwarg_dispatcher,
     create_frame,
@@ -14,7 +12,7 @@ from footings.tools.frames import (
     expand_frame_per_record,
 )
 
-FILE = os.path.join("tests", "tools", "data", "frame-examples.xlsx")
+FILE = os.path.join("tests", "model_tools", "data", "frame-examples.xlsx")
 TEST_PARAMS = [
     (
         "test-month-duration",

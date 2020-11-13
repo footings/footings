@@ -88,23 +88,26 @@ def scrape_html(file):
 
 
 def test_rst(sphinx_app):
+    def strip_str(x: str):
+        return x.replace("\n", "").replace(" ", "")
+
     src_dir = sphinx_app.srcdir
     generated_file = op.join(src_dir, "generated", "footings_test_module.DocModel.rst")
     with open(generated_file, "r") as fid:
         generated = fid.read()
     expected_file = op.join(
-        "tests", "doctools", "output", "footings_test_module.DocModel.rst"
+        "tests", "doc_tools", "output", "footings_test_module.DocModel.rst"
     )
     with open(expected_file, "r") as fid:
         expected = fid.read()
-    assert generated == expected
+    assert strip_str(generated) == strip_str(expected)
 
 
 def test_html(sphinx_app):
     """Test that class documentation is reasonable."""
     out_dir = sphinx_app.outdir
     src_html = op.join(
-        "tests", "doctools", "output", "footings_test_module.DocModel.html"
+        "tests", "doc_tools", "output", "footings_test_module.DocModel.html"
     )
     gen_html = op.join(out_dir, "generated", "footings_test_module.DocModel.html")
 
