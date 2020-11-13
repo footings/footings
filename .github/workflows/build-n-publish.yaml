@@ -3,14 +3,9 @@ name: Build and Publish Package
 on:
   push:
     tags: ["v*"]
-  workflow_run:
-    workflows: ["CI"]
-    branches: [master]
-    types: [completed]
 
 jobs:
   build-n-publish:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Build and publish package to PyPI and TestPyPI
     runs-on: ubuntu-latest
     steps:
