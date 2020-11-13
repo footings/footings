@@ -10,6 +10,7 @@ on:
 
 jobs:
   build-n-publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Build and publish package to PyPI and TestPyPI
     runs-on: ubuntu-latest
     steps:
