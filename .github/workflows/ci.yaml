@@ -34,14 +34,17 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: "${{ matrix.python-version }}"
-      - uses: conda-incubator/setup-miniconda@v2
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
           environment-file: environments/environment-dev.yml
           activate-environment: footings-dev
+      - name: Conda info
+        run: conda info
       - name: Run tests
-        run:  nox -s test-${{ matrix.python-version }}
+        run:  nox -s test_ci
   coverage:
     needs: [tests]
     name: Run coverage
@@ -59,7 +62,7 @@ jobs:
           environment-file: environments/environment-dev.yml
           activate-environment: footings-dev
       - name: Run coverage
-        run:  nox -s coverage
+        run:  nox -s coverage_ci
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:

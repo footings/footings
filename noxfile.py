@@ -24,19 +24,14 @@ def test(session):
     session.run("pytest", "-vv")
 
 
+@nox.session(venv_backend="none")
+def test_ci(session):
+    session.install("-e", ".", "--no-deps")
+    session.run("pytest", "-vv")
+
+
 @nox.session(python=3.7, venv_backend="conda")
-def coverage(session):
-    session.run(
-        "conda",
-        "env",
-        "update",
-        "--prefix",
-        session.virtualenv.location,
-        "--file",
-        "environments/environment-dev.yml",
-        # options
-        silent=False,
-    )
+def coverage_ci(session):
     session.install("-e", ".", "--no-deps")
     session.run("pytest", "--cov=./", "--cov-report=xml")
 
