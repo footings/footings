@@ -29,15 +29,15 @@ jobs:
         python-version: ["3.7", "3.8"]
         os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
-      - uses: "actions/checkout@v2"
+      - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: "actions/setup-python@v2"
+        uses: actions/setup-python@v2
         with:
           python-version: "${{ matrix.python-version }}"
       - name: Setup Conda Environment
         uses: goanpeca/setup-miniconda@v1
         with:
-          miniconda-version: "latest"
+          miniconda-version: latest
           python-version: ${{ matrix.python-version }}
           environment-file: environments/environment-dev.yml
           activate-environment: footings-dev
@@ -48,19 +48,16 @@ jobs:
           pip install nox
       - name: Run tests
         run:  nox -s test-${{ matrix.python-version }}
+      - name: Run coverage
+        run:  nox -s coverage
   coverage:
-    name: pre-commit
+    name: Push Coverage
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
         python-version: 3.7
-    - name: Generate coverage report
-      run: |
-        pip install pytest
-        pip install pytest-cov
-        pytest --cov=./ --cov-report=xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
