@@ -46,7 +46,9 @@ jobs:
           activate-environment: footings-dev
           auto-activate-base: false
       - name: Conda info
-        run: conda info
+        run: |
+          conda info
+          conda list
       - name: Run tests
         run:  nox -s test_ci
   coverage:
@@ -66,6 +68,10 @@ jobs:
           environment-file: environments/environment-dev.yml
           activate-environment: footings-dev
           auto-activate-base: false
+      - name: Conda info
+        run: |
+          conda info
+          conda list
       - name: Run coverage
         run:  nox -s coverage_ci
       - name: Upload coverage to Codecov

@@ -30,7 +30,7 @@ def test_ci(session):
     session.run("pytest", "-vv")
 
 
-@nox.session(python=3.7, venv_backend="conda")
+@nox.session(venv_backend="none")
 def coverage_ci(session):
     session.install("-e", ".", "--no-deps")
     session.run("pytest", "--cov=./", "--cov-report=xml")
