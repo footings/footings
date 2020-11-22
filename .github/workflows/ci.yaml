@@ -48,21 +48,34 @@ jobs:
           pip install nox
       - name: Run tests
         run:  nox -s test-${{ matrix.python-version }}
-      - name: Run coverage
-        run:  nox -s coverage
   coverage:
-    name: Push Coverage
+    needs: [tests]
+    name: Run coverage
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
-      with:
-        python-version: 3.7
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
-        flags: PYTHON37
-        name: codecov-reports-37
-        fail_ci_if_error: true
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Setup Conda Environment
+        uses: goanpeca/setup-miniconda@v1
+        with:
+          miniconda-version: latest
+          python-version: 3.7
+          environment-file: environments/environment-dev.yml
+          activate-environment: footings-dev
+          auto-activate-base: false
+      - name: Install nox
+        run: |
+          python -m pip install --upgrade pip
+          pip install nox
+      - name: Run coverage
+        run:  nox -s coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          flags: PYTHON37
+          name: codecov-reports-37
+          fail_ci_if_error: true
