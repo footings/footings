@@ -40,7 +40,8 @@ jobs:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
           environment-file: environments/environment-dev.yml
-          activate-environment: footings-dev
+      - name: Active footings-dev environment-file
+        run: conda activate footings-dev
       - name: Conda info
         run: conda info
       - name: Run tests
@@ -60,7 +61,8 @@ jobs:
           auto-update-conda: true
           python-version: 3.7
           environment-file: environments/environment-dev.yml
-          activate-environment: footings-dev
+      - name: Active footings-dev environment-file
+        run: conda activate footings-dev
       - name: Run coverage
         run:  nox -s coverage_ci
       - name: Upload coverage to Codecov
