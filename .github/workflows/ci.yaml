@@ -38,13 +38,8 @@ jobs:
         with:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
-      - name: Install nox
-        run: |
-          python -m pip install --upgrade pip
-          pip install nox
-      - name: Modify numpy
-        if: ${{ matrix.os }} == 'windows-latest'
-        run: pip uninstall numpy
+          environment-file: environments/environment-dev.yml
+          activate-environment: footings-dev
       - name: Run tests
         run:  nox -s test-${{ matrix.python-version }}
   coverage:
@@ -61,10 +56,8 @@ jobs:
         with:
           auto-update-conda: true
           python-version: 3.7
-      - name: Install nox
-        run: |
-          python -m pip install --upgrade pip
-          pip install nox
+          environment-file: environments/environment-dev.yml
+          activate-environment: footings-dev
       - name: Run coverage
         run:  nox -s coverage
       - name: Upload coverage to Codecov

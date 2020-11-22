@@ -3,7 +3,9 @@ channels:
   - conda-forge
 dependencies:
   # required
+  - pip
   - attrs
+  - numpy
   - pandas
   - numpydoc=1.0.*
   - openpyxl
@@ -23,3 +25,5 @@ dependencies:
   - ipython
   - ipykernel
   - dask
+  - pip:
+    - nox
