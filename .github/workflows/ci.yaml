@@ -28,9 +28,11 @@ jobs:
       matrix:
         python-version: ["3.7", "3.8"]
         os: [ubuntu-latest, macOS-latest, windows-latest]
-    env:
-      CONDA_DLL_SEARCH_MODIFICATION_ENABLE: 1
     steps:
+      - name: Modify env
+        if: ${{ matrix.os }} == 'windows-latest'
+        env:
+          CONDA_DLL_SEARCH_MODIFICATION_ENABLE: 1
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
