@@ -19,8 +19,8 @@ FILE = os.path.join("tests", "model_tools", "data", "frame-examples.xlsx")
 TEST_PARAMS = [
     (
         "test-month-duration",
-        {"usecols": "B,C", "skiprows": 3, "nrows": 7},
-        {"usecols": "B:E", "skiprows": 15, "nrows": 30},
+        {"usecols": "B,C", "skiprows": 3, "nrows": 8},
+        {"usecols": "B:F", "skiprows": 16, "nrows": 30},
     ),
     (
         "test-month-calendar",
@@ -52,9 +52,10 @@ def _get_return_from_spreadsheet(sheet, **kwargs):
 @pytest.mark.parametrize("sheet, func_kwargs, output_kwargs", TEST_PARAMS, ids=IDS)
 def test_create_frame(sheet, func_kwargs, output_kwargs):
     expected = _get_return_from_spreadsheet(sheet, **output_kwargs)
+    print(expected)
 
     kwargs = _get_kwargs_from_spreadsheet(sheet, **func_kwargs)
-
+    print(kwargs)
     # test frequency_dispatcher
     freq_kws = ["frequency", "start_dt", "end_dt", "col_date_nm"]
     freq_ret = freq_dispatcher(**{k: v for k, v in kwargs.items() if k in freq_kws})
@@ -153,7 +154,7 @@ def test_frame_add_exposure():
                 ["2020-02-10", "2020-03-10", "2020-04-10", "2020-05-10",]
             ),
             "END_DURATION_COL": pd.to_datetime(
-                ["2020-03-09", "2020-04-09", "2020-05-09", "2020-06-09"]
+                ["2020-03-10", "2020-04-10", "2020-05-10", "2020-06-10"]
             ),
         }
     )
@@ -223,7 +224,7 @@ def test_frame_add_weights():
                 ["2020-02-10", "2020-03-10", "2020-04-10", "2020-05-10",]
             ),
             "END_DURATION_COL": pd.to_datetime(
-                ["2020-03-09", "2020-04-09", "2020-05-09", "2020-06-09"]
+                ["2020-03-10", "2020-04-10", "2020-05-10", "2020-06-10"]
             ),
         }
     )
@@ -271,7 +272,7 @@ def test_frame_filter():
                 ["2020-02-10", "2020-03-10", "2020-04-10", "2020-05-10",]
             ),
             "END_DURATION_COL": pd.to_datetime(
-                ["2020-03-09", "2020-04-09", "2020-05-09", "2020-06-09"]
+                ["2020-03-10", "2020-04-10", "2020-05-10", "2020-06-10"]
             ),
         }
     )
