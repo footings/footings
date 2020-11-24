@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from attr import attrs, attrib
+from attr import attrs
 from numpydoc.docscrape import FunctionDoc
 from openpyxl.styles import NamedStyle, Font
 
@@ -63,25 +63,30 @@ def _create_step_output(model, output):
     return return_dict
 
 
-@attrs(slots=True, frozen=True, repr=False)
-class ModelAudit:
+@attrs(slots=True, frozen=True)
+class AuditStep:
+    pass
+
+
+@attrs(slots=True, frozen=True, auto_attribs=True)
+class Audit:
     """Container for model audit output."""
 
-    model_name: dict = attrib()
-    model_doc: str = attrib()
-    model_sig: str = attrib()
-    steps: dict = attrib()
+    name: str
+    docstring: str
+    signature: str
+    steps: dict
 
     @classmethod
-    def create_audit(cls, model):
+    def create(cls, model):
         """Create audit"""
-        model_name = model.__class__.__name__
-        model_doc = str(model.__doc__)
-        model_sig = f"{model_name}{str(model.__signature__)}"
+        name = model.__class__.__name__
+        docstring = str(model.__doc__)
+        signature = f"{name}{str(model.__signature__)}"
         output = _get_model_output(model)
         steps = _create_step_output(model, output)
 
-        return cls(model_name, model_doc, model_sig, steps)
+        return cls(name, docstring, signature, steps)
 
 
 #########################################################################################
@@ -103,44 +108,34 @@ def create_xlsx_file(model_audit, file):
     for format_nm, format_val in XLSX_FORMATS.items():
         wb.add_named_style(format_nm, format_val)
 
-    model_name = model_audit.model_name
+    name = model_audit.name
     footings_headings = list(FootingsDoc.sections.keys()) + ["Steps"]
     function_headings = list(FunctionDoc.sections.keys())
     steps = list(model_audit.steps.keys())
 
     # create sheets
-    wb.create_sheet(model_name, start_row=2, start_col=2)
+    wb.create_sheet(name, start_row=2, start_col=2)
     for step_name in steps:
         wb.create_sheet(step_name, start_row=2, start_col=2)
 
     # populate model sheet
     wb.write_obj(
-        model_name, "Model Name:", add_cols=1, style=XLSX_FORMATS["title"], source="NAME"
+        name, "Model Name:", add_cols=1, style=XLSX_FORMATS["title"], source="NAME"
     )
-    wb.write_obj(model_name, model_name, add_rows=2, add_cols=-1, source="NAME")
+    wb.write_obj(name, name, add_rows=2, add_cols=-1, source="NAME")
     wb.write_obj(
-        model_name,
-        "Signature:",
-        add_cols=1,
-        style=XLSX_FORMATS["title"],
-        source="SIGNATURE",
+        name, "Signature:", add_cols=1, style=XLSX_FORMATS["title"], source="SIGNATURE",
     )
+    wb.write_obj(name, model_audit.signature, add_rows=2, add_cols=-1, source="SIGNATURE")
     wb.write_obj(
-        model_name, model_audit.model_sig, add_rows=2, add_cols=-1, source="SIGNATURE"
-    )
-    wb.write_obj(
-        model_name,
-        "Docstring:",
-        add_cols=1,
-        style=XLSX_FORMATS["title"],
-        source="DOCSTRING",
+        name, "Docstring:", add_cols=1, style=XLSX_FORMATS["title"], source="DOCSTRING",
     )
 
     in_steps_zone = False
-    for line in model_audit.model_doc.split("\n"):
+    for line in model_audit.docstring.split("\n"):
         if line in footings_headings:
             wb.write_obj(
-                model_name,
+                name,
                 line,
                 add_rows=1,
                 style=XLSX_FORMATS["underline"],
@@ -154,7 +149,7 @@ def create_xlsx_file(model_audit, file):
             pass
         elif in_steps_zone and line in steps:
             wb.write_obj(
-                model_name,
+                name,
                 line,
                 add_rows=1,
                 hyperlink=line,
@@ -162,10 +157,10 @@ def create_xlsx_file(model_audit, file):
                 source="DOCSTRING",
             )
         else:
-            wb.write_obj(model_name, line, add_rows=1, source="DOCSTRING")
+            wb.write_obj(name, line, add_rows=1, source="DOCSTRING")
 
     # format model sheet
-    wksht = wb.worksheets[model_name].obj
+    wksht = wb.worksheets[name].obj
     wksht.sheet_view.showGridLines = False
     wksht.column_dimensions["A"].width = 2.14
     wksht.column_dimensions["B"].width = 14
@@ -250,5 +245,5 @@ def run_model_audit(model, file, **kwargs):
 @run_model_audit.register(output_type="xlsx")
 def _(model, file, **kwargs):
     """Run model audit"""
-    audit = ModelAudit.create_audit(model)
+    audit = Audit.create(model)
     create_xlsx_file(audit, file, **kwargs)
