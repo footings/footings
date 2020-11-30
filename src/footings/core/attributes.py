@@ -14,23 +14,23 @@ from footings.core.validators import (
 )
 
 
-class _Parameter:
+class Parameter:
     pass
 
 
-class _Modifier:
+class Modifier:
     pass
 
 
-class _Meta:
+class Meta:
     pass
 
 
-class _Placeholder:
+class Placeholder:
     pass
 
 
-class _Asset:
+class Asset:
     pass
 
 
@@ -94,7 +94,7 @@ def define_asset(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=_Asset,
+        footing_group=Asset(),
         init=False,
         dtype=dtype,
         description=description,
@@ -127,7 +127,7 @@ def define_placeholder(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=_Placeholder,
+        footing_group=Placeholder(),
         init=False,
         dtype=dtype,
         description=description,
@@ -161,7 +161,7 @@ def define_meta(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=_Meta,
+        footing_group=Meta(),
         init=False,
         dtype=dtype,
         description=description,
@@ -195,7 +195,7 @@ def define_modifier(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=_Modifier,
+        footing_group=Modifier(),
         init=True,
         dtype=dtype,
         description=description,
@@ -227,7 +227,7 @@ def define_parameter(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=_Parameter,
+        footing_group=Parameter(),
         init=True,
         dtype=dtype,
         description=description,

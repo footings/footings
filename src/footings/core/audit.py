@@ -1,233 +1,132 @@
 from copy import deepcopy
+import pathlib
+from inspect import getfullargspec
 
-from attr import attrs
-from numpydoc.docscrape import FunctionDoc
-from openpyxl.styles import NamedStyle, Font
+from attr import attrs, attrib, asdict
+from attr.validators import instance_of, optional
 
 from .utils import dispatch_function
-from .xlsx import FootingsXlsxWb
-from ..doc_tools.docscrape import FootingsDoc
-
-
-def _format_docstring(docstring):
-
-    if docstring is None:
-        return ""
-
-    def _format_line(line, indent_len):
-        if line[:indent_len] == "".join([" " for x in range(0, indent_len)]):
-            return line[indent_len:]
-        else:
-            return line
-
-    lines = docstring.split("\n")
-    sections = [line for line in lines if "---" in line]
-    if sections != []:
-        section = sections[0]
-        indent_len = len(section) - len(section.lstrip(" "))
-    else:
-        indent_len = 0
-    return "\n".join(
-        [_format_line(line, indent_len) if indent_len > 0 else line for line in lines]
-    )
-
-
-def _get_model_output(model):
-    output = {}
-    for step in model.steps:
-        func = getattr(model, step)
-        func()
-        results = deepcopy(model)
-        step_output = {item: getattr(results, item) for item in func.impacts}
-        if hasattr(model, step + "_audit"):
-            getattr(results, step + "_audit")()
-        output.update({step: step_output})
-
-    return output
-
-
-def _get_dtype(dtype):
-    if dtype is None:
-        return ""
-    return dtype.__class__.__name__
-
-
-def _create_step_output(model, output):
-    """Create step output"""
-    return_dict = {}
-    for step in model.steps:
-        step_dict = {}
-        step_dict["Docstring"] = _format_docstring(getattr(model, step).__doc__)
-        step_dict["Output"] = output[step]
-        return_dict[step] = step_dict
-    return return_dict
+from .xlsx import create_xlsx_audit_file
 
 
 @attrs(slots=True, frozen=True)
-class AuditStep:
-    pass
+class AuditStepConfig:
+    show_method_name = attrib(type=bool, default=True)
+    show_docstring = attrib(type=bool, default=True)
+    show_uses = attrib(type=bool, default=True)
+    show_impacts = attrib(type=bool, default=True)
+    show_output = attrib(type=bool, default=True)
+    show_metadata = attrib(type=bool, default=True)
+    nonconstant = attrib(type=dict, factory=dict)
+    input_format = attrib(type=str, default="base")
+    output_format = attrib(type=str, default="base")
 
 
-@attrs(slots=True, frozen=True, auto_attribs=True)
-class Audit:
-    """Container for model audit output."""
+@attrs(slots=True, frozen=True)
+class AuditConfig:
+    show_signature = attrib(type=bool, default=True)
+    show_docstring = attrib(type=bool, default=True)
+    show_steps = attrib(type=bool, default=True)
+    step_config = attrib(type=AuditStepConfig, default=AuditStepConfig())
 
-    name: str
-    docstring: str
-    signature: str
-    steps: dict
+
+def _get_model_output(model):
+    steps = []
+    for step in model.__footings_steps__:
+        method = getattr(model, step)
+        step_obj = method.func
+        method()
+        results = deepcopy(model)
+        if hasattr(model, step + "_audit"):
+            getattr(results, step + "_audit")()
+        step_output = {item: getattr(results, item) for item in step_obj.impacts}
+        steps.append(step_output)
+
+    final_output = {asset: getattr(model, asset) for asset in model.__footings_assets__}
+
+    return steps, final_output
+
+
+@attrs(slots=True, frozen=True)
+class AuditStepContainer:
+    name = attrib(type=str)
+    method_name = attrib(type=str, default=None)
+    docstring = attrib(type=str, default=None)
+    uses = attrib(type=list, default=None)
+    impacts = attrib(type=list, default=None)
+    output = attrib(type=dict, default=None)
+    metadata = attrib(type=dict, default=None)
 
     @classmethod
-    def create(cls, model):
+    def create(cls, step, output, config):
+        kwargs = {"name": step.name}
+        if config.show_method_name:
+            kwargs.update({"method_name": step.method_name})
+        if config.show_docstring:
+            kwargs.update({"docstring": step.docstring})
+        if config.show_uses:
+            kwargs.update({"uses": step.uses})
+        if config.show_impacts:
+            kwargs.update({"impacts": step.impacts})
+        if config.show_output:
+            kwargs.update({"output": output})
+        if config.show_metadata:
+            kwargs.update({"metadata": step.metadata})
+        return cls(**kwargs)
+
+    def as_audit(self):
+        return {k: v for k, v in asdict(self).items() if v is not None}
+
+
+@attrs(slots=True, frozen=True)
+class AuditContainer:
+    """Container for model audit output."""
+
+    name = attrib(type=str)
+    instantiation = attrib(type=dict, validator=instance_of(dict))
+    output = attrib(type=dict, validator=instance_of(dict))
+    docstring = attrib(type=str, default=None, validator=optional(instance_of(str)))
+    signature = attrib(type=str, default=None, validator=optional(instance_of(str)))
+    steps = attrib(type=list, default=None, validator=optional(instance_of(list)))
+    metadata = attrib(type=dict, default=None, validator=optional(instance_of(dict)))
+    config = attrib(
+        type=AuditConfig, factory=AuditConfig, validator=instance_of(AuditConfig)
+    )
+
+    @classmethod
+    def create(cls, model, config=None):
         """Create audit"""
-        name = model.__class__.__name__
-        docstring = str(model.__doc__)
-        signature = f"{name}{str(model.__signature__)}"
-        output = _get_model_output(model)
-        steps = _create_step_output(model, output)
+        if config is None:
+            config = AuditConfig()
+        name = model.__class__.__qualname__
+        kwargs = {"name": name, "config": config}
+        if config.show_docstring:
+            kwargs.update({"docstring": model.__doc__})
+        if config.show_signature:
+            kwargs.update({"signature": f"{name}{str(model.__signature__)}"})
 
-        return cls(name, docstring, signature, steps)
+        kws = getfullargspec(model.__class__).kwonlyargs
+        attributes = model._combine_attributes()
+        instantiation = {attributes[kw]: deepcopy(getattr(model, kw)) for kw in kws}
+        kwargs.update({"instantiation": instantiation})
 
+        step_output, final_output = _get_model_output(model)
 
-#########################################################################################
-# to xlsx
-#########################################################################################
+        if config.show_steps:
+            steps = []
+            for step, output in zip(model.__footings_steps__, step_output):
+                step_dict = AuditStepContainer.create(
+                    getattr(model, step).func, output, config.step_config
+                ).as_audit()
+                steps.append(step_dict)
+            kwargs.update({"steps": steps})
 
-XLSX_FORMATS = {
-    "title": NamedStyle(name="bold", font=Font(name="Calibri", bold=True)),
-    "underline": NamedStyle("underline", font=Font(name="Calibri", underline="single")),
-    "hyperlink": NamedStyle(
-        "hyperlink", font=Font(name="Calibri", italic=True, bold=True)
-    ),
-}
+        kwargs.update({"output": final_output})
 
+        return cls(**kwargs)
 
-def create_xlsx_file(model_audit, file):
-    """Create xlsx file."""
-    wb = FootingsXlsxWb.create()
-    for format_nm, format_val in XLSX_FORMATS.items():
-        wb.add_named_style(format_nm, format_val)
-
-    name = model_audit.name
-    footings_headings = list(FootingsDoc.sections.keys()) + ["Steps"]
-    function_headings = list(FunctionDoc.sections.keys())
-    steps = list(model_audit.steps.keys())
-
-    # create sheets
-    wb.create_sheet(name, start_row=2, start_col=2)
-    for step_name in steps:
-        wb.create_sheet(step_name, start_row=2, start_col=2)
-
-    # populate model sheet
-    wb.write_obj(
-        name, "Model Name:", add_cols=1, style=XLSX_FORMATS["title"], source="NAME"
-    )
-    wb.write_obj(name, name, add_rows=2, add_cols=-1, source="NAME")
-    wb.write_obj(
-        name, "Signature:", add_cols=1, style=XLSX_FORMATS["title"], source="SIGNATURE",
-    )
-    wb.write_obj(name, model_audit.signature, add_rows=2, add_cols=-1, source="SIGNATURE")
-    wb.write_obj(
-        name, "Docstring:", add_cols=1, style=XLSX_FORMATS["title"], source="DOCSTRING",
-    )
-
-    in_steps_zone = False
-    for line in model_audit.docstring.split("\n"):
-        if line in footings_headings:
-            wb.write_obj(
-                name,
-                line,
-                add_rows=1,
-                style=XLSX_FORMATS["underline"],
-                source="DOCSTRING",
-            )
-            if in_steps_zone:
-                in_steps_zone = False
-            if line == "Steps":
-                in_steps_zone = True
-        elif "---" in line:
-            pass
-        elif in_steps_zone and line in steps:
-            wb.write_obj(
-                name,
-                line,
-                add_rows=1,
-                hyperlink=line,
-                style=XLSX_FORMATS["hyperlink"],
-                source="DOCSTRING",
-            )
-        else:
-            wb.write_obj(name, line, add_rows=1, source="DOCSTRING")
-
-    # format model sheet
-    wksht = wb.worksheets[name].obj
-    wksht.sheet_view.showGridLines = False
-    wksht.column_dimensions["A"].width = 2.14
-    wksht.column_dimensions["B"].width = 14
-    wksht.column_dimensions["C"].width = 1
-
-    for step_name, step_value in model_audit.steps.items():
-
-        # populate step sheets
-        wb.write_obj(
-            step_name,
-            "Step Name:",
-            add_cols=1,
-            style=XLSX_FORMATS["title"],
-            source="NAME",
-        )
-        wb.write_obj(step_name, step_name, add_rows=2, add_cols=-1, source="NAME")
-        wb.write_obj(
-            step_name,
-            "Docstring:",
-            add_cols=1,
-            style=XLSX_FORMATS["title"],
-            source="DOCSTRING",
-        )
-
-        step_docstring = (
-            step_value["Docstring"] if step_value["Docstring"] is not None else ""
-        )
-        for line in step_docstring.split("\n"):
-            if line in function_headings:
-                wb.write_obj(
-                    step_name,
-                    line,
-                    add_rows=1,
-                    style=XLSX_FORMATS["underline"],
-                    source="DOCSTRING",
-                )
-            elif "---" in line:
-                pass
-            else:
-                wb.write_obj(step_name, line, add_rows=1)
-        wb.write_obj(step_name, "", add_rows=1, add_cols=-1)
-        wb.write_obj(
-            step_name, "Output:", add_cols=2, style=XLSX_FORMATS["title"], source="OUTPUT"
-        )
-        wb.write_obj(step_name, step_value["Output"], source="OUTPUT")
-
-        # format step sheets
-        wksht = wb.worksheets[step_name].obj
-        wksht.sheet_view.showGridLines = False
-        wksht.column_dimensions["A"].width = 2.14
-        wksht.column_dimensions["B"].width = 14
-        wksht.column_dimensions["C"].width = 1
-        for col in list(wksht.columns)[3:]:
-            max_length = 0
-            for cell in col:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(str(cell.value))
-                except:
-                    pass
-            if max_length <= 3:
-                adj_width = (max_length + 1) * 1.2
-            else:
-                adj_width = max_length + 3
-            wksht.column_dimensions[col[0].column_letter].width = adj_width
-
-    wb.save(file)
+    def as_audit(self):
+        return {k: v for k, v in asdict(self).items() if v is not None}
 
 
 #########################################################################################
@@ -235,15 +134,22 @@ def create_xlsx_file(model_audit, file):
 #########################################################################################
 
 
-@dispatch_function(key_parameters=("output_type",))
 def run_model_audit(model, file, **kwargs):
+    output_ext = pathlib.Path(file).suffix
+    config = kwargs.pop("config", None)
+    audit_dict = AuditContainer.create(model, config=config).as_audit()
+    _run_model_audit(output_ext=output_ext, audit_dict=audit_dict, file=file, **kwargs)
+
+
+@dispatch_function(key_parameters=("output_ext",))
+def _run_model_audit(output_ext, audit_dict, file, **kwargs):
     """test run_model audit"""
     msg = "No registered function based on passed paramters and no default function."
     raise NotImplementedError(msg)
 
 
-@run_model_audit.register(output_type="xlsx")
-def _(model, file, **kwargs):
+@_run_model_audit.register(output_ext=".xlsx")
+def _(audit_dict, file, **kwargs):
     """Run model audit"""
-    audit = Audit.create(model)
-    create_xlsx_file(audit, file, **kwargs)
+
+    create_xlsx_audit_file(audit_dict, file, **kwargs)

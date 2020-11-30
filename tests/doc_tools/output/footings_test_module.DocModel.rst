@@ -28,11 +28,9 @@
 
       ~DocModel.asset_1
       ~DocModel.asset_2
-      ~DocModel.assets
       ~DocModel.meta_1
       ~DocModel.meta_2
       ~DocModel.modif_1
       ~DocModel.modif_2
       ~DocModel.param_1
       ~DocModel.param_2
-      ~DocModel.steps

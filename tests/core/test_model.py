@@ -7,6 +7,7 @@ from footings.core.attributes import (
     define_meta,
     define_modifier,
     define_parameter,
+    define_placeholder,
 )
 
 from footings.core.model import Footing, FootingsDoc, model, step, ModelCreationError
@@ -101,6 +102,50 @@ def test_model_documentation():
     doc["Meta"] = [Parameter("meta", None, ["This is meta."])]
     doc["Modifiers"] = [Parameter("modifier", None, ["this is a modifier."])]
     doc["Parameters"] = [Parameter("parameter", None, ["This is a parameter."])]
+
+
+def test_model_attributes():
+    @model(steps=["_step1"])
+    class TestAttributes(Footing):
+        param1 = define_parameter()
+        param2 = define_parameter()
+        modifier1 = define_modifier(default=1)
+        modifier2 = define_modifier(default=2)
+        meta1 = define_meta(meta="meta1", dtype=str)
+        meta2 = define_meta(meta="meta2", dtype=str)
+        placeholder1 = define_placeholder()
+        placeholder2 = define_placeholder()
+        asset1 = define_asset()
+        asset2 = define_asset()
+
+        @step(uses=["param1", "param2"], impacts=["asset1"])
+        def _step1(self):
+            pass
+
+    # instanticate model
+    init_model = TestAttributes(param1=1, param2=2)
+
+    # test params
+    params = {"param1": "parameter.param1", "param2": "parameter.param2"}
+    assert init_model.__footings_parameters__ == tuple(params.keys())
+    modifiers = {"modifier1": "modifier.modifier1", "modifier2": "modifier.modifier2"}
+    assert init_model.__footings_modifiers__ == tuple(modifiers.keys())
+    meta = {"meta1": "meta.meta1", "meta2": "meta.meta2"}
+    assert init_model.__footings_meta__ == tuple(meta.keys())
+    placeholders = {
+        "placeholder1": "placeholder.placeholder1",
+        "placeholder2": "placeholder.placeholder2",
+    }
+    assert init_model.__footings_placeholders__ == tuple(placeholders.keys())
+    assets = {"asset1": "asset.asset1", "asset2": "asset.asset2"}
+    assert init_model.__footings_assets__ == tuple(assets.keys())
+    assert init_model._combine_attributes() == {
+        **params,
+        **modifiers,
+        **meta,
+        **placeholders,
+        **assets,
+    }
 
 
 def test_model_steps():

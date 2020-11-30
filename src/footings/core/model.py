@@ -1,17 +1,15 @@
 from functools import partial
 from inspect import signature
-import os
 import sys
 from traceback import extract_tb, format_list
-from typing import List
-import warnings
+from typing import List, Optional
 
 from attr import attrs, attrib
 from attr._make import _CountingAttr
 from attr.setters import frozen
-from numpydoc.docscrape import Parameter, FunctionDoc
+import numpydoc.docscrape as numpydoc
 
-from .attributes import _Parameter, _Modifier, _Meta, _Placeholder, _Asset
+from .attributes import Parameter, Modifier, Meta, Placeholder, Asset
 from .audit import run_model_audit
 from ..doc_tools.docscrape import FootingsDoc
 from .visualize import visualize_model
@@ -28,11 +26,11 @@ class ModelCreationError(Exception):
 def _run(self, to_step):
 
     if to_step is None:
-        steps = self.steps
+        steps = self.__footings_steps__
     else:
         try:
-            position = self.steps.index(to_step)
-            steps = self.steps[: (position + 1)]
+            position = self.__footings_steps__.index(to_step)
+            steps = self.__footings_steps__[: (position + 1)]
         except ValueError as e:
             msg = f"The step passed to to_step '{to_step}' does not exist as a step."
             raise e(msg)
@@ -53,17 +51,34 @@ def _run(self, to_step):
 
     if to_step is not None:
         return self
-    if len(self.assets) > 1:
-        return tuple(getattr(self, asset) for asset in self.assets)
-    return getattr(self, self.assets[0])
+    if len(self.__footings_assets__) > 1:
+        return tuple(getattr(self, asset) for asset in self.__footings_assets__)
+    return getattr(self, self.__footings_assets__[0])
 
 
 @attrs(slots=True, repr=False)
 class Footing:
     """The parent modeling class providing the key methods of run, audit, and visualize."""
 
-    steps: list = attrib(init=False, repr=False)
-    assets: list = attrib(init=False, repr=False)
+    __footings_steps__: tuple = attrib(init=False, repr=False)
+    __footings_parameters__: tuple = attrib(init=False, repr=False)
+    __footings_modifiers__: tuple = attrib(init=False, repr=False)
+    __footings_meta__: tuple = attrib(init=False, repr=False)
+    __footings_placeholders__: tuple = attrib(init=False, repr=False)
+    __footings_assets__: tuple = attrib(init=False, repr=False)
+
+    def _combine_attributes(self):
+        def _format(x):
+            if x[-1] == "s":
+                return x[:-1]
+            return x
+
+        srcs = ["parameters", "modifiers", "meta", "placeholders", "assets"]
+        return {
+            a: f"{_format(src)}.{a}"
+            for src in srcs
+            for a in getattr(self, f"__footings_{src}__")
+        }
 
     def visualize(self):
         """Visualize the model to get an understanding of what model attributes are used and when."""
@@ -84,8 +99,7 @@ class Footing:
         None
             An audit file in specfified format (e.g., .xlsx).
         """
-        _, file_ext = os.path.splitext(file)
-        return run_model_audit(model=self, output_type=file_ext[1:], file=file, **kwargs)
+        return run_model_audit(model=self, file=file, **kwargs)
 
     def run(self, to_step=None):
         """Runs the model and returns any assets defined.
@@ -99,12 +113,57 @@ class Footing:
         return _run(self, to_step=to_step)
 
 
+@attrs(frozen=True, slots=True)
+class Step:
+    name = attrib(type=str)
+    docstring = attrib(type=str)
+    method = attrib(type=callable)
+    method_name = attrib(type=str)
+    uses = attrib(type=List[str])
+    impacts = attrib(type=List[str])
+    metadata = attrib(type=dict, factory=dict)
+
+    @classmethod
+    def create(
+        cls,
+        method: callable,
+        uses: List[str],
+        impacts: List[str],
+        name: Optional[str] = None,
+        docstring: Optional[str] = None,
+        metadata: Optional[dict] = None,
+    ):
+        method_name = method.__qualname__.split(".")[1]
+        return cls(
+            name=name if name is not None else method_name,
+            docstring=docstring if docstring is not None else method.__doc__,
+            method=method,
+            method_name=method_name,
+            uses=uses,
+            impacts=impacts,
+            metadata={} if metadata is None else metadata,
+        )
+
+    def __doc__(self):
+        return self.docstring
+
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        return partial(self, obj)
+
+    def __call__(self, *args, **kwargs):
+        return self.method(*args, **kwargs)
+
+
 def step(
     method: callable = None,
     *,
     uses: List[str],
     impacts: List[str],
-    wrap: callable = None,
+    name: str = None,
+    docstring: str = None,
+    metadata: dict = None,
 ):
     """Turn a method into a step within the footings framework.
 
@@ -125,27 +184,30 @@ def step(
         The decorated method with a attributes for uses and impacts and updated docstring if wrap passed.
     """
     if method is None:
-        return partial(step, uses=uses, impacts=impacts, wrap=wrap)
+        return partial(
+            step,
+            uses=uses,
+            impacts=impacts,
+            name=name,
+            docstring=docstring,
+            metadata=metadata,
+        )
 
-    def wrapper(*args, **kwargs):
-        return method(*args, **kwargs)
-
-    wrapper.uses = uses
-    wrapper.impacts = impacts
-    if wrap is not None:
-        wrapper.__doc__ = wrap.__doc__
-    else:
-        wrapper.__doc__ = method.__doc__
-    return wrapper
+    return Step.create(
+        method=method,
+        uses=uses,
+        impacts=impacts,
+        name=name,
+        docstring=docstring,
+        metadata=metadata,
+    )
 
 
-_FOOTING_GROUP_MAP = {
-    _Parameter: "Parameters",
-    _Modifier: "Modifiers",
-    _Meta: "Meta",
-    _Placeholder: "Placeholders",
-    _Asset: "Assets",
-}
+def _make_doc_parameter(attribute):
+    str_type = str(attribute.type) if attribute.type is not None else ""
+    return numpydoc.Parameter(
+        attribute.name, str_type, [attribute.metadata.get("description", "")]
+    )
 
 
 def _parse_attriubtes(cls):
@@ -153,28 +215,26 @@ def _parse_attriubtes(cls):
     parsed_attributes = {section: [] for section in sections}
 
     for attribute in cls.__attrs_attrs__:
-        section = _FOOTING_GROUP_MAP.get(attribute.metadata.get("footing_group"), None)
-        if section is not None:
-            if section not in sections:
-                msg = f"The footing_group {section} is not one of the known groups [{str(sections)}]."
-                warnings.warn(msg)
-            else:
-                parsed_attributes[section].append(_make_doc_parameter(attribute))
+        grp = attribute.metadata.get("footing_group", None)
+        if isinstance(grp, Parameter):
+            parsed_attributes["Parameters"].append(_make_doc_parameter(attribute))
+        elif isinstance(grp, Modifier):
+            parsed_attributes["Modifiers"].append(_make_doc_parameter(attribute))
+        elif isinstance(grp, Meta):
+            parsed_attributes["Meta"].append(_make_doc_parameter(attribute))
+        elif isinstance(grp, Placeholder):
+            parsed_attributes["Placeholders"].append(_make_doc_parameter(attribute))
+        elif isinstance(grp, Asset):
+            parsed_attributes["Assets"].append(_make_doc_parameter(attribute))
+
     return parsed_attributes
 
 
-def _make_doc_parameter(attribute):
-    str_type = str(attribute.type) if attribute.type is not None else ""
-    return Parameter(
-        attribute.name, str_type, [attribute.metadata.get("description", "")]
-    )
-
-
 def _update_run_return(cls, assets):
-    run_doc = FunctionDoc(cls.run)
+    run_doc = numpydoc.FunctionDoc(cls.run)
 
     if cls._return.__doc__ is not None:
-        return_doc = FunctionDoc(cls._return)
+        return_doc = numpydoc.FunctionDoc(cls._return)
         run_doc["Returns"] = return_doc["Returns"]
     else:
         run_doc["Returns"] = assets
@@ -183,12 +243,8 @@ def _update_run_return(cls, assets):
 
 
 def _generate_steps_sections(cls, steps):
-    def add_step_summary(step_func):
-        doc = FunctionDoc(step_func)
-        return "\n".join(doc["Summary"])
-
     return [
-        f"{idx}. {step} - {add_step_summary(getattr(cls, step))}"
+        f"{idx}. {step} - {getattr(cls, step).docstring}"
         for idx, step in enumerate(steps, start=1)
     ]
 
@@ -196,7 +252,6 @@ def _generate_steps_sections(cls, steps):
 def _attr_doc(cls, steps):
 
     parsed_attributes = _parse_attriubtes(cls)
-
     doc = FootingsDoc(cls)
 
     doc["Parameters"] = parsed_attributes["Parameters"]
@@ -248,7 +303,7 @@ def model(cls: type = None, *, steps: List[str]):
         attributes = [x for x in dir(cls) if x[0] != "_" and x not in exclude]
         if hasattr(cls, "__attrs_attrs__"):
             attrs_attrs = {x.name: x for x in cls.__attrs_attrs__}
-        assets = []
+        parameters, modifiers, meta, placeholders, assets = [], [], [], [], []
         for attribute in attributes:
             attr = getattr(cls, attribute)
             if attribute in attrs_attrs:
@@ -265,7 +320,15 @@ def model(cls: type = None, *, steps: List[str]):
                 msg += "Use one of define_parameter, define_meta, define_modifier or define_asset "
                 msg += "when building a model."
                 raise ModelCreationError(msg)
-            if footing_group is _Asset:
+            if isinstance(footing_group, Parameter):
+                parameters.append(attribute)
+            elif isinstance(footing_group, Modifier):
+                modifiers.append(attribute)
+            elif isinstance(footing_group, Meta):
+                meta.append(attribute)
+            elif isinstance(footing_group, Placeholder):
+                placeholders.append(attribute)
+            elif isinstance(footing_group, Asset):
                 assets.append(attribute)
 
         # 3. Make sure at least one asset
@@ -298,8 +361,13 @@ def model(cls: type = None, *, steps: List[str]):
             )
 
         # If all test pass, update steps and assets with known values as defaults.
-        cls.steps = attrib(default=steps, init=False, repr=False)
-        cls.assets = attrib(default=assets, init=False, repr=False)
+        kws = {"init": False, "repr": False}
+        cls.__footings_steps__ = attrib(default=tuple(steps), **kws)
+        cls.__footings_parameters__ = attrib(default=tuple(parameters), **kws)
+        cls.__footings_modifiers__ = attrib(default=tuple(modifiers), **kws)
+        cls.__footings_meta__ = attrib(default=tuple(meta), **kws)
+        cls.__footings_placeholders__ = attrib(default=tuple(placeholders), **kws)
+        cls.__footings_assets__ = attrib(default=tuple(assets), **kws)
 
         # Make attrs dataclass and update signature
         cls = attrs(

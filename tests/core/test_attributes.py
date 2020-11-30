@@ -10,11 +10,11 @@ from footings.core.attributes import (
     define_meta,
     define_modifier,
     define_parameter,
-    _Asset,
-    _Placeholder,
-    _Meta,
-    _Modifier,
-    _Parameter,
+    Asset,
+    Placeholder,
+    Meta,
+    Modifier,
+    Parameter,
 )
 
 
@@ -34,11 +34,11 @@ def test_attributes():
 
     # test fields
     attributes = {x.name: x for x in Test.__attrs_attrs__}
-    attributes["asset"].metadata["footing_group"] is _Asset
-    attributes["placeholder"].metadata["footing_group"] is _Placeholder
-    attributes["meta"].metadata["footing_group"] is _Meta
-    attributes["modifier"].metadata["footing_group"] is _Modifier
-    attributes["parameter"].metadata["footing_group"] is _Parameter
+    attributes["asset"].metadata["footing_group"] is Asset
+    attributes["placeholder"].metadata["footing_group"] is Placeholder
+    attributes["meta"].metadata["footing_group"] is Meta
+    attributes["modifier"].metadata["footing_group"] is Modifier
+    attributes["parameter"].metadata["footing_group"] is Parameter
 
     # test values
     assert test.parameter == "parameter"

@@ -1,15 +1,27 @@
 import os
+from inspect import signature
+
+from attr import asdict
 
 from footings.core.model import Footing, model, step
 from footings.core.attributes import (
     define_asset,
     define_parameter,
 )
+from footings.core.audit import (
+    AuditContainer,
+    # AuditStepContainer,
+    AuditConfig,
+    AuditStepConfig,
+)
+
 from footings.test_tools import assert_footings_audit_xlsx_equal
 
 
 @model(steps=["_step_1", "_step_2", "_step_3"])
 class IntegerModel(Footing):
+    """Integer model for testing."""
+
     a = define_parameter(dtype=int, description="A number A")
     b = define_parameter(dtype=int, description="A number B")
     c = define_parameter(dtype=int, description="A number C")
@@ -33,31 +45,88 @@ class IntegerModel(Footing):
         """Add total of steps 1 and 2."""
         self.ret_3 = self.ret_1 + self.ret_2
 
-    def _return(self):
-        """Return override
 
-        Returns
-        -------
-        ret_3
-        """
-        return self.ret_3
+def test_audit():
+    int_model = IntegerModel(a=1, b=1, c=2, d=2)
+
+    # test default config
+    test_default = AuditContainer.create(int_model)
+    expected_step_1 = {
+        "name": "_step_1",
+        "method_name": "_step_1",
+        "docstring": "Add a and b together.",
+        "uses": ["a", "b"],
+        "impacts": ["ret_1"],
+        "output": {"ret_1": 2},
+        "metadata": {},
+    }
+    expected_step_2 = {
+        "name": "_step_2",
+        "method_name": "_step_2",
+        "docstring": "Subtract d from c",
+        "uses": ["c", "d"],
+        "impacts": ["ret_2"],
+        "output": {"ret_2": 0},
+        "metadata": {},
+    }
+    expected_step_3 = {
+        "name": "_step_3",
+        "method_name": "_step_3",
+        "docstring": "Add total of steps 1 and 2.",
+        "uses": ["ret_1", "ret_2"],
+        "impacts": ["ret_3"],
+        "output": {"ret_3": 2},
+        "metadata": {},
+    }
+
+    expected_default = {
+        "name": "IntegerModel",
+        "docstring": IntegerModel.__doc__,
+        "signature": f"IntegerModel{str(signature(int_model.__class__))}",
+        "instantiation": {
+            "parameter.a": 1,
+            "parameter.b": 1,
+            "parameter.c": 2,
+            "parameter.d": 2,
+        },
+        "steps": [expected_step_1, expected_step_2, expected_step_3],
+        "output": {"ret_1": 2, "ret_2": 0, "ret_3": 2},
+        "config": asdict(AuditConfig()),
+    }
+    assert test_default.as_audit() == expected_default
+
+    # test exclude all step detail
+    step_config = AuditStepConfig(
+        show_method_name=False,
+        show_docstring=False,
+        show_uses=False,
+        show_impacts=False,
+        show_output=False,
+        show_metadata=False,
+    )
+    test_no_step_detail = AuditContainer.create(
+        int_model, config=AuditConfig(step_config=step_config)
+    )
+    expected_no_step_detail = {
+        "name": "IntegerModel",
+        "docstring": IntegerModel.__doc__,
+        "signature": f"IntegerModel{str(signature(int_model.__class__))}",
+        "instantiation": {
+            "parameter.a": 1,
+            "parameter.b": 1,
+            "parameter.c": 2,
+            "parameter.d": 2,
+        },
+        "steps": [{"name": "_step_1"}, {"name": "_step_2"}, {"name": "_step_3"}],
+        "output": {"ret_1": 2, "ret_2": 0, "ret_3": 2},
+        "config": asdict(AuditConfig(step_config=step_config)),
+    }
+    assert test_no_step_detail.as_audit() == expected_no_step_detail
 
 
 def test_audit_xlsx(tmp_path):
-
     test_integer_out = os.path.join(tmp_path, "test-integers.xlsx")
     expected_integer_out = os.path.join("tests", "core", "data", "expected-integers.xlsx")
     loaded_integer_model = IntegerModel(a=1, b=1, c=2, d=2)
     loaded_integer_model.audit(file=test_integer_out)
-
     assert_footings_audit_xlsx_equal(test_integer_out, expected_integer_out)
-
-    # test_pandas_out = os.path.join(tmp_path, "test-pandas.xlsx")
-    # expected_pandas_out = os.path.join("tests", "core", "data", "expected-pandas.xlsx")
-    # pandas_model = build_model("PandasModel", steps=STEPS_USING_PANDAS)
-    # loaded_pandas_model = pandas_model(n=5, add=1, subtract=1)
-    # loaded_pandas_model.audit(file=test_pandas_out)
-
-
-#
-# assert_footings_audit_xlsx_equal(test_pandas_out, expected_pandas_out)
