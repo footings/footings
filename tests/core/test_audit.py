@@ -55,27 +55,27 @@ def test_audit():
         "name": "_step_1",
         "method_name": "_step_1",
         "docstring": "Add a and b together.",
-        "uses": ["a", "b"],
-        "impacts": ["ret_1"],
-        "output": {"ret_1": 2},
+        "uses": ["parameter.a", "parameter.b"],
+        "impacts": ["asset.ret_1"],
+        "output": {"asset.ret_1": 2},
         "metadata": {},
     }
     expected_step_2 = {
         "name": "_step_2",
         "method_name": "_step_2",
         "docstring": "Subtract d from c",
-        "uses": ["c", "d"],
-        "impacts": ["ret_2"],
-        "output": {"ret_2": 0},
+        "uses": ["parameter.c", "parameter.d"],
+        "impacts": ["asset.ret_2"],
+        "output": {"asset.ret_2": 0},
         "metadata": {},
     }
     expected_step_3 = {
         "name": "_step_3",
         "method_name": "_step_3",
         "docstring": "Add total of steps 1 and 2.",
-        "uses": ["ret_1", "ret_2"],
-        "impacts": ["ret_3"],
-        "output": {"ret_3": 2},
+        "uses": ["asset.ret_1", "asset.ret_2"],
+        "impacts": ["asset.ret_3"],
+        "output": {"asset.ret_3": 2},
         "metadata": {},
     }
 

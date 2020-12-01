@@ -139,7 +139,7 @@ def test_model_attributes():
     assert init_model.__footings_placeholders__ == tuple(placeholders.keys())
     assets = {"asset1": "asset.asset1", "asset2": "asset.asset2"}
     assert init_model.__footings_assets__ == tuple(assets.keys())
-    assert init_model._combine_attributes() == {
+    assert init_model.__footings_attribute_map__ == {
         **params,
         **modifiers,
         **meta,

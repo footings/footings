@@ -39,7 +39,9 @@ def _get_model_output(model):
         results = deepcopy(model)
         if hasattr(model, step + "_audit"):
             getattr(results, step + "_audit")()
-        step_output = {item: getattr(results, item) for item in step_obj.impacts}
+        step_output = {
+            item: getattr(results, item.split(".")[1]) for item in step_obj.impacts
+        }
         steps.append(step_output)
 
     final_output = {asset: getattr(model, asset) for asset in model.__footings_assets__}
@@ -106,7 +108,7 @@ class AuditContainer:
             kwargs.update({"signature": f"{name}{str(model.__signature__)}"})
 
         kws = getfullargspec(model.__class__).kwonlyargs
-        attributes = model._combine_attributes()
+        attributes = model.__footings_attribute_map__
         instantiation = {attributes[kw]: deepcopy(getattr(model, kw)) for kw in kws}
         kwargs.update({"instantiation": instantiation})
 

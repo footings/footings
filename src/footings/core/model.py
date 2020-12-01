@@ -4,7 +4,7 @@ import sys
 from traceback import extract_tb, format_list
 from typing import List, Optional
 
-from attr import attrs, attrib
+from attr import attrs, attrib, evolve
 from attr._make import _CountingAttr
 from attr.setters import frozen
 import numpydoc.docscrape as numpydoc
@@ -66,19 +66,7 @@ class Footing:
     __footings_meta__: tuple = attrib(init=False, repr=False)
     __footings_placeholders__: tuple = attrib(init=False, repr=False)
     __footings_assets__: tuple = attrib(init=False, repr=False)
-
-    def _combine_attributes(self):
-        def _format(x):
-            if x[-1] == "s":
-                return x[:-1]
-            return x
-
-        srcs = ["parameters", "modifiers", "meta", "placeholders", "assets"]
-        return {
-            a: f"{_format(src)}.{a}"
-            for src in srcs
-            for a in getattr(self, f"__footings_{src}__")
-        }
+    __footings_attribute_map__: dict = attrib(init=False, repr=False)
 
     def visualize(self):
         """Visualize the model to get an understanding of what model attributes are used and when."""
@@ -368,6 +356,23 @@ def model(cls: type = None, *, steps: List[str]):
         cls.__footings_meta__ = attrib(default=tuple(meta), **kws)
         cls.__footings_placeholders__ = attrib(default=tuple(placeholders), **kws)
         cls.__footings_assets__ = attrib(default=tuple(assets), **kws)
+
+        attribute_map = {
+            **{p: f"parameter.{p}" for p in parameters},
+            **{m: f"modifier.{m}" for m in modifiers},
+            **{m: f"meta.{m}" for m in meta},
+            **{p: f"placeholder.{p}" for p in placeholders},
+            **{a: f"asset.{a}" for a in assets},
+        }
+        for step in steps:
+            use_old = getattr(cls, step).uses
+            use_new = [attribute_map[x] for x in use_old]
+            impact_old = getattr(cls, step).impacts
+            impact_new = [attribute_map[x] for x in impact_old]
+            setattr(
+                cls, step, evolve(getattr(cls, step), uses=use_new, impacts=impact_new)
+            )
+        cls.__footings_attribute_map__ = attrib(default=attribute_map, **kws)
 
         # Make attrs dataclass and update signature
         cls = attrs(
