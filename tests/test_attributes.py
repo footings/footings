@@ -4,7 +4,7 @@ from attr import attrs
 from attr.setters import frozen, FrozenAttributeError
 import pytest
 
-from footings.core.attributes import (
+from footings.attributes import (
     define_asset,
     define_placeholder,
     define_meta,

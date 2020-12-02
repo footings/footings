@@ -5,7 +5,7 @@ import json
 from attr import attrs, attrib
 import pandas as pd
 
-from footings.core.to_json import create_audit_json_file
+from footings.to_json import create_audit_json_file
 
 
 def test_footings_json(tmp_path):
@@ -83,9 +83,7 @@ def test_footings_json(tmp_path):
     with open(test_dict_file, "r") as file:
         test_json = json.load(file)
 
-    expected_json_file = os.path.join(
-        "tests", "core", "data", "expected-footings-json.json"
-    )
+    expected_json_file = os.path.join("tests", "data", "expected-footings-json.json")
     with open(expected_json_file, "r") as file:
         expected_json = json.load(file)
 

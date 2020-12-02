@@ -2,7 +2,7 @@ from attr import attrib
 from numpydoc.docscrape import Parameter
 import pytest
 
-from footings.core.attributes import (
+from footings.attributes import (
     define_asset,
     define_meta,
     define_modifier,
@@ -10,7 +10,7 @@ from footings.core.attributes import (
     define_placeholder,
 )
 
-from footings.core.model import Footing, FootingsDoc, model, step, ModelCreationError
+from footings.model import Footing, FootingsDoc, model, step, ModelCreationError
 
 
 def test_model_instantiation():

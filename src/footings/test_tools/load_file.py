@@ -4,8 +4,8 @@ import pathlib
 import pandas as pd
 from openpyxl import load_workbook
 
-from ..core.to_xlsx import FootingsXlsxEntry
-from ..core.utils import dispatch_function
+from ..to_xlsx import FootingsXlsxEntry
+from ..utils import dispatch_function
 
 
 class FootingsAuditLoadError(Exception):

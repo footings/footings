@@ -5,7 +5,7 @@ from attr._make import _CountingAttr
 from attr.validators import instance_of, in_
 from attr.setters import NO_OP
 
-from footings.core.validators import (
+from footings.validators import (
     custom_validator,
     min_len_validator,
     max_len_validator,

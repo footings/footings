@@ -1,7 +1,7 @@
 from attr import attrs, attrib
 import pytest
 
-from footings.core.validators import (
+from footings.validators import (
     custom_validator,
     min_len_validator,
     max_len_validator,

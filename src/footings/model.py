@@ -11,7 +11,7 @@ import numpydoc.docscrape as numpydoc
 
 from .attributes import Parameter, Modifier, Meta, Placeholder, Asset
 from .audit import run_model_audit
-from ..doc_tools.docscrape import FootingsDoc
+from .doc_tools.docscrape import FootingsDoc
 from .visualize import visualize_model
 
 

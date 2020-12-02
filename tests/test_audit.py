@@ -3,12 +3,12 @@ from inspect import signature
 
 from attr import asdict
 
-from footings.core.model import Footing, model, step
-from footings.core.attributes import (
+from footings.model import Footing, model, step
+from footings.attributes import (
     define_asset,
     define_parameter,
 )
-from footings.core.audit import (
+from footings.audit import (
     AuditContainer,
     # AuditStepContainer,
     AuditConfig,
@@ -126,7 +126,7 @@ def test_audit():
 
 def test_audit_xlsx(tmp_path):
     test_integer_out = os.path.join(tmp_path, "test-integers.xlsx")
-    expected_integer_out = os.path.join("tests", "core", "data", "expected-integers.xlsx")
+    expected_integer_out = os.path.join("tests", "data", "expected-integers.xlsx")
     loaded_integer_model = IntegerModel(a=1, b=1, c=2, d=2)
     loaded_integer_model.audit(file=test_integer_out)
     assert_footings_files_equal(test_integer_out, expected_integer_out)
@@ -134,7 +134,7 @@ def test_audit_xlsx(tmp_path):
 
 def test_audit_json(tmp_path):
     test_integer_out = os.path.join(tmp_path, "test-integers.json")
-    expected_integer_out = os.path.join("tests", "core", "data", "expected-integers.json")
+    expected_integer_out = os.path.join("tests", "data", "expected-integers.json")
     loaded_integer_model = IntegerModel(a=1, b=1, c=2, d=2)
     loaded_integer_model.audit(file=test_integer_out)
     assert_footings_files_equal(test_integer_out, expected_integer_out)
