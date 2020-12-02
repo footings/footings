@@ -353,7 +353,7 @@ XLSX_FORMATS = {
 }
 
 
-def create_xlsx_audit_file(audit_dict, file):
+def create_audit_xlsx_file(audit_dict, file, **kwargs):
     """Create xlsx file."""
     wb = FootingsXlsxWb.create()
     for format_nm, format_val in XLSX_FORMATS.items():

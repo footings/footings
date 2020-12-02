@@ -1,0 +1,135 @@
+{
+  "test-builtins": {
+    "test-bool": true,
+    "test-str": "string",
+    "test-int": 1,
+    "test-float": 1.23456789,
+    "test-date": "2018-12-31",
+    "test-datetime": "2018-12-31 12:00:00"
+  },
+  "test-series": {
+    "test-numbers": [
+      {
+        "numbers": [
+          1,
+          2,
+          3
+        ]
+      }
+    ],
+    "test-letters": [
+      {
+        "letters": [
+          "a",
+          "b",
+          "c"
+        ]
+      }
+    ]
+  },
+  "test-dataframe": {
+    "test-dataframe": [
+      {
+        "numbers": [
+          1,
+          2
+        ]
+      },
+      {
+        "letters": [
+          "a",
+          "b"
+        ]
+      }
+    ]
+  },
+  "test-mapping": {
+    "test-mapping1": {
+      "key": "value"
+    },
+    "test-mapping2": {
+      "key": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "test-mapping3": {
+      "key": [
+        {
+          "numbers": [
+            1,
+            2
+          ]
+        },
+        {
+          "letters": [
+            "a",
+            "b"
+          ]
+        }
+      ]
+    }
+  },
+  "test-iterable": {
+    "test-iterable1": [
+      1,
+      2,
+      3
+    ],
+    "test-iterable2": [
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        1,
+        2,
+        3
+      ]
+    ],
+    "test-iterable3": [
+      [
+        {
+          "numbers": [
+            1,
+            2
+          ]
+        },
+        {
+          "letters": [
+            "a",
+            "b"
+          ]
+        }
+      ],
+      [
+        {
+          "numbers": [
+            1,
+            2
+          ]
+        },
+        {
+          "letters": [
+            "a",
+            "b"
+          ]
+        }
+      ]
+    ]
+  },
+  "test-custom": {
+    "test-custom1": {
+      "a": 1,
+      "b": 2
+    },
+    "test-custom2": {
+      "a": 2,
+      "b": 4
+    }
+  },
+  "test-function": "callable: test_to_json.test_footings_json.<locals>.test_func"
+}

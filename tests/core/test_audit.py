@@ -15,7 +15,7 @@ from footings.core.audit import (
     AuditStepConfig,
 )
 
-from footings.test_tools import assert_footings_audit_xlsx_equal
+from footings.test_tools import assert_footings_files_equal
 
 
 @model(steps=["_step_1", "_step_2", "_step_3"])
@@ -129,4 +129,12 @@ def test_audit_xlsx(tmp_path):
     expected_integer_out = os.path.join("tests", "core", "data", "expected-integers.xlsx")
     loaded_integer_model = IntegerModel(a=1, b=1, c=2, d=2)
     loaded_integer_model.audit(file=test_integer_out)
-    assert_footings_audit_xlsx_equal(test_integer_out, expected_integer_out)
+    assert_footings_files_equal(test_integer_out, expected_integer_out)
+
+
+def test_audit_json(tmp_path):
+    test_integer_out = os.path.join(tmp_path, "test-integers.json")
+    expected_integer_out = os.path.join("tests", "core", "data", "expected-integers.json")
+    loaded_integer_model = IntegerModel(a=1, b=1, c=2, d=2)
+    loaded_integer_model.audit(file=test_integer_out)
+    assert_footings_files_equal(test_integer_out, expected_integer_out)

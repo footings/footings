@@ -4,8 +4,8 @@ import datetime
 from attr import attrs, attrib
 import pandas as pd
 
-from footings.core.xlsx import FootingsXlsxWb
-from footings.test_tools import assert_footings_audit_xlsx_equal
+from footings.core.to_xlsx import FootingsXlsxWb
+from footings.test_tools import assert_footings_files_equal
 
 
 def test_footings_xlsx_wb(tmp_path):
@@ -85,4 +85,4 @@ def test_footings_xlsx_wb(tmp_path):
 
     expected_wb = os.path.join("tests", "core", "data", "expected-footings-wb.xlsx")
 
-    assert_footings_audit_xlsx_equal(test_wb, expected_wb)
+    assert_footings_files_equal(test_wb, expected_wb)

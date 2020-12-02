@@ -6,7 +6,8 @@ from attr import attrs, attrib, asdict
 from attr.validators import instance_of, optional
 
 from .utils import dispatch_function
-from .xlsx import create_xlsx_audit_file
+from .to_xlsx import create_audit_xlsx_file
+from .to_json import create_audit_json_file
 
 
 @attrs(slots=True, frozen=True)
@@ -127,8 +128,21 @@ class AuditContainer:
 
         return cls(**kwargs)
 
-    def as_audit(self):
-        return {k: v for k, v in asdict(self).items() if v is not None}
+    def as_audit(self, include_config=True):
+        d = {"name": self.name}
+        if self.signature is not None:
+            d.update({"signature": self.signature})
+        if self.docstring is not None:
+            d.update({"docstring": self.docstring})
+        if self.instantiation is not None:
+            d.update({"instantiation": self.instantiation})
+        if self.steps is not None:
+            d.update({"steps": self.steps})
+        if self.output is not None:
+            d.update({"output": self.output})
+        if include_config is True:
+            d.update({"config": asdict(self.config)})
+        return d
 
 
 #########################################################################################
@@ -137,21 +151,28 @@ class AuditContainer:
 
 
 def run_model_audit(model, file, **kwargs):
-    output_ext = pathlib.Path(file).suffix
+    file_ext = pathlib.Path(file).suffix
     config = kwargs.pop("config", None)
     audit_dict = AuditContainer.create(model, config=config).as_audit()
-    _run_model_audit(output_ext=output_ext, audit_dict=audit_dict, file=file, **kwargs)
+    _run_model_audit(file_ext=file_ext, audit_dict=audit_dict, file=file, **kwargs)
 
 
-@dispatch_function(key_parameters=("output_ext",))
-def _run_model_audit(output_ext, audit_dict, file, **kwargs):
+@dispatch_function(key_parameters=("file_ext",))
+def _run_model_audit(file_ext, audit_dict, file, **kwargs):
     """test run_model audit"""
     msg = "No registered function based on passed paramters and no default function."
     raise NotImplementedError(msg)
 
 
-@_run_model_audit.register(output_ext=".xlsx")
+@_run_model_audit.register(file_ext=".xlsx")
 def _(audit_dict, file, **kwargs):
     """Run model audit"""
 
-    create_xlsx_audit_file(audit_dict, file, **kwargs)
+    create_audit_xlsx_file(audit_dict, file, **kwargs)
+
+
+@_run_model_audit.register(file_ext=".json")
+def _(audit_dict, file, **kwargs):
+    """Run model audit"""
+
+    create_audit_json_file(audit_dict, file, **kwargs)

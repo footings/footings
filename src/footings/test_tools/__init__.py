@@ -1,1 +1,2 @@
-from .testing import assert_footings_audit_xlsx_equal, load_footings_audit_xlsx
+from .compare_files import assert_footings_files_equal
+from .load_file import load_footings_file
