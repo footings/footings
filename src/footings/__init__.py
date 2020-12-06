@@ -1,8 +1,3 @@
-"""The provided objects under ``footings.core`` are the core objects used to build models using the Footings framework.
-
-They are exposed under ``footings``. Thus, when loading these objects it is not necessary to include ``.core``.
-"""
-
 from footings.attributes import (
     define_asset,
     define_meta,
