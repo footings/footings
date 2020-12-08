@@ -1,7 +1,7 @@
 {
   "name": "IntegerModel",
-  "signature": "IntegerModel(*, a: 'int', b: 'int', c: 'int', d: 'int') -> 'IntegerModel'",
-  "docstring": "\nInteger model for testing.\n\nParameters\n----------\na : int\n    A number A\nb : int\n    A number B\nc : int\n    A number C\nd : int\n    A number D\n\nAssets\n------\nret_1 : int\n    Results a + b\nret_2 : int\n    Results c - d\nret_3 : int\n    Result total of step_1 and step_2\n\nSteps\n-----\n1. _step_1 - Add a and b together.\n2. _step_2 - Subtract d from c\n3. _step_3 - Add total of steps 1 and 2.\n",
+  "signature": "IntegerModel(*, a: int, b: int, c: int, d: int) -> 'IntegerModel'",
+  "docstring": "\nInteger model for testing.\n\nParameters\n----------\na : int\n    A number A\nb : int\n    A number B\nc : int\n    A number C\nd : int\n    A number D\n\nIntermediates\n-------------\nret_1 : int\n    Results a + b\nret_2 : int\n    Results c - d\n\nReturns\n-------\nret_3 : int\n    Result total of step_1 and step_2\n\nSteps\n-----\n1) _step_1 - Add a and b together.\n2) _step_2 - Subtract d from c\n3) _step_3 - Add total of steps 1 and 2.\n",
   "instantiation": {
     "parameter.a": 1,
     "parameter.b": 1,
@@ -18,10 +18,10 @@
         "parameter.b"
       ],
       "impacts": [
-        "asset.ret_1"
+        "intermediate.ret_1"
       ],
       "output": {
-        "asset.ret_1": 2
+        "intermediate.ret_1": 2
       },
       "metadata": {}
     },
@@ -34,10 +34,10 @@
         "parameter.d"
       ],
       "impacts": [
-        "asset.ret_2"
+        "intermediate.ret_2"
       ],
       "output": {
-        "asset.ret_2": 0
+        "intermediate.ret_2": 0
       },
       "metadata": {}
     },
@@ -46,21 +46,19 @@
       "method_name": "_step_3",
       "docstring": "Add total of steps 1 and 2.",
       "uses": [
-        "asset.ret_1",
-        "asset.ret_2"
+        "intermediate.ret_1",
+        "intermediate.ret_2"
       ],
       "impacts": [
-        "asset.ret_3"
+        "return.ret_3"
       ],
       "output": {
-        "asset.ret_3": 2
+        "return.ret_3": 2
       },
       "metadata": {}
     }
   ],
   "output": {
-    "ret_1": 2,
-    "ret_2": 0,
     "ret_3": 2
   },
   "config": {

@@ -1,9 +1,9 @@
 from footings.attributes import (
-    define_asset,
+    define_return,
     define_meta,
-    define_modifier,
+    define_sensitivity,
     define_parameter,
-    define_placeholder,
+    define_intermediate,
 )
 from footings.utils import dispatch_function
 from footings.model import Footing, model, step

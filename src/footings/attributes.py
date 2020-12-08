@@ -18,7 +18,7 @@ class Parameter:
     pass
 
 
-class Modifier:
+class Sensitivity:
     pass
 
 
@@ -26,11 +26,11 @@ class Meta:
     pass
 
 
-class Placeholder:
+class Intermediate:
     pass
 
 
-class Asset:
+class Return:
     pass
 
 
@@ -62,7 +62,7 @@ def _define(
 
     return attrib(
         init=init,
-        type=dtype.__qualname__ if hasattr(dtype, "__qualname__") else dtype,
+        type=dtype,
         repr=False,
         validator=validators,
         metadata=metadata,
@@ -71,7 +71,7 @@ def _define(
     )
 
 
-def define_asset(
+def define_return(
     *, dtype=None, description=None, default=None, **kwargs
 ) -> _CountingAttr:
     """Define an asset to the model where an asset is a non-frozen attribute that is
@@ -94,7 +94,7 @@ def define_asset(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=Asset(),
+        footing_group=Return(),
         init=False,
         dtype=dtype,
         description=description,
@@ -104,7 +104,7 @@ def define_asset(
     )
 
 
-def define_placeholder(
+def define_intermediate(
     *, dtype=None, description=None, default=None, **kwargs
 ) -> _CountingAttr:
     """Define a placeholder to the model where a placeholder is a non-frozen attribute that is
@@ -127,7 +127,7 @@ def define_placeholder(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=Placeholder(),
+        footing_group=Intermediate(),
         init=False,
         dtype=dtype,
         description=description,
@@ -171,7 +171,7 @@ def define_meta(
     )
 
 
-def define_modifier(
+def define_sensitivity(
     *, default: Any, dtype=None, description=None, **kwargs
 ) -> _CountingAttr:
     """Define a modifer to the model where a modifier is a frozen attribute with a required default value.
@@ -195,7 +195,7 @@ def define_modifier(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=Modifier(),
+        footing_group=Sensitivity(),
         init=True,
         dtype=dtype,
         description=description,

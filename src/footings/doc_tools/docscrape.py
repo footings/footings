@@ -7,14 +7,13 @@ class FootingsDoc(ClassDoc):
         "Summary": [""],
         "Extended Summary": [],
         "Parameters": [],
-        "Modifiers": [],
+        "Sensitivities": [],
         "Meta": [],
-        "Placeholders": [],
-        "Assets": [],
-        "Steps": [],
+        "Intermediates": [],
         "Returns": [],
         "Yields": [],
         "Receives": [],
+        "Steps": [],
         "Raises": [],
         "Warns": [],
         "Other Parameters": [],
@@ -57,10 +56,10 @@ class FootingsDoc(ClassDoc):
 
             if section in (
                 "Parameters",
-                "Modifiers",
+                "Sensitivities",
                 "Meta",
-                "Placeholders",
-                "Assets",
+                "Intermediates",
+                "Returns",
                 "Other Parameters",
                 "Attributes",
                 "Methods",
@@ -68,7 +67,7 @@ class FootingsDoc(ClassDoc):
                 self[section] = self._parse_param_list(content)
             elif section == "Steps":
                 self[section] = self._parse_steps(content)
-            elif section in ("Returns", "Yields", "Raises", "Warns", "Receives"):
+            elif section in ("Raises", "Warns", "Receives"):
                 self[section] = self._parse_param_list(
                     content, single_element_is_type=True
                 )
@@ -102,18 +101,17 @@ class FootingsDoc(ClassDoc):
         out += self._str_extended_summary()
         for param_list in (
             "Parameters",
-            "Modifiers",
+            "Sensitivities",
             "Meta",
-            "Placeholders",
-            "Assets",
-        ):
-            out += self._str_param_list(param_list)
-        out += self._str_steps("Steps")
-        for param_list in (
+            "Intermediates",
             "Returns",
             "Yields",
             "Receives",
             "Other Parameters",
+        ):
+            out += self._str_param_list(param_list)
+        out += self._str_steps("Steps")
+        for param_list in (
             "Raises",
             "Warns",
         ):

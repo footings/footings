@@ -5,15 +5,15 @@ from attr.setters import frozen, FrozenAttributeError
 import pytest
 
 from footings.attributes import (
-    define_asset,
-    define_placeholder,
+    define_return,
+    define_intermediate,
     define_meta,
-    define_modifier,
+    define_sensitivity,
     define_parameter,
-    Asset,
-    Placeholder,
+    Return,
+    Intermediate,
     Meta,
-    Modifier,
+    Sensitivity,
     Parameter,
 )
 
@@ -21,10 +21,10 @@ from footings.attributes import (
 def test_attributes():
     @attrs(kw_only=True, on_setattr=frozen)
     class Test:
-        asset = define_asset()
-        placeholder = define_placeholder()
+        asset = define_return()
+        placeholder = define_intermediate()
         meta = define_meta(meta="meta")
-        modifier = define_modifier(default=1)
+        modifier = define_sensitivity(default=1)
         parameter = define_parameter()
 
     test = Test(parameter="parameter")
@@ -34,10 +34,10 @@ def test_attributes():
 
     # test fields
     attributes = {x.name: x for x in Test.__attrs_attrs__}
-    attributes["asset"].metadata["footing_group"] is Asset
-    attributes["placeholder"].metadata["footing_group"] is Placeholder
+    attributes["asset"].metadata["footing_group"] is Return
+    attributes["placeholder"].metadata["footing_group"] is Intermediate
     attributes["meta"].metadata["footing_group"] is Meta
-    attributes["modifier"].metadata["footing_group"] is Modifier
+    attributes["modifier"].metadata["footing_group"] is Sensitivity
     attributes["parameter"].metadata["footing_group"] is Parameter
 
     # test values

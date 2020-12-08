@@ -1,6 +1,6 @@
 from dask import delayed, compute
 
-from footings import model, step, Footing, define_parameter, define_asset
+from footings import model, step, Footing, define_parameter, define_return
 from footings.model_tools import make_foreach_model
 
 
@@ -8,7 +8,7 @@ from footings.model_tools import make_foreach_model
 class Model(Footing):
     x = define_parameter(dtype=int)
     y = define_parameter(dtype=int)
-    total = define_asset(dtype=int)
+    total = define_return(dtype=int)
 
     @step(uses=["x", "y"], impacts=["total"])
     def _add(self):

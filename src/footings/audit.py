@@ -45,7 +45,7 @@ def _get_model_output(model):
         }
         steps.append(step_output)
 
-    final_output = {asset: getattr(model, asset) for asset in model.__footings_assets__}
+    final_output = {asset: getattr(model, asset) for asset in model.__footings_returns__}
 
     return steps, final_output
 

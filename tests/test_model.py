@@ -3,11 +3,11 @@ from numpydoc.docscrape import Parameter
 import pytest
 
 from footings.attributes import (
-    define_asset,
+    define_return,
     define_meta,
-    define_modifier,
+    define_sensitivity,
     define_parameter,
-    define_placeholder,
+    define_intermediate,
 )
 
 from footings.model import Footing, FootingsDoc, model, step, ModelCreationError
@@ -21,87 +21,89 @@ def test_model_instantiation():
         @model(steps=["_add"])  # noqa: F841
         class MissingFooting:
             parameter = define_parameter(dtype=int)
-            asset = define_asset(default=0)
+            ret = define_return(default=0)
 
-            @step(uses=["parameter"], impacts=["assets"])
+            @step(uses=["parameter"], impacts=["ret"])
             def _add(self):
-                self.asset = self.asset + self.parameter
+                self.ret = self.ret + self.parameter
 
-        # fails due to using a value vs using one of define_[assets, meta, modifier, parameter]
+        # fails due to using a value vs using one of define_[return, meta, sensitivity, parameter]
         @model(steps=["_add"])
         class FailUsingValue(Footing):
             parameter = define_parameter(dtype=int)
-            asset = 0
+            ret = 0
 
-            @step(uses=["parameter"], impacts=["assets"])
+            @step(uses=["parameter"], impacts=["ret"])
             def _add(self):
-                self.asset = self.asset + self.parameter
+                self.ret = self.ret + self.parameter
 
-        # fails due to using attrib() vs using one of define_[assets, meta, modifier, parameter]
+        # fails due to using attrib() vs using one of define_[return, meta, sensitivity, parameter]
         @model(steps=["_add"])
         class FailUsingAttrib(Footing):
             parameter = define_parameter(dtype=int)
-            asset = attrib(default=0)
+            ret = attrib(default=0)
 
-            @step(uses=["parameter"], impacts=["assets"])
+            @step(uses=["parameter"], impacts=["ret"])
             def _add(self):
-                self.asset = self.asset + self.parameter
+                self.ret = self.ret + self.parameter
 
-        # fail due to missing at least one attribute defined using define_asset()
+        # fail due to missing at least one attribute defined using define_return()
         @model(steps=["_add"])
-        class FailMissingAsset:
+        class FailMissingReturn:
             parameter = define_parameter(dtype=int)
-            asset = define_parameter(default=0)
+            ret = define_parameter(default=0)
 
-            @step(uses=["parameter"], impacts=["assets"])
+            @step(uses=["parameter"], impacts=["ret"])
             def _add(self):
-                self.asset = self.asset + self.parameter
+                self.ret = self.ret + self.parameter
 
         # fail due to missing step as method
         @model(steps=[])
         class FailZeroSteps(Footing):
             x = define_parameter()
-            y = define_asset()
+            y = define_return()
 
         # fail due to missing step as method
         @model(steps=["_add"])
         class FailMissingStep(Footing):
             parameter = define_parameter(dtype=int)
-            asset = define_asset(default=0)
+            ret = define_return(default=0)
 
         # fail due to step not decorated
         @model(steps=["_add"])  # noqa: F841
         class FailStepNotDecorated(Footing):
             parameter = define_parameter(dtype=int)
-            asset = define_asset(default=0)
+            ret = define_return(default=0)
 
             def _add(self):
-                self.asset = self.asset + self.parameter
+                self.ret = self.ret + self.parameter
 
 
 def test_model_documentation():
     @model(steps=["_add", "_subtract"])
     class Test(Footing):
-        asset = define_asset(dtype="int", description="This is an asset.")
+        parameter = define_parameter(description="This is a parameter.")
+        sensitivity = define_sensitivity(default=1, description="This is a sensitivity.")
         meta = define_meta(meta="meta", description="This is meta.")
-        modifier = define_modifier(default=1, description="This is a modifier.")
-        pmeter = define_parameter(description="This is a parameter.")
+        ret = define_return(dtype="int", description="This is a return.")
 
-        @step(uses=["pmeter"], impacts=["asset"])
+        @step(uses=["parameter"], impacts=["ret"])
         def _add(self):
             """Do addition."""
             pass
 
-        @step(uses=["asset", "modifier"], impacts=["asset"])
+        @step(uses=["ret", "sensitivity"], impacts=["ret"])
         def _subtract(self):
             """Do subtraction."""
             pass
 
     doc = FootingsDoc(Test)
-    doc["Assets"] = [Parameter("asset", "int", ["This is an asset."])]
-    doc["Meta"] = [Parameter("meta", None, ["This is meta."])]
-    doc["Modifiers"] = [Parameter("modifier", None, ["this is a modifier."])]
-    doc["Parameters"] = [Parameter("parameter", None, ["This is a parameter."])]
+    assert doc["Returns"] == [Parameter("ret", "int", ["This is a return."])]
+    assert doc["Meta"] == [Parameter("meta", "", ["This is meta."])]
+    assert doc["Sensitivities"] == [
+        Parameter("sensitivity", "", ["This is a sensitivity."])
+    ]
+    assert doc["Parameters"] == [Parameter("parameter", "", ["This is a parameter."])]
 
 
 def test_model_attributes():
@@ -109,16 +111,16 @@ def test_model_attributes():
     class TestAttributes(Footing):
         param1 = define_parameter()
         param2 = define_parameter()
-        modifier1 = define_modifier(default=1)
-        modifier2 = define_modifier(default=2)
+        sensitivity1 = define_sensitivity(default=1)
+        sensitivity2 = define_sensitivity(default=2)
         meta1 = define_meta(meta="meta1", dtype=str)
         meta2 = define_meta(meta="meta2", dtype=str)
-        placeholder1 = define_placeholder()
-        placeholder2 = define_placeholder()
-        asset1 = define_asset()
-        asset2 = define_asset()
+        intermediate1 = define_intermediate()
+        intermediate2 = define_intermediate()
+        return1 = define_return()
+        return2 = define_return()
 
-        @step(uses=["param1", "param2"], impacts=["asset1"])
+        @step(uses=["param1", "param2"], impacts=["return1"])
         def _step1(self):
             pass
 
@@ -128,23 +130,26 @@ def test_model_attributes():
     # test params
     params = {"param1": "parameter.param1", "param2": "parameter.param2"}
     assert init_model.__footings_parameters__ == tuple(params.keys())
-    modifiers = {"modifier1": "modifier.modifier1", "modifier2": "modifier.modifier2"}
-    assert init_model.__footings_modifiers__ == tuple(modifiers.keys())
+    sensitivities = {
+        "sensitivity1": "sensitivity.sensitivity1",
+        "sensitivity2": "sensitivity.sensitivity2",
+    }
+    assert init_model.__footings_sensitivities__ == tuple(sensitivities.keys())
     meta = {"meta1": "meta.meta1", "meta2": "meta.meta2"}
     assert init_model.__footings_meta__ == tuple(meta.keys())
-    placeholders = {
-        "placeholder1": "placeholder.placeholder1",
-        "placeholder2": "placeholder.placeholder2",
+    intermediates = {
+        "intermediate1": "intermediate.intermediate1",
+        "intermediate2": "intermediate.intermediate2",
     }
-    assert init_model.__footings_placeholders__ == tuple(placeholders.keys())
-    assets = {"asset1": "asset.asset1", "asset2": "asset.asset2"}
-    assert init_model.__footings_assets__ == tuple(assets.keys())
+    assert init_model.__footings_intermediates__ == tuple(intermediates.keys())
+    returns = {"return1": "return.return1", "return2": "return.return2"}
+    assert init_model.__footings_returns__ == tuple(returns.keys())
     assert init_model.__footings_attribute_map__ == {
         **params,
-        **modifiers,
+        **sensitivities,
         **meta,
-        **placeholders,
-        **assets,
+        **intermediates,
+        **returns,
     }
 
 
@@ -154,7 +159,7 @@ def test_model_steps():
         x = define_parameter()
         y = define_parameter()
         z = define_parameter()
-        out = define_asset()
+        out = define_return()
 
         @step(uses=["x", "y"], impacts=["out"])
         def _add(self):

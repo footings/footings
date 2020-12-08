@@ -5,8 +5,9 @@ from attr import asdict
 
 from footings.model import Footing, model, step
 from footings.attributes import (
-    define_asset,
     define_parameter,
+    define_intermediate,
+    define_return,
 )
 from footings.audit import (
     AuditContainer,
@@ -26,9 +27,9 @@ class IntegerModel(Footing):
     b = define_parameter(dtype=int, description="A number B")
     c = define_parameter(dtype=int, description="A number C")
     d = define_parameter(dtype=int, description="A number D")
-    ret_1 = define_asset(dtype=int, description="Results a + b")
-    ret_2 = define_asset(dtype=int, description="Results c - d")
-    ret_3 = define_asset(dtype=int, description="Result total of step_1 and step_2")
+    ret_1 = define_intermediate(dtype=int, description="Results a + b")
+    ret_2 = define_intermediate(dtype=int, description="Results c - d")
+    ret_3 = define_return(dtype=int, description="Result total of step_1 and step_2")
 
     @step(uses=["a", "b"], impacts=["ret_1"])
     def _step_1(self):
@@ -56,8 +57,8 @@ def test_audit():
         "method_name": "_step_1",
         "docstring": "Add a and b together.",
         "uses": ["parameter.a", "parameter.b"],
-        "impacts": ["asset.ret_1"],
-        "output": {"asset.ret_1": 2},
+        "impacts": ["intermediate.ret_1"],
+        "output": {"intermediate.ret_1": 2},
         "metadata": {},
     }
     expected_step_2 = {
@@ -65,17 +66,17 @@ def test_audit():
         "method_name": "_step_2",
         "docstring": "Subtract d from c",
         "uses": ["parameter.c", "parameter.d"],
-        "impacts": ["asset.ret_2"],
-        "output": {"asset.ret_2": 0},
+        "impacts": ["intermediate.ret_2"],
+        "output": {"intermediate.ret_2": 0},
         "metadata": {},
     }
     expected_step_3 = {
         "name": "_step_3",
         "method_name": "_step_3",
         "docstring": "Add total of steps 1 and 2.",
-        "uses": ["asset.ret_1", "asset.ret_2"],
-        "impacts": ["asset.ret_3"],
-        "output": {"asset.ret_3": 2},
+        "uses": ["intermediate.ret_1", "intermediate.ret_2"],
+        "impacts": ["return.ret_3"],
+        "output": {"return.ret_3": 2},
         "metadata": {},
     }
 
@@ -90,7 +91,7 @@ def test_audit():
             "parameter.d": 2,
         },
         "steps": [expected_step_1, expected_step_2, expected_step_3],
-        "output": {"ret_1": 2, "ret_2": 0, "ret_3": 2},
+        "output": {"ret_3": 2},
         "config": asdict(AuditConfig()),
     }
     assert test_default.as_audit() == expected_default
@@ -118,7 +119,7 @@ def test_audit():
             "parameter.d": 2,
         },
         "steps": [{"name": "_step_1"}, {"name": "_step_2"}, {"name": "_step_3"}],
-        "output": {"ret_1": 2, "ret_2": 0, "ret_3": 2},
+        "output": {"ret_3": 2},
         "config": asdict(AuditConfig(step_config=step_config)),
     }
     assert test_no_step_detail.as_audit() == expected_no_step_detail

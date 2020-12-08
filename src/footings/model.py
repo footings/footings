@@ -9,7 +9,7 @@ from attr._make import _CountingAttr
 from attr.setters import frozen
 import numpydoc.docscrape as numpydoc
 
-from .attributes import Parameter, Modifier, Meta, Placeholder, Asset
+from .attributes import Parameter, Sensitivity, Meta, Intermediate, Return
 from .audit import run_model_audit
 from .doc_tools.docscrape import FootingsDoc
 from .visualize import visualize_model
@@ -51,9 +51,9 @@ def _run(self, to_step):
 
     if to_step is not None:
         return self
-    if len(self.__footings_assets__) > 1:
-        return tuple(getattr(self, asset) for asset in self.__footings_assets__)
-    return getattr(self, self.__footings_assets__[0])
+    if len(self.__footings_returns__) > 1:
+        return tuple(getattr(self, asset) for asset in self.__footings_returns__)
+    return getattr(self, self.__footings_returns__[0])
 
 
 @attrs(slots=True, repr=False)
@@ -62,10 +62,10 @@ class Footing:
 
     __footings_steps__: tuple = attrib(init=False, repr=False)
     __footings_parameters__: tuple = attrib(init=False, repr=False)
-    __footings_modifiers__: tuple = attrib(init=False, repr=False)
+    __footings_sensitivities__: tuple = attrib(init=False, repr=False)
     __footings_meta__: tuple = attrib(init=False, repr=False)
-    __footings_placeholders__: tuple = attrib(init=False, repr=False)
-    __footings_assets__: tuple = attrib(init=False, repr=False)
+    __footings_intermediates__: tuple = attrib(init=False, repr=False)
+    __footings_returns__: tuple = attrib(init=False, repr=False)
     __footings_attribute_map__: dict = attrib(init=False, repr=False)
 
     def visualize(self):
@@ -90,7 +90,7 @@ class Footing:
         return run_model_audit(model=self, file=file, **kwargs)
 
     def run(self, to_step=None):
-        """Runs the model and returns any assets defined.
+        """Runs the model and returns any returns defined.
 
         Parameters
         ----------
@@ -162,7 +162,7 @@ def step(
     uses : List[str]
         A list of the object names used by the step.
     impacts : List[str]
-        A list of the object names that are impacted by the step (i.e., the assets and placeholders).
+        A list of the object names that are impacted by the step (i.e., the returns and intermediates).
     wrap : callable, optional
         Wrap or source the docstring from another object, by default None.
 
@@ -192,47 +192,45 @@ def step(
 
 
 def _make_doc_parameter(attribute):
-    str_type = str(attribute.type) if attribute.type is not None else ""
+    if attribute.type is None:
+        atype = ""
+    elif isinstance(attribute.type, str):
+        atype = attribute.type
+    elif hasattr(attribute.type, "__qualname__"):
+        atype = attribute.type.__qualname__
+    else:
+        try:
+            atype = str(attribute.type)
+        except:
+            atype = ""
     return numpydoc.Parameter(
-        attribute.name, str_type, [attribute.metadata.get("description", "")]
+        attribute.name, atype, [attribute.metadata.get("description", "")]
     )
 
 
 def _parse_attriubtes(cls):
-    sections = ["Parameters", "Modifiers", "Meta", "Placeholders", "Assets"]
+    sections = ["Parameters", "Sensitivities", "Meta", "Intermediates", "Returns"]
     parsed_attributes = {section: [] for section in sections}
 
     for attribute in cls.__attrs_attrs__:
         grp = attribute.metadata.get("footing_group", None)
         if isinstance(grp, Parameter):
             parsed_attributes["Parameters"].append(_make_doc_parameter(attribute))
-        elif isinstance(grp, Modifier):
-            parsed_attributes["Modifiers"].append(_make_doc_parameter(attribute))
+        elif isinstance(grp, Sensitivity):
+            parsed_attributes["Sensitivities"].append(_make_doc_parameter(attribute))
         elif isinstance(grp, Meta):
             parsed_attributes["Meta"].append(_make_doc_parameter(attribute))
-        elif isinstance(grp, Placeholder):
-            parsed_attributes["Placeholders"].append(_make_doc_parameter(attribute))
-        elif isinstance(grp, Asset):
-            parsed_attributes["Assets"].append(_make_doc_parameter(attribute))
+        elif isinstance(grp, Intermediate):
+            parsed_attributes["Intermediates"].append(_make_doc_parameter(attribute))
+        elif isinstance(grp, Return):
+            parsed_attributes["Returns"].append(_make_doc_parameter(attribute))
 
     return parsed_attributes
 
 
-def _update_run_return(cls, assets):
-    run_doc = numpydoc.FunctionDoc(cls.run)
-
-    if cls._return.__doc__ is not None:
-        return_doc = numpydoc.FunctionDoc(cls._return)
-        run_doc["Returns"] = return_doc["Returns"]
-    else:
-        run_doc["Returns"] = assets
-
-    return str(run_doc)
-
-
 def _generate_steps_sections(cls, steps):
     return [
-        f"{idx}. {step} - {getattr(cls, step).docstring}"
+        f"{idx}) {step} - {getattr(cls, step).docstring}"
         for idx, step in enumerate(steps, start=1)
     ]
 
@@ -243,10 +241,10 @@ def _attr_doc(cls, steps):
     doc = FootingsDoc(cls)
 
     doc["Parameters"] = parsed_attributes["Parameters"]
-    doc["Modifiers"] = parsed_attributes["Modifiers"]
+    doc["Sensitivities"] = parsed_attributes["Sensitivities"]
     doc["Meta"] = parsed_attributes["Meta"]
-    doc["Placeholders"] = parsed_attributes["Placeholders"]
-    doc["Assets"] = parsed_attributes["Assets"]
+    doc["Intermediates"] = parsed_attributes["Intermediates"]
+    doc["Returns"] = parsed_attributes["Returns"]
     doc["Steps"] = _generate_steps_sections(cls, steps)
     doc["Methods"] = []
 
@@ -291,7 +289,7 @@ def model(cls: type = None, *, steps: List[str]):
         attributes = [x for x in dir(cls) if x[0] != "_" and x not in exclude]
         if hasattr(cls, "__attrs_attrs__"):
             attrs_attrs = {x.name: x for x in cls.__attrs_attrs__}
-        parameters, modifiers, meta, placeholders, assets = [], [], [], [], []
+        parameters, sensitivities, meta, intermediates, returns = [], [], [], [], []
         for attribute in attributes:
             attr = getattr(cls, attribute)
             if attribute in attrs_attrs:
@@ -299,30 +297,30 @@ def model(cls: type = None, *, steps: List[str]):
             else:
                 if isinstance(attr, _CountingAttr) is False:
                     msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
-                    msg += "Use one of define_parameter, define_meta, define_modifier, define_placeholder "
-                    msg += "or define_asset when building a model."
+                    msg += "Use one of define_parameter, define_meta, define_sensitivity, define_intermediate "
+                    msg += "or define_return when building a model."
                     raise ModelCreationError(msg)
             footing_group = attr.metadata.get("footing_group", None)
             if footing_group is None:
                 msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
-                msg += "Use one of define_parameter, define_meta, define_modifier or define_asset "
+                msg += "Use one of define_parameter, define_meta, define_sensitivity or define_return "
                 msg += "when building a model."
                 raise ModelCreationError(msg)
             if isinstance(footing_group, Parameter):
                 parameters.append(attribute)
-            elif isinstance(footing_group, Modifier):
-                modifiers.append(attribute)
+            elif isinstance(footing_group, Sensitivity):
+                sensitivities.append(attribute)
             elif isinstance(footing_group, Meta):
                 meta.append(attribute)
-            elif isinstance(footing_group, Placeholder):
-                placeholders.append(attribute)
-            elif isinstance(footing_group, Asset):
-                assets.append(attribute)
+            elif isinstance(footing_group, Intermediate):
+                intermediates.append(attribute)
+            elif isinstance(footing_group, Return):
+                returns.append(attribute)
 
         # 3. Make sure at least one asset
-        if len(assets) == 0:
+        if len(returns) == 0:
             raise ModelCreationError(
-                "No assets registered to model. At least one asset needs to be registered."
+                "No returns registered to model. At least one asset needs to be registered."
             )
 
         # 4. For steps -
@@ -348,21 +346,21 @@ def model(cls: type = None, *, steps: List[str]):
                 f"The followings steps listed do not appear to be decorated steps - {str(missing_attributes)}."
             )
 
-        # If all test pass, update steps and assets with known values as defaults.
+        # If all test pass, update steps and returns with known values as defaults.
         kws = {"init": False, "repr": False}
         cls.__footings_steps__ = attrib(default=tuple(steps), **kws)
         cls.__footings_parameters__ = attrib(default=tuple(parameters), **kws)
-        cls.__footings_modifiers__ = attrib(default=tuple(modifiers), **kws)
+        cls.__footings_sensitivities__ = attrib(default=tuple(sensitivities), **kws)
         cls.__footings_meta__ = attrib(default=tuple(meta), **kws)
-        cls.__footings_placeholders__ = attrib(default=tuple(placeholders), **kws)
-        cls.__footings_assets__ = attrib(default=tuple(assets), **kws)
+        cls.__footings_intermediates__ = attrib(default=tuple(intermediates), **kws)
+        cls.__footings_returns__ = attrib(default=tuple(returns), **kws)
 
         attribute_map = {
             **{p: f"parameter.{p}" for p in parameters},
-            **{m: f"modifier.{m}" for m in modifiers},
+            **{m: f"sensitivity.{m}" for m in sensitivities},
             **{m: f"meta.{m}" for m in meta},
-            **{p: f"placeholder.{p}" for p in placeholders},
-            **{a: f"asset.{a}" for a in assets},
+            **{p: f"intermediate.{p}" for p in intermediates},
+            **{a: f"return.{a}" for a in returns},
         }
         for step in steps:
             use_old = getattr(cls, step).uses

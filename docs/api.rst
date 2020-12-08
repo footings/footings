@@ -26,10 +26,10 @@ core
    model
    step
    define_parameter
-   define_modifier
+   define_sensitivity
    define_meta
-   define_placeholder
-   define_asset
+   define_intermediate
+   define_return
    dispatch_function
 
 |

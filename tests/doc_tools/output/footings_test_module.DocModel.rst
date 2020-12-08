@@ -26,11 +26,11 @@
 
    .. autosummary::
 
-      ~DocModel.asset_1
-      ~DocModel.asset_2
       ~DocModel.meta_1
       ~DocModel.meta_2
-      ~DocModel.modif_1
-      ~DocModel.modif_2
       ~DocModel.param_1
       ~DocModel.param_2
+      ~DocModel.return_1
+      ~DocModel.return_2
+      ~DocModel.sensit_1
+      ~DocModel.sensit_2
