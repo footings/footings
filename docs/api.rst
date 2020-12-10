@@ -19,25 +19,25 @@ core
    :nosignatures:
    :toctree: generated
 
-   Footing
-   Footing.audit
-   Footing.run
-   Footing.visualize
-   model
-   step
-   define_parameter
-   define_sensitivity
-   define_meta
-   define_intermediate
-   define_return
-   dispatch_function
+   footings.Footing
+   footings.Footing.audit
+   footings.Footing.run
+   footings.Footing.visualize
+   footings.model
+   footings.step
+   footings.define_parameter
+   footings.define_sensitivity
+   footings.define_meta
+   footings.define_intermediate
+   footings.define_return
+   footings.dispatch_function
 
 |
 
+
+
 model_tools
 -----------
-
-.. currentmodule:: footings.model_tools
 
 .. automodule:: footings.model_tools
    :exclude-members:
@@ -46,21 +46,19 @@ model_tools
    :nosignatures:
    :toctree: generated
 
-   create_frame
-   create_frame_from_record
-   expand_frame_per_record
-   frame_add_exposure
-   frame_add_weights
-   frame_filter
-   calculate_age
+   footings.model_tools.create_frame
+   footings.model_tools.create_frame_from_record
+   footings.model_tools.expand_frame_per_record
+   footings.model_tools.frame_add_exposure
+   footings.model_tools.frame_add_weights
+   footings.model_tools.frame_filter
+   footings.model_tools.calculate_age
 
 
 |
 
 test_tools
 -----------
-
-.. currentmodule:: footings.test_tools
 
 .. automodule:: footings.test_tools
    :exclude-members:
@@ -69,8 +67,8 @@ test_tools
    :nosignatures:
    :toctree: generated
 
-   assert_footings_audit_xlsx_equal
-   load_footings_audit_xlsx
+   footings.test_tools.assert_footings_files_equal
+   footings.test_tools.load_footings_file
 
 |
 
