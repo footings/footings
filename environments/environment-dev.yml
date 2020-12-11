@@ -19,9 +19,8 @@ dependencies:
   - black==19.*
   - pre-commit
   - sphinx
-  - recommonmark
-  - sphinx_rtd_theme
-  - nbsphinx
+  - myst-nb
+  - pydata-sphinx-theme
   - ipython
   - ipykernel
   - dask
