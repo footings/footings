@@ -41,6 +41,7 @@ def docs(session):
     session.install(".")
     session.run("sphinx-build", "-E", "-v", "-b", "html", "docs", "docs/_build")
     session.run("rm", "-r", "docs/generated/")
+    session.run("rm", "-r", "docs/jupyter_execute/")
 
 
 @nox.session(python="3.7", venv_backend="none")
