@@ -52,7 +52,7 @@ def _run(self, to_step):
     if to_step is not None:
         return self
     if len(self.__footings_returns__) > 1:
-        return tuple(getattr(self, asset) for asset in self.__footings_returns__)
+        return tuple(getattr(self, ret) for ret in self.__footings_returns__)
     return getattr(self, self.__footings_returns__[0])
 
 
@@ -293,13 +293,15 @@ def model(cls: type = None, *, steps: List[str]):
             else:
                 if isinstance(attr, _CountingAttr) is False:
                     msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
-                    msg += "Use one of define_parameter, define_meta, define_sensitivity, define_intermediate "
-                    msg += "or define_return when building a model."
+                    msg += "Use one of def_parameter, def_meta, def_sensitivity, def_intermediate "
+                    msg += "or def_return when building a model."
                     raise ModelCreationError(msg)
             footing_group = attr.metadata.get("footing_group", None)
             if footing_group is None:
                 msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
-                msg += "Use one of define_parameter, define_meta, define_sensitivity or define_return "
+                msg += (
+                    "Use one of def_parameter, def_meta, def_sensitivity or def_return "
+                )
                 msg += "when building a model."
                 raise ModelCreationError(msg)
             if isinstance(footing_group, Parameter):
@@ -316,7 +318,7 @@ def model(cls: type = None, *, steps: List[str]):
         # 2. Make sure at least one return
         if len(returns) == 0:
             raise ModelCreationError(
-                "No returns registered to model. At least one asset needs to be registered."
+                "No returns registered to model. At least one ret needs to be registered."
             )
 
         # 3. For steps -

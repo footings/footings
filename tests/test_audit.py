@@ -5,9 +5,9 @@ from attr import asdict
 
 from footings.model import model, step
 from footings.attributes import (
-    define_parameter,
-    define_intermediate,
-    define_return,
+    def_parameter,
+    def_intermediate,
+    def_return,
 )
 from footings.audit import (
     AuditContainer,
@@ -23,13 +23,13 @@ from footings.test_tools import assert_footings_files_equal
 class IntegerModel:
     """Integer model for testing."""
 
-    a = define_parameter(dtype=int, description="A number A")
-    b = define_parameter(dtype=int, description="A number B")
-    c = define_parameter(dtype=int, description="A number C")
-    d = define_parameter(dtype=int, description="A number D")
-    ret_1 = define_intermediate(dtype=int, description="Results a + b")
-    ret_2 = define_intermediate(dtype=int, description="Results c - d")
-    ret_3 = define_return(dtype=int, description="Result total of step_1 and step_2")
+    a = def_parameter(dtype=int, description="A number A")
+    b = def_parameter(dtype=int, description="A number B")
+    c = def_parameter(dtype=int, description="A number C")
+    d = def_parameter(dtype=int, description="A number D")
+    ret_1 = def_intermediate(dtype=int, description="Results a + b")
+    ret_2 = def_intermediate(dtype=int, description="Results c - d")
+    ret_3 = def_return(dtype=int, description="Result total of step_1 and step_2")
 
     @step(uses=["a", "b"], impacts=["ret_1"])
     def _step_1(self):

@@ -71,10 +71,8 @@ def _define(
     )
 
 
-def define_return(
-    *, dtype=None, description=None, default=None, **kwargs
-) -> _CountingAttr:
-    """Define an asset to the model where an asset is a non-frozen attribute that is
+def def_return(*, dtype=None, description=None, default=None, **kwargs) -> _CountingAttr:
+    """Define an return to the model where an return is a non-frozen attribute that is
     created by the model and when the model runs.
 
     Parameters
@@ -104,7 +102,7 @@ def define_return(
     )
 
 
-def define_intermediate(
+def def_intermediate(
     *, dtype=None, description=None, default=None, **kwargs
 ) -> _CountingAttr:
     """Define a placeholder to the model where a placeholder is a non-frozen attribute that is
@@ -137,7 +135,7 @@ def define_intermediate(
     )
 
 
-def define_meta(
+def def_meta(
     *, meta: Any, dtype=None, description=None, default=None, **kwargs
 ) -> _CountingAttr:
     """Define meta data for the model which is a frozen attribute that is passed on instantiation of the model.
@@ -171,7 +169,7 @@ def define_meta(
     )
 
 
-def define_sensitivity(
+def def_sensitivity(
     *, default: Any, dtype=None, description=None, **kwargs
 ) -> _CountingAttr:
     """Define a modifer to the model where a modifier is a frozen attribute with a required default value.
@@ -205,7 +203,7 @@ def define_sensitivity(
     )
 
 
-def define_parameter(
+def def_parameter(
     *, dtype=None, description=None, default=None, **kwargs
 ) -> _CountingAttr:
     """Define a parameter to the model where a parameter is a frozen attribute that is passed on instantiation of the model.

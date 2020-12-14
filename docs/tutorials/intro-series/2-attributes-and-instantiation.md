@@ -23,20 +23,19 @@ We will start with the model code from the [prior tutorial](1-a-footings-model.m
 ```{code-cell} ipython3
 from footings import (
     model,
-    Footing,
     step,
-    define_parameter,
-    define_intermediate,
-    define_return,
+    def_parameter,
+    def_intermediate,
+    def_return,
 )
 
 @model(steps=["_add_a_b", "_add_ab_c"])
 class AddABC:
-    a = define_parameter()
-    b = define_parameter()
-    c = define_parameter()
-    ab = define_intermediate()
-    abc = define_return()
+    a = def_parameter()
+    b = def_parameter()
+    c = def_parameter()
+    ab = def_intermediate()
+    abc = def_return()
 
     @step(uses=["a", "b"], impacts=["ab"])
     def _add_a_b(self):
@@ -57,7 +56,7 @@ inspection = getfullargspec(AddABC)
 inspection
 ```
 
-The first thing one should notice is `args` is equal to `[]`. This means there are no arguments that can be passed in without being assigned to a keyword. Looking at the attribute `kwonlyags` we see the 3 parameters - `['a', 'b', 'c']` that were defined using `define_parameter`. Neither `ab` nor `abc` appear in the inspection because they were defined using `define_intermediate` and `define_return` which excludes them from the `__init__` method of the model.
+The first thing one should notice is `args` is equal to `[]`. This means there are no arguments that can be passed in without being assigned to a keyword. Looking at the attribute `kwonlyags` we see the 3 parameters - `['a', 'b', 'c']` that were defined using `def_parameter`. Neither `ab` nor `abc` appear in the inspection because they were defined using `def_intermediate` and `def_return` which excludes them from the `__init__` method of the model.
 
 This can be tested by running the following line of code which will return an error.
 
@@ -91,7 +90,7 @@ These attributes are frozen and cannot be modified. The below code will demonstr
 model.a = 0
 ```
 
-In addition, the attributes defined using `define_return` and `define_intermediate` also appear as attributes under the model object. Though, they have a value of `None` as shown below.
+In addition, the attributes defined using `def_return` and `def_intermediate` also appear as attributes under the model object. Though, they have a value of `None` as shown below.
 
 ```{code-cell} ipython3
 print(f"attribute ab  = {model.ab}")
@@ -104,27 +103,26 @@ These attributes are not frozen so when the model is run the different steps wit
 model.ab = 0
 model.ab
 ```
-## Arguments to define_*
+## Arguments to def_*
 
 Returning to the code of our example model -
 
 ```{code-cell} ipython3
 from footings import (
     model,
-    Footing,
     step,
-    define_parameter,
-    define_intermediate,
-    define_return,
+    def_parameter,
+    def_intermediate,
+    def_return,
 )
 
 @model(steps=["_add_a_b", "_add_ab_c"])
 class AddABC:
-    a = define_parameter()
-    b = define_parameter()
-    c = define_parameter()
-    ab = define_intermediate()
-    abc = define_return()
+    a = def_parameter()
+    b = def_parameter()
+    c = def_parameter()
+    ab = def_intermediate()
+    abc = def_return()
 
     @step(uses=["a", "b"], impacts=["ab"])
     def _add_a_b(self):
@@ -135,18 +133,18 @@ class AddABC:
         self.abc = self.ab + self.c
 ```
 
-When calling the `define_*` functions we did not pass any arguments. These functions take a number of optional arguments add the ability to validate data passed to arguments as well as adds to the documentation of the model which will be covered in more detail in the [documentation tutorial](3-documentation.md). To see a list of the available arguments you can see the [api section](../../api.rst).
+When calling the `def_*` functions we did not pass any arguments. These functions take a number of optional arguments add the ability to validate data passed to arguments as well as adds to the documentation of the model which will be covered in more detail in the [documentation tutorial](3-documentation.md). To see a list of the available arguments you can see the [api section](../../api.rst).
 
-Below is an example of how we can add validation to the model when adding arguments to `define_parameter`.
+Below is an example of how we can add validation to the model when adding arguments to `def_parameter`.
 
 ```{code-cell} ipython3
 @model(steps=["_add_a_b", "_add_ab_c"])
 class AddABC:
-    a = define_parameter(dtype=int, min_val=0)
-    b = define_parameter(dtype=int, max_val=0)
-    c = define_parameter(dtype=int, allowed=[1, 2])
-    ab = define_intermediate()
-    abc = define_return()
+    a = def_parameter(dtype=int, min_val=0)
+    b = def_parameter(dtype=int, max_val=0)
+    c = def_parameter(dtype=int, allowed=[1, 2])
+    ab = def_intermediate()
+    abc = def_return()
 
     @step(uses=["a", "b"], impacts=["ab"])
     def _add_a_b(self):
@@ -171,35 +169,34 @@ AddABC(a=1, b=1, c=3)
 :tags: [raises-exception]
 AddABC(a=1, b=0, c=3)
 ```
-## Additional define_* functions
+## Additional def_* functions
 
 The `footings` library also contains two additional define functions. Both of these will come in handy when building actuarial models.
 
-- `defin_meta` is a way to add metadata to a model. As an example, this might be the run date/time a model is ran.
+- `def_meta` is a way to add metadata to a model. As an example, this might be the run date/time a model is ran.
 
-- `define_sensitivity` is a way to add a default parameter. The name sensitivity is often used in actuarial models to test how sensitve an outcome is to a given parameter. As an example, an actuarial model might have an interest rate parameter and an interest rate sensitivty. The default value for the sensitivity would be 1 but could be changed to 1.1 to test the impact of a 10% increase in interes rates.
+- `def_sensitivity` is a way to add a default parameter. The name sensitivity is often used in actuarial models to test how sensitve an outcome is to a given parameter. As an example, an actuarial model might have an interest rate parameter and an interest rate sensitivty. The default value for the sensitivity would be 1 but could be changed to 1.1 to test the impact of a 10% increase in interes rates.
 
 Both of these are demonstrated in the code below.
 
 ```{code-cell} ipython3
 from footings import (
     model,
-    Footing,
     step,
-    define_parameter,
-    define_sensitivity,
-    define_meta,
-    define_intermediate,
-    define_return,
+    def_parameter,
+    def_sensitivity,
+    def_meta,
+    def_intermediate,
+    def_return,
 )
 from footings.model_tools import run_date_time
 
 @model(steps=["_calculate"])
 class DiscountFactors:
-    interest_rate = define_parameter()
-    interest_sensitivity = define_sensitivity(default=1)
-    discount_factors = define_return()
-    run_date_time = define_meta(meta=run_date_time)
+    interest_rate = def_parameter()
+    interest_sensitivity = def_sensitivity(default=1)
+    discount_factors = def_return()
+    run_date_time = def_meta(meta=run_date_time)
 
     @step(uses=["interest_rate", "interest_sensitivity"], impacts=["discount_factors"])
     def _calculate(self):
@@ -229,14 +226,14 @@ print(f"output = {str(discount2.run())}")
 
 ## Closing
 
-With this tutorial, we dug deeper into how the `Footings framework` defines attributes and how they are represented in the model. When building models, it is recommended to use the optional argument into the `define_*` functions to add validation.
+With this tutorial, we dug deeper into how the `Footings framework` defines attributes and how they are represented in the model. When building models, it is recommended to use the optional argument into the `def_*` functions to add validation.
 
-Below is a summary of the functionality of each `define_*` function -
+Below is a summary of the functionality of each `def_*` function -
 
 | Define Function     | Init | Default | Frozen | Return |
 |:--------------------|:----:|:-------:|:------:|:------:|
-| define_parameter    | yes  | no      | yes    | no     |
-| define_sensitivity  | yes  | yes     | yes    | no     |
-| define_meta         | no   | no      | yes    | no     |
-| define_intermediate | no   | no      | no     | no     |
-| define_return       | no   | no      | no     | yes    |
+| def_parameter       | yes  | no      | yes    | no     |
+| def_sensitivity     | yes  | yes     | yes    | no     |
+| def_meta            | no   | no      | yes    | no     |
+| def_intermediate    | no   | no      | no     | no     |
+| def_return          | no   | no      | no     | yes    |

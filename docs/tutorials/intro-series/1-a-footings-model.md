@@ -39,20 +39,19 @@ The code for the  model is below.
 ```{code-cell} ipython3
 from footings import (
     model,
-    Footing,
     step,
-    define_parameter,
-    define_intermediate,
-    define_return,
+    def_parameter,
+    def_intermediate,
+    def_return,
 )
 
 @model(steps=["_add_a_b", "_add_ab_c"])
 class AddABC:
-    a = define_parameter()
-    b = define_parameter()
-    c = define_parameter()
-    ab = define_intermediate()
-    abc = define_return()
+    a = def_parameter()
+    b = def_parameter()
+    c = def_parameter()
+    ab = def_intermediate()
+    abc = def_return()
 
     @step(uses=["a", "b"], impacts=["ab"])
     def _add_a_b(self):
@@ -70,7 +69,7 @@ class AddABC:
 
 - Model construction starts on the line `@model`. To build a model with the footings framework, you  need to decorate a standard python class with the `@model` decorator. Our model is called `AddABC`. The model decorator takes an argument `steps` which is explained in the last bullet.
 
-- Attributes of the class are defined using the `define_*` functions imported from the `footings` library. These will be covered in further detail in the [attributes and instantiation tutorial](./2-attributes-and-instantiation.md). But for purposes of this model, know that attributes - defined using `define_parameter` are required parameters to instantiate the model. These attributes are frozen and cannot be modified after the model is instantiated. Attributes defined using `define_intermediate` and `define_return` are empty attributes that are created on instantiation that are unfrozen for modification throughout the steps. The only difference between the two is `define_return` attributes are returned after the model runs.
+- Attributes of the class are defined using the `def_*` functions imported from the `footings` library. These will be covered in further detail in the [attributes and instantiation tutorial](./2-attributes-and-instantiation.md). But for purposes of this model, know that attributes - defined using `def_parameter` are required parameters to instantiate the model. These attributes are frozen and cannot be modified after the model is instantiated. Attributes defined using `def_intermediate` and `def_return` are empty attributes that are created on instantiation that are unfrozen for modification throughout the steps. The only difference between the two is `def_return` attributes are returned after the model runs.
 
 - Moving under the attributes, are methods decorated with `@step`. Each step has two arguments - `uses` which is a list of the attributes used for the respective step and `impacts` which is a list of the attributes impacted for the respective step.
 

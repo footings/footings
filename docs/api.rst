@@ -19,17 +19,13 @@ core
    :nosignatures:
    :toctree: generated
 
-   footings.Footing
-   footings.Footing.audit
-   footings.Footing.run
-   footings.Footing.visualize
    footings.model
    footings.step
-   footings.define_parameter
-   footings.define_sensitivity
-   footings.define_meta
-   footings.define_intermediate
-   footings.define_return
+   footings.def_parameter
+   footings.def_sensitivity
+   footings.def_meta
+   footings.def_intermediate
+   footings.def_return
    footings.dispatch_function
 
 |
