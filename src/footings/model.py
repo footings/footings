@@ -278,17 +278,13 @@ def model(cls: type = None, *, steps: List[str]):
     def inner(cls):
         # In order to be instantiated as a model, need to pass the following test.
 
-        # 1. Needs to be a subclass of Footing
-        if issubclass(cls, Footing) is False:
-            raise ModelCreationError(
-                f"The object {str(cls)} is not a child of the Footing class."
-            )
-
-        # 2. All attributes need to belong to a footings_group
-        exclude = [x for x in dir(Footing) if x[0] != "_"]
+        # 1. All attributes need to belong to a footings_group
+        exclude = ["run", "audit", "visualize"]
         attributes = [x for x in dir(cls) if x[0] != "_" and x not in exclude]
         if hasattr(cls, "__attrs_attrs__"):
             attrs_attrs = {x.name: x for x in cls.__attrs_attrs__}
+        else:
+            attrs_attrs = {}
         parameters, sensitivities, meta, intermediates, returns = [], [], [], [], []
         for attribute in attributes:
             attr = getattr(cls, attribute)
@@ -317,13 +313,13 @@ def model(cls: type = None, *, steps: List[str]):
             elif isinstance(footing_group, Return):
                 returns.append(attribute)
 
-        # 3. Make sure at least one asset
+        # 2. Make sure at least one return
         if len(returns) == 0:
             raise ModelCreationError(
                 "No returns registered to model. At least one asset needs to be registered."
             )
 
-        # 4. For steps -
+        # 3. For steps -
         #    - make sure at least one step in model
         #    - all steps are methods of cls
         #    - all steps have attributes uses and impacts
@@ -345,6 +341,11 @@ def model(cls: type = None, *, steps: List[str]):
             raise ModelCreationError(
                 f"The followings steps listed do not appear to be decorated steps - {str(missing_attributes)}."
             )
+
+        # Add Footings methods
+        cls.run = Footing.run
+        cls.audit = Footing.audit
+        cls.visualize = Footing.visualize
 
         # If all test pass, update steps and returns with known values as defaults.
         kws = {"init": False, "repr": False}

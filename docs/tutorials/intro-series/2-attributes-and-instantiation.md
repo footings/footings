@@ -31,7 +31,7 @@ from footings import (
 )
 
 @model(steps=["_add_a_b", "_add_ab_c"])
-class AddABC(Footing):
+class AddABC:
     a = define_parameter()
     b = define_parameter()
     c = define_parameter()
@@ -119,7 +119,7 @@ from footings import (
 )
 
 @model(steps=["_add_a_b", "_add_ab_c"])
-class AddABC(Footing):
+class AddABC:
     a = define_parameter()
     b = define_parameter()
     c = define_parameter()
@@ -141,7 +141,7 @@ Below is an example of how we can add validation to the model when adding argume
 
 ```{code-cell} ipython3
 @model(steps=["_add_a_b", "_add_ab_c"])
-class AddABC(Footing):
+class AddABC:
     a = define_parameter(dtype=int, min_val=0)
     b = define_parameter(dtype=int, max_val=0)
     c = define_parameter(dtype=int, allowed=[1, 2])
@@ -195,7 +195,7 @@ from footings import (
 from footings.model_tools import run_date_time
 
 @model(steps=["_calculate"])
-class DiscountFactors(Footing):
+class DiscountFactors:
     interest_rate = define_parameter()
     interest_sensitivity = define_sensitivity(default=1)
     discount_factors = define_return()

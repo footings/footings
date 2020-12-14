@@ -1,11 +1,11 @@
 from dask import delayed, compute
 
-from footings import model, step, Footing, define_parameter, define_return
+from footings import model, step, define_parameter, define_return
 from footings.model_tools import make_foreach_model
 
 
 @model(steps=["_add"])
-class Model(Footing):
+class Model:
     x = define_parameter(dtype=int)
     y = define_parameter(dtype=int)
     total = define_return(dtype=int)

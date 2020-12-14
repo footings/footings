@@ -6,7 +6,7 @@ from footings.attributes import (
     define_intermediate,
 )
 from footings.utils import dispatch_function
-from footings.model import Footing, model, step
+from footings.model import model, step
 
 from ._version import get_versions
 

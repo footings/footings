@@ -10,7 +10,7 @@ from footings.attributes import (
     define_intermediate,
 )
 
-from footings.model import Footing, FootingsDoc, model, step, ModelCreationError
+from footings.model import FootingsDoc, model, step, ModelCreationError
 
 
 def test_model_instantiation():
@@ -29,7 +29,7 @@ def test_model_instantiation():
 
         # fails due to using a value vs using one of define_[return, meta, sensitivity, parameter]
         @model(steps=["_add"])
-        class FailUsingValue(Footing):
+        class FailUsingValue:
             parameter = define_parameter(dtype=int)
             ret = 0
 
@@ -39,7 +39,7 @@ def test_model_instantiation():
 
         # fails due to using attrib() vs using one of define_[return, meta, sensitivity, parameter]
         @model(steps=["_add"])
-        class FailUsingAttrib(Footing):
+        class FailUsingAttrib:
             parameter = define_parameter(dtype=int)
             ret = attrib(default=0)
 
@@ -59,19 +59,19 @@ def test_model_instantiation():
 
         # fail due to missing step as method
         @model(steps=[])
-        class FailZeroSteps(Footing):
+        class FailZeroSteps:
             x = define_parameter()
             y = define_return()
 
         # fail due to missing step as method
         @model(steps=["_add"])
-        class FailMissingStep(Footing):
+        class FailMissingStep:
             parameter = define_parameter(dtype=int)
             ret = define_return(default=0)
 
         # fail due to step not decorated
         @model(steps=["_add"])  # noqa: F841
-        class FailStepNotDecorated(Footing):
+        class FailStepNotDecorated:
             parameter = define_parameter(dtype=int)
             ret = define_return(default=0)
 
@@ -81,7 +81,7 @@ def test_model_instantiation():
 
 def test_model_documentation():
     @model(steps=["_add", "_subtract"])
-    class Test(Footing):
+    class Test:
         parameter = define_parameter(description="This is a parameter.")
         sensitivity = define_sensitivity(default=1, description="This is a sensitivity.")
         meta = define_meta(meta="meta", description="This is meta.")
@@ -108,7 +108,7 @@ def test_model_documentation():
 
 def test_model_attributes():
     @model(steps=["_step1"])
-    class TestAttributes(Footing):
+    class TestAttributes:
         param1 = define_parameter()
         param2 = define_parameter()
         sensitivity1 = define_sensitivity(default=1)
@@ -155,7 +155,7 @@ def test_model_attributes():
 
 def test_model_steps():
     @model(steps=["_add", "_subtract"])
-    class Test(Footing):
+    class Test:
         x = define_parameter()
         y = define_parameter()
         z = define_parameter()

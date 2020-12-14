@@ -47,7 +47,7 @@ from footings import (
 )
 
 @model(steps=["_add_a_b", "_add_ab_c"])
-class AddABC(Footing):
+class AddABC:
     a = define_parameter()
     b = define_parameter()
     c = define_parameter()

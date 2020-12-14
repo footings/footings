@@ -1,5 +1,4 @@
 from footings import (
-    Footing,
     model,
     step,
     define_parameter,
@@ -10,7 +9,7 @@ from footings import (
 
 
 @model(steps=["_step_1", "_step_2"])
-class DocModel(Footing):
+class DocModel:
     """This is a model to test documentation."""
 
     param_1 = define_parameter(dtype=int, description="This is parameter 1.")

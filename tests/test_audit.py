@@ -3,7 +3,7 @@ from inspect import signature
 
 from attr import asdict
 
-from footings.model import Footing, model, step
+from footings.model import model, step
 from footings.attributes import (
     define_parameter,
     define_intermediate,
@@ -20,7 +20,7 @@ from footings.test_tools import assert_footings_files_equal
 
 
 @model(steps=["_step_1", "_step_2", "_step_3"])
-class IntegerModel(Footing):
+class IntegerModel:
     """Integer model for testing."""
 
     a = define_parameter(dtype=int, description="A number A")
