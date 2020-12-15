@@ -280,7 +280,7 @@ def model(cls: type = None, *, steps: List[str]):
 
         # 1. All attributes need to belong to a footings_group
         exclude = ["run", "audit", "visualize"]
-        attributes = [x for x in dir(cls) if x[0] != "_" and x not in exclude]
+        attributes = [x for x in cls.__dict__.keys() if x[0] != "_" and x not in exclude]
         if hasattr(cls, "__attrs_attrs__"):
             attrs_attrs = {x.name: x for x in cls.__attrs_attrs__}
         else:
