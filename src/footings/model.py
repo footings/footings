@@ -72,13 +72,13 @@ class Footing:
         """Visualize the model to get an understanding of what model attributes are used and when."""
         return visualize_model(self)
 
-    def audit(self, file: str, **kwargs):
+    def audit(self, file: str = None, **kwargs):
         """Audit the model which returns copies of the object as it is modified across each step.
 
         Parameters
         ----------
-        file : str
-            The name of the audit file.
+        file : str, optional
+            The name of the audit output file.
         kwargs
             Additional key words passed to audit.
 
@@ -94,7 +94,7 @@ class Footing:
 
         Parameters
         ----------
-        to_step : str
+        to_step : str, optional
             The name of the step to run model to.
 
         """

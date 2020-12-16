@@ -150,9 +150,11 @@ class AuditContainer:
 #########################################################################################
 
 
-def run_model_audit(model, file, **kwargs):
-    file_ext = pathlib.Path(file).suffix
+def run_model_audit(model, file=None, **kwargs):
     config = kwargs.pop("config", None)
+    if file is None:
+        return AuditContainer.create(model, config=config).as_audit()
+    file_ext = pathlib.Path(file).suffix
     audit_dict = AuditContainer.create(model, config=config).as_audit()
     _run_model_audit(file_ext=file_ext, audit_dict=audit_dict, file=file, **kwargs)
 

@@ -47,53 +47,55 @@ class IntegerModel:
         self.ret_3 = self.ret_1 + self.ret_2
 
 
+expected_step_1 = {
+    "name": "_step_1",
+    "method_name": "_step_1",
+    "docstring": "Add a and b together.",
+    "uses": ["parameter.a", "parameter.b"],
+    "impacts": ["intermediate.ret_1"],
+    "output": {"intermediate.ret_1": 2},
+    "metadata": {},
+}
+
+expected_step_2 = {
+    "name": "_step_2",
+    "method_name": "_step_2",
+    "docstring": "Subtract d from c",
+    "uses": ["parameter.c", "parameter.d"],
+    "impacts": ["intermediate.ret_2"],
+    "output": {"intermediate.ret_2": 0},
+    "metadata": {},
+}
+
+expected_step_3 = {
+    "name": "_step_3",
+    "method_name": "_step_3",
+    "docstring": "Add total of steps 1 and 2.",
+    "uses": ["intermediate.ret_1", "intermediate.ret_2"],
+    "impacts": ["return.ret_3"],
+    "output": {"return.ret_3": 2},
+    "metadata": {},
+}
+
+expected_default = {
+    "name": "IntegerModel",
+    "docstring": IntegerModel.__doc__,
+    "signature": f"IntegerModel{str(signature(IntegerModel))}",
+    "instantiation": {
+        "parameter.a": 1,
+        "parameter.b": 1,
+        "parameter.c": 2,
+        "parameter.d": 2,
+    },
+    "steps": [expected_step_1, expected_step_2, expected_step_3],
+    "output": {"ret_3": 2},
+    "config": asdict(AuditConfig()),
+}
+
+
 def test_audit():
     int_model = IntegerModel(a=1, b=1, c=2, d=2)
-
-    # test default config
     test_default = AuditContainer.create(int_model)
-    expected_step_1 = {
-        "name": "_step_1",
-        "method_name": "_step_1",
-        "docstring": "Add a and b together.",
-        "uses": ["parameter.a", "parameter.b"],
-        "impacts": ["intermediate.ret_1"],
-        "output": {"intermediate.ret_1": 2},
-        "metadata": {},
-    }
-    expected_step_2 = {
-        "name": "_step_2",
-        "method_name": "_step_2",
-        "docstring": "Subtract d from c",
-        "uses": ["parameter.c", "parameter.d"],
-        "impacts": ["intermediate.ret_2"],
-        "output": {"intermediate.ret_2": 0},
-        "metadata": {},
-    }
-    expected_step_3 = {
-        "name": "_step_3",
-        "method_name": "_step_3",
-        "docstring": "Add total of steps 1 and 2.",
-        "uses": ["intermediate.ret_1", "intermediate.ret_2"],
-        "impacts": ["return.ret_3"],
-        "output": {"return.ret_3": 2},
-        "metadata": {},
-    }
-
-    expected_default = {
-        "name": "IntegerModel",
-        "docstring": IntegerModel.__doc__,
-        "signature": f"IntegerModel{str(signature(int_model.__class__))}",
-        "instantiation": {
-            "parameter.a": 1,
-            "parameter.b": 1,
-            "parameter.c": 2,
-            "parameter.d": 2,
-        },
-        "steps": [expected_step_1, expected_step_2, expected_step_3],
-        "output": {"ret_3": 2},
-        "config": asdict(AuditConfig()),
-    }
     assert test_default.as_audit() == expected_default
 
     # test exclude all step detail
@@ -123,6 +125,10 @@ def test_audit():
         "config": asdict(AuditConfig(step_config=step_config)),
     }
     assert test_no_step_detail.as_audit() == expected_no_step_detail
+
+
+def test_audit_python():
+    assert IntegerModel(a=1, b=1, c=2, d=2).audit() == expected_default
 
 
 def test_audit_xlsx(tmp_path):
