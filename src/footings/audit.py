@@ -18,9 +18,6 @@ class AuditStepConfig:
     show_impacts = attrib(type=bool, default=True)
     show_output = attrib(type=bool, default=True)
     show_metadata = attrib(type=bool, default=True)
-    nonconstant = attrib(type=dict, factory=dict)
-    input_format = attrib(type=str, default="base")
-    output_format = attrib(type=str, default="base")
 
 
 @attrs(slots=True, frozen=True)

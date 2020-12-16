@@ -71,10 +71,7 @@
       "show_uses": true,
       "show_impacts": true,
       "show_output": true,
-      "show_metadata": true,
-      "nonconstant": {},
-      "input_format": "base",
-      "output_format": "base"
+      "show_metadata": true
     }
   }
 }
