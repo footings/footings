@@ -13,7 +13,7 @@ The footings library was developed with the intention of making it easier to dev
 
 ## Principles
 
-The Footings library was designed as framework library using the below princples -
+The Footings library was designed as framework library using the below principles -
 
 - Models are a sequence of linked steps.
 - Models should be easy to understand.
@@ -22,9 +22,11 @@ The Footings library was designed as framework library using the below princples
 - Models should be self documenting.
 - Models need to scale when needed.
 - Models can be combined to form other models.
-
+- Models will be built and used in an environment with a mix of software that comes together to create a best in class modeling environment.
 
 **These all become easier when you can leverage the amazing Python and wider open source ecosystems.**
+
+For a more insights into principles see [principles](principles.md)
 
 ## Learning
 
@@ -36,6 +38,7 @@ The best way to learn how to use the footings library to build models is to read
 :hidden:
 
 installation.md
+principles.md
 tutorials/index.md
 api.rst
 license.md

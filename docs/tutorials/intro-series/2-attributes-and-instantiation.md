@@ -18,7 +18,7 @@ execution:
 
 This is the second tutorial in the [Intro Series](index.md). Here we will do a deeper dive into attributes and instantiation of models.
 
-We will start with the model code from the [prior tutorial](1-a-footings-model.md) which is shown below.
+We will start with the model code from the [prior tutorial](1-building-a-model.md) which is shown below.
 
 ```{code-cell} ipython3
 from footings import (
@@ -65,7 +65,7 @@ This can be tested by running the following line of code which will return an er
 AddABC(1, 2, 3)
 ```
 
-The `Footings framework` intentially make the models key word only objects as many in order to be explicit when models have many parameters.
+The `Footings framework` intentionally make the models key word only objects as many in order to be explicit when models have many parameters.
 
 ## An Instantiated Model
 
@@ -133,7 +133,7 @@ class AddABC:
         self.abc = self.ab + self.c
 ```
 
-When calling the `def_*` functions we did not pass any arguments. These functions take a number of optional arguments add the ability to validate data passed to arguments as well as adds to the documentation of the model which will be covered in more detail in the [documentation tutorial](3-documentation.md). To see a list of the available arguments you can see the [api section](../../api.rst).
+When calling the `def_*` functions we did not pass any arguments. These functions take a number of optional arguments add the ability to validate data passed to arguments as well as adds to the documentation of the model which will be covered in more detail in the [documentation tutorial](3-documenting-models.md). To see a list of the available arguments you can see the [api section](../../api.rst).
 
 Below is an example of how we can add validation to the model when adding arguments to `def_parameter`.
 
@@ -175,7 +175,7 @@ The `footings` library also contains two additional define functions. Both of th
 
 - `def_meta` is a way to add metadata to a model. As an example, this might be the run date/time a model is ran.
 
-- `def_sensitivity` is a way to add a default parameter. The name sensitivity is often used in actuarial models to test how sensitve an outcome is to a given parameter. As an example, an actuarial model might have an interest rate parameter and an interest rate sensitivty. The default value for the sensitivity would be 1 but could be changed to 1.1 to test the impact of a 10% increase in interes rates.
+- `def_sensitivity` is a way to add a default parameter. The name sensitivity is often used in actuarial models to test how sensitive an outcome is to a given parameter. As an example, an actuarial model might have an interest rate parameter and an interest rate sensitivity. The default value for the sensitivity would be 1 but could be changed to 1.1 to test the impact of a 10% increase in interest rates.
 
 Both of these are demonstrated in the code below.
 
@@ -226,7 +226,7 @@ print(f"output = {str(discount2.run())}")
 
 ## Closing
 
-With this tutorial, we dug deeper into how the `Footings framework` defines attributes and how they are represented in the model. When building models, it is recommended to use the optional argument into the `def_*` functions to add validation.
+With this tutorial, we dug deeper into how the `Footings framework` defines attributes and how they are represented in the model. When building models, it is recommended to pass in optional arguments to the `def_*` functions to add validation.
 
 Below is a summary of the functionality of each `def_*` function -
 

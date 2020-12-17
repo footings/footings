@@ -12,23 +12,13 @@ execution:
   timeout: -1
 ---
 
-# A Footings Model
+# Building a Model
 
 ## Introduction
 
-This is the first tutorail in the [Intro Series](index.md) describing how to use the [Footings framework](https://www.github.com/footings/footings) to build models. Note the `Footings framework` was developed with the intention of making it easier to build actuarial models, but it can also be used to build any type of model.
+This is the first tutorial in the [Intro Series](index.md) describing how to use the [Footings framework](https://www.github.com/footings/footings) to build models. Note the `Footings framework` was developed with the intention of making it easier to build actuarial models, but it can also be used to build any type of model.
 
-Knowing the princples of the `Footings framework` which are listed below will help one understand why models are built the way in which they are.
-
-- Models are a sequence of linked steps
-- Models should be easy to understand
-- Models need to have validation built in
-- Models need to be audited using a second source such as excel
-- Models should be self documenting
-- Models need to scale when needed
-- Models can be combined to form other models
-
-This tutorial won't touch all of the princples, but it will highlight the first two - `models are a sequence of linked steps` and `models should be easy to understand`.
+Knowing the [principles](../../principles.md) of the `Footings framework` will help one understand why models are built the way in which they are. This tutorial won't touch all of the principles, but it will highlight the first two - `models are a sequence of linked steps` and `models should be easy to understand`.
 
 ## Example Model Code
 

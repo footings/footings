@@ -27,10 +27,9 @@ core
    footings.def_intermediate
    footings.def_return
    footings.dispatch_function
+   footings.audit
 
 |
-
-
 
 model_tools
 -----------
