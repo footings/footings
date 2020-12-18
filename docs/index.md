@@ -15,16 +15,16 @@ The footings library was developed with the intention of making it easier to dev
 
 The Footings library was designed as framework library using the below principles -
 
-- Models are a sequence of linked steps.
-- Models should be easy to understand.
-- Models need to have validation built in.
-- Models need to be audited using a second source such as excel.
-- Models should be self documenting.
-- Models need to scale when needed.
-- Models can be combined to form other models.
-- Models will be built and used in an environment with a mix of software that comes together to create a best in class modeling environment.
+- Models are a sequence of linked steps
+- Models need to be easy to understand
+- Models need to have validation built in
+- Models need to be easy to audit
+- Models need to be self documenting
+- Models need to be able to scale up
+- Models need to be able to build off other models
+- Model environments should not be monolithic
 
-**These all become easier when you can leverage the amazing Python and wider open source ecosystems.**
+**These all become easier when you can leverage the amazing Python and wider open source ecosystems as well.**
 
 For a more insights into principles see [principles](principles.md)
 
