@@ -20,13 +20,13 @@ This is a model to test documentation.
     **param_2** : int
         This is parameter 2.
 
-:Modifiers:
+:Sensitivities:
 
-    **modif_1** : int
-        This is modifier 1.
+    **sensit_1** : int
+        This is sensitivity 1.
 
-    **modif_2** : int
-        This is modifier 2.
+    **sensit_2** : int
+        This is sensitivity 2.
 
 :Meta:
 
@@ -37,22 +37,21 @@ This is a model to test documentation.
         This is meta 2.
 
 
-:Assets:
+:Returns:
 
-    **asset_1** : int
-        This is asset 1.
+    **return_1** : int
+        This is return 1.
 
-    **asset_2** : int
-        This is asset 2.
+    **return_2** : int
+        This is return 2.
+
+
+
 
 :Steps:
 
-    1. _step_1 - Step 1 summary
-    2. _step_2 - Step 2 summary
-
-
-
-
+    1) _step_1 - Step 1 summary
+    2) _step_2 - Step 2 summary
 
 
 
@@ -76,4 +75,6 @@ This is a model to test documentation.
             print(idx)
             print(tup[0])
             print(tup[1])
+    for x in str(doc_1).split("\n"):
+        print(x)
     assert all([a == e for a, e in zip(str(doc_1).split("\n"), expected.split("\n"))])

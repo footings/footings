@@ -1,0 +1,77 @@
+{
+  "name": "IntegerModel",
+  "signature": "IntegerModel(*, a: int, b: int, c: int, d: int) -> 'IntegerModel'",
+  "docstring": "\nInteger model for testing.\n\nParameters\n----------\na : int\n    A number A\nb : int\n    A number B\nc : int\n    A number C\nd : int\n    A number D\n\nIntermediates\n-------------\nret_1 : int\n    Results a + b\nret_2 : int\n    Results c - d\n\nReturns\n-------\nret_3 : int\n    Result total of step_1 and step_2\n\nSteps\n-----\n1) _step_1 - Add a and b together.\n2) _step_2 - Subtract d from c\n3) _step_3 - Add total of steps 1 and 2.\n",
+  "instantiation": {
+    "parameter.a": 1,
+    "parameter.b": 1,
+    "parameter.c": 2,
+    "parameter.d": 2
+  },
+  "steps": [
+    {
+      "name": "_step_1",
+      "method_name": "_step_1",
+      "docstring": "Add a and b together.",
+      "uses": [
+        "parameter.a",
+        "parameter.b"
+      ],
+      "impacts": [
+        "intermediate.ret_1"
+      ],
+      "output": {
+        "intermediate.ret_1": 2
+      },
+      "metadata": {}
+    },
+    {
+      "name": "_step_2",
+      "method_name": "_step_2",
+      "docstring": "Subtract d from c",
+      "uses": [
+        "parameter.c",
+        "parameter.d"
+      ],
+      "impacts": [
+        "intermediate.ret_2"
+      ],
+      "output": {
+        "intermediate.ret_2": 0
+      },
+      "metadata": {}
+    },
+    {
+      "name": "_step_3",
+      "method_name": "_step_3",
+      "docstring": "Add total of steps 1 and 2.",
+      "uses": [
+        "intermediate.ret_1",
+        "intermediate.ret_2"
+      ],
+      "impacts": [
+        "return.ret_3"
+      ],
+      "output": {
+        "return.ret_3": 2
+      },
+      "metadata": {}
+    }
+  ],
+  "output": {
+    "ret_3": 2
+  },
+  "config": {
+    "show_signature": true,
+    "show_docstring": true,
+    "show_steps": true,
+    "step_config": {
+      "show_method_name": true,
+      "show_docstring": true,
+      "show_uses": true,
+      "show_impacts": true,
+      "show_output": true,
+      "show_metadata": true
+    }
+  }
+}

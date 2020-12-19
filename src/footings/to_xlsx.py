@@ -6,7 +6,7 @@ from attr import attrs, attrib, asdict
 import pandas as pd
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from openpyxl.styles import NamedStyle
+from openpyxl.styles import NamedStyle, Font
 
 
 @attrs(slots=True, frozen=True)
@@ -249,3 +249,165 @@ class FootingsXlsxWb:
         self.write_obj("__footings__", df, record_entry=False)
         del self.workbook["Sheet"]
         self.workbook.save(file)
+
+
+#########################################################################################
+# xlsx helper functions
+#########################################################################################
+
+
+def _add_section(wb, sheet, section_name, section_value, source):
+    wb.write_obj(
+        sheet, section_name, add_cols=1, style=XLSX_FORMATS["title"], source=source
+    )
+    wb.write_obj(sheet, section_value, add_rows=2, add_cols=-1, source=source)
+
+
+def _format_docstring(docstring):
+    if docstring is None:
+        return ""
+
+    def _format_line(line, indent_len):
+        if line[:indent_len] == "".join([" " for x in range(0, indent_len)]):
+            return line[indent_len:]
+        else:
+            return line
+
+    lines = docstring.split("\n")
+    if lines[0] == "":
+        lines = lines[1:]
+    sections = [line for line in lines if "---" in line]
+    if sections != []:
+        section = sections[0]
+        indent_len = len(section) - len(section.lstrip(" "))
+    else:
+        indent_len = 0
+    return "\n".join(
+        [_format_line(line, indent_len) if indent_len > 0 else line for line in lines]
+    )
+
+
+def _format_signature(sig):
+    return sig
+
+
+def _format_sheets(wb, sheet, format_beyond_c=False):
+    wksht = wb.worksheets[sheet].obj
+    wksht.sheet_view.showGridLines = False
+    wksht.column_dimensions["A"].width = 2.14
+    wksht.column_dimensions["B"].width = 14
+    # wksht.column_dimensions["C"].width = 1
+
+    if format_beyond_c:
+        for col in list(wksht.columns)[2:]:
+            max_length = 0
+            for cell in col:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            if max_length <= 3:
+                adj_width = (max_length + 1) * 1.2
+            else:
+                adj_width = max_length + 3
+            wksht.column_dimensions[col[0].column_letter].width = adj_width
+
+
+def _write_sheet(wb, sheet, step):
+    _add_section(wb, sheet, "Step Name:", step["name"], "NAME")
+    if "method_name" in step:
+        _add_section(wb, sheet, "Method Name:", step["method_name"], "MTEHOD_NAME")
+    if "docstring" in step:
+        _add_section(
+            wb, sheet, "Docstring:", _format_docstring(step["docstring"]), "DOCSTRING",
+        )
+    if "uses" in step:
+        _add_section(
+            wb, sheet, "Uses:", str(step["uses"]).replace("'", ""), "USES",
+        )
+    if "impacts" in step:
+        _add_section(
+            wb, sheet, "Impacts:", str(step["impacts"]).replace("'", ""), "IMPACTS",
+        )
+    if "metadata" in step:
+        _add_section(
+            wb, sheet, "Metadata:", step["metadata"], "METADATA",
+        )
+    if "output" in step:
+        _add_section(
+            wb, sheet, "Output:", step["output"], "OUTPUT",
+        )
+
+
+#########################################################################################
+# create xlsx audit file
+#########################################################################################
+
+XLSX_FORMATS = {
+    "title": NamedStyle(name="bold", font=Font(name="Calibri", bold=True)),
+    "underline": NamedStyle("underline", font=Font(name="Calibri", underline="single")),
+    "hyperlink": NamedStyle(
+        "hyperlink", font=Font(name="Calibri", italic=True, bold=True)
+    ),
+}
+
+
+def create_audit_xlsx_file(audit_dict, file, **kwargs):
+    """Create xlsx file."""
+    wb = FootingsXlsxWb.create()
+    for format_nm, format_val in XLSX_FORMATS.items():
+        wb.add_named_style(format_nm, format_val)
+
+    # write main
+    wb.create_sheet("Main", start_row=2, start_col=2)
+    _add_section(wb, "Main", "Model Name:", audit_dict["name"], "NAME")
+
+    if "signature" in audit_dict:
+        _add_section(
+            wb,
+            "Main",
+            "Signature:",
+            _format_signature(audit_dict["signature"]),
+            "SIGNATURE",
+        )
+
+    if "docstring" in audit_dict:
+        _add_section(
+            wb,
+            "Main",
+            "Docstring:",
+            _format_docstring(audit_dict["docstring"]),
+            "DOCSTRING",
+        )
+
+    _format_sheets(wb, "Main", format_beyond_c=False)
+
+    # write instantiation
+    wb.create_sheet("Instantiation", start_row=2, start_col=2)
+    _add_section(
+        wb,
+        "Instantiation",
+        "Instantiation:",
+        audit_dict["instantiation"],
+        "INSTANTIATION",
+    )
+    _format_sheets(wb, "Instantiation", format_beyond_c=True)
+
+    # write steps
+    if "steps" in audit_dict:
+        for step in audit_dict["steps"]:
+            name = step.get("name", None)
+            wb.create_sheet(name, start_row=2, start_col=2)
+            _write_sheet(wb, name, step)
+            _format_sheets(wb, name, format_beyond_c=True)
+
+    # write output
+    wb.create_sheet("Output", start_row=2, start_col=2)
+    _add_section(
+        wb, "Output", "Output:", audit_dict["output"], "OUTPUT",
+    )
+    _format_sheets(wb, "Output", format_beyond_c=True)
+
+    # save file
+    wb.save(file)

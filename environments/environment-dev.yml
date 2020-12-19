@@ -3,22 +3,26 @@ channels:
   - conda-forge
 dependencies:
   # required
+  - pip
   - attrs
+  - numpy
   - pandas
   - numpydoc=1.0.*
   - openpyxl
 
   # testing
   - pytest
+  - pytest-cov
 
   # development
   - flake8
   - black==19.*
   - pre-commit
   - sphinx
-  - recommonmark
-  - sphinx_rtd_theme
-  - nbsphinx
+  - myst-nb
+  - pydata-sphinx-theme
   - ipython
   - ipykernel
   - dask
+  - pip:
+    - nox

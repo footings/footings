@@ -1,5 +1,6 @@
 import math
 
+import numpy as np
 import pandas as pd
 
 from footings import dispatch_function
@@ -18,55 +19,112 @@ def _day_diff(start, end):
 
 @dispatch_function(key_parameters=("frequency",))
 def freq_dispatcher(
-    start_dt: pd.Timestamp, end_dt: pd.Timestamp, col_date_nm: str, frequency: str
+    start_dt: pd.Timestamp,
+    end_dt: pd.Timestamp,
+    col_date_nm: str,
+    frequency: str,
+    end_duration: str = None,
 ):
     msg = "No registered function based on passed paramters and no default function."
     raise NotImplementedError(msg)
 
 
 @freq_dispatcher.register(frequency="Y")
-def _(start_dt: pd.Timestamp, end_dt: pd.Timestamp, col_date_nm: str):
+def _(
+    start_dt: pd.Timestamp,
+    end_dt: pd.Timestamp,
+    col_date_nm: str,
+    end_duration: str = None,
+):
     periods = math.ceil(_month_diff(start_dt, end_dt) / 12) + 1
-    dates = pd.to_datetime(
+    frame = pd.DataFrame()
+    frame[col_date_nm] = pd.to_datetime(
         [start_dt + pd.DateOffset(years=period) for period in range(0, periods)]
     )
-    return pd.DataFrame({col_date_nm: dates})
+    if end_duration is not None:
+        frame[end_duration] = pd.to_datetime(
+            [start_dt + pd.DateOffset(years=period) for period in range(1, periods + 1)]
+        )
+    return frame
 
 
 @freq_dispatcher.register(frequency="Q")
-def _(start_dt: pd.Timestamp, end_dt: pd.Timestamp, col_date_nm: str):
+def _(
+    start_dt: pd.Timestamp,
+    end_dt: pd.Timestamp,
+    col_date_nm: str,
+    end_duration: str = None,
+):
     periods = math.ceil(_month_diff(start_dt, end_dt) / 3) + 1
-    dates = pd.to_datetime(
+    frame = pd.DataFrame()
+    frame[col_date_nm] = pd.to_datetime(
         [start_dt + pd.DateOffset(months=period * 3) for period in range(0, periods)]
     )
-    return pd.DataFrame({col_date_nm: dates})
+    if end_duration is not None:
+        frame[end_duration] = pd.to_datetime(
+            [
+                start_dt + pd.DateOffset(months=period * 3)
+                for period in range(1, periods + 1)
+            ]
+        )
+    return frame
 
 
 @freq_dispatcher.register(frequency="M")
-def _(start_dt: pd.Timestamp, end_dt: pd.Timestamp, col_date_nm: str):
+def _(
+    start_dt: pd.Timestamp,
+    end_dt: pd.Timestamp,
+    col_date_nm: str,
+    end_duration: str = None,
+):
     periods = _month_diff(start_dt, end_dt) + 1
-    dates = pd.to_datetime(
+    frame = pd.DataFrame()
+    frame[col_date_nm] = pd.to_datetime(
         [start_dt + pd.DateOffset(months=period) for period in range(0, periods)]
     )
-    return pd.DataFrame({col_date_nm: dates})
+    if end_duration is not None:
+        frame[end_duration] = pd.to_datetime(
+            [start_dt + pd.DateOffset(months=period) for period in range(1, periods + 1)]
+        )
+    return frame
 
 
 @freq_dispatcher.register(frequency="W")
-def _(start_dt: pd.Timestamp, end_dt: pd.Timestamp, col_date_nm: str):
+def _(
+    start_dt: pd.Timestamp,
+    end_dt: pd.Timestamp,
+    col_date_nm: str,
+    end_duration: str = None,
+):
     periods = math.ceil(_day_diff(start_dt, end_dt) / 7) + 1
-    dates = pd.to_datetime(
+    frame = pd.DataFrame()
+    frame[col_date_nm] = pd.to_datetime(
         [start_dt + pd.DateOffset(weeks=period) for period in range(0, periods)]
     )
-    return pd.DataFrame({col_date_nm: dates})
+    if end_duration is not None:
+        frame[end_duration] = pd.to_datetime(
+            [start_dt + pd.DateOffset(weeks=period) for period in range(1, periods + 1)]
+        )
+    return frame
 
 
 @freq_dispatcher.register(frequency="D")
-def _(start_dt: pd.Timestamp, end_dt: pd.Timestamp, col_date_nm: str):
+def _(
+    start_dt: pd.Timestamp,
+    end_dt: pd.Timestamp,
+    col_date_nm: str,
+    end_duration: str = None,
+):
     periods = _day_diff(start_dt, end_dt) + 1
-    dates = pd.to_datetime(
+    frame = pd.DataFrame()
+    frame[col_date_nm] = pd.to_datetime(
         [start_dt + pd.DateOffset(days=period) for period in range(0, periods)]
     )
-    return pd.DataFrame({col_date_nm: dates})
+    if end_duration is not None:
+        frame[end_duration] = pd.to_datetime(
+            [start_dt + pd.DateOffset(days=period) for period in range(1, periods + 1)]
+        )
+    return frame
 
 
 @dispatch_function(key_parameters=("kw",))
@@ -213,6 +271,7 @@ def create_frame(
     col_date_nm : str
         The column name to assign the date column.
     kwargs :
+        end_duration \n
         duration_year \n
         duration_quarter \n
         duration_month \n
@@ -235,13 +294,13 @@ def create_frame(
 
     See Also
     --------
-    footings.library.create_frame_from_record
-    footings.library.expand_frame_per_record
+    footings.model_tools.create_frame_from_record
+    footings.model_tools.expand_frame_per_record
 
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.library import create_frame
+    >>> from footings.model_tools import create_frame
     >>> frame = create_frame(
     >>>     start_dt = pd.Timestamp("2020-01-10"),
     >>>     end_dt = pd.Timestamp("2020-05-30"),
@@ -258,8 +317,13 @@ def create_frame(
     >>> # 4	2020-05-10	5
     >>> # 5	2020-06-10	6
     """
+    end_duration = kwargs.pop("end_duration", None)
     tbl = freq_dispatcher(
-        start_dt=start_dt, end_dt=end_dt, col_date_nm=col_date_nm, frequency=frequency
+        start_dt=start_dt,
+        end_dt=end_dt,
+        col_date_nm=col_date_nm,
+        frequency=frequency,
+        end_duration=end_duration,
     )
     for k, v in kwargs.items():
         tbl = kwarg_dispatcher(
@@ -284,7 +348,7 @@ def create_frame_from_record(
     and an end date. All columns from the original record will be duplicated the length of the date
     range. See example for usage.
 
-    If wanting to do this for many records use the function ``footings.library.expand_frame_per_record``.
+    If wanting to do this for many records use the function ``footings.model_tools.expand_frame_per_record``.
     When doing one record ``create_frame_from_record`` is faster than expand_frame_per_record.
 
     Parameters
@@ -300,7 +364,7 @@ def create_frame_from_record(
     col_date_nm : str
         The column name to assign the date column.
     kwargs :
-        See kwargs under footings.library.create_frame
+        See kwargs under footings.model_tools.create_frame
 
     Returns
     -------
@@ -314,13 +378,13 @@ def create_frame_from_record(
 
     See Also
     --------
-    footings.library.create_frame
-    footings.library.expand_frame_per_record
+    footings.model_tools.create_frame
+    footings.model_tools.expand_frame_per_record
 
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.library import create_frame_from_record
+    >>> from footings.model_tools import create_frame_from_record
     >>> record = pd.DataFrame(
     >>>     {
     >>>         "POLICY": ["P1"],
@@ -346,7 +410,7 @@ def create_frame_from_record(
     >>> # 4     2020-05-10	5	            P1	        M
     >>> # 5     2020-06-10	6	            P1	        M
     """
-    record = record.to_dict(orient="record")
+    record = record.to_dict(orient="records")
     if len(record) != 1:
         msg = f"The record must be a pd.DataFrame with one row. The record pass has {len(record)} rows."
         raise ValueError(msg)
@@ -376,7 +440,7 @@ def expand_frame_per_record(
     """
     Create a frame with a date colum ranging from the start_dt to the end_dt from a record.
 
-    This function expands the function ``footings.library.create_frame_from_record`` to cover the
+    This function expands the function ``footings.model_tools.create_frame_from_record`` to cover the
     application of covering many records. Internally, it applies the function
     ``create_frame_from_record`` for each record.
 
@@ -393,7 +457,7 @@ def expand_frame_per_record(
     col_date_nm : str
         The column name to assign the date column.
     kwargs :
-        See kwargs under footings.library.create_frame
+        See kwargs under footings.model_tools.create_frame
 
     Returns
     -------
@@ -402,13 +466,13 @@ def expand_frame_per_record(
 
     See Also
     --------
-    footings.library.create_frame
-    footings.library.create_frame_from_record
+    footings.model_tools.create_frame
+    footings.model_tools.create_frame_from_record
 
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.library import expand_frame_per_record
+    >>> from footings.model_tools import expand_frame_per_record
     >>> df = pd.DataFrame(
     >>>     {
     >>>         "POLICY": ["P1", "P2"],
@@ -455,6 +519,293 @@ def expand_frame_per_record(
     )
 
 
-def normalize_to_calendar_year(tbl, col_date_nm):
-    """Normalize to calendar year."""
-    raise NotImplementedError("Feature not implemented yet.")
+def frame_add_exposure(
+    frame: pd.DataFrame,
+    *,
+    begin_date: pd.Timestamp = None,
+    end_date: pd.Timestamp = None,
+    exposure_name: str = "EXPOSURE",
+    begin_duration_col: str = "DATE_BD",
+    end_duration_col: str = "DATE_ED",
+):
+    """Add an exposure values to a duration based frame.
+
+    Parameters
+    ----------
+    frame : pd.DataFrame
+        The frame to add an exposure value.
+    begin_date : pd.Timestamp, optional
+        Begin date for measuring exposure, by default None.
+    end_date : pd.Timestamp, optional
+        End date for measuring exposure, by default None.
+    exposure_name : str, optional
+        The name to give the column added representing the exposure, by default = EXPOSURE.
+    begin_duration_col : str, optional
+        The column name representing the start of a duration, by default DATE_BD.
+    end_duration_col : str, optional
+        The column name representing the end of a duration, by default DATE_ED.
+
+    Raises
+    ------
+    ValueError
+        If begin_duration_col is not in frame.
+    ValueError
+        if end_ducration_col is not in frame.
+
+    Returns
+    -------
+    pd.DataFrame
+        The frame with an additional column (name given to exposure) with the exposure value.
+
+    Notes
+    -----
+    As an example, with a date of 2020-03-15 and a duration covering the period
+    from 2020-03-10 through 2020-04-10, the exposure would be 0.838710 = 26 / 31.
+    Notice the 15th is included as a day in the numerator and the end date is
+    excluded in the denominator.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from footings.model_tools import frame_add_exposure
+    >>>
+    >>> frame = pd.DataFrame(
+    >>>     {
+    >>>         "BEGIN_DURATION_COL": pd.to_datetime(
+    >>>             ["2020-02-10", "2020-03-10", "2020-04-10", "2020-05-10",]
+    >>>         ),
+    >>>         "END_DURATION_COL": pd.to_datetime(
+    >>>             ["2020-03-10", "2020-04-10", "2020-05-10", "2020-06-10"]
+    >>>         ),
+    >>>     }
+    >>> )
+    >>>
+    >>> example = frame_add_exposure(
+    >>>     frame.copy(),
+    >>>     exposure_name="EXPOSURE",
+    >>>     begin_duration_col="BEGIN_DURATION_COL",
+    >>>     end_duration_col="END_DURATION_COL",
+    >>>     begin_date=pd.Timestamp("2020-03-15"),
+    >>>     end_date=pd.Timestamp("2020-04-20"),
+    >>> )
+    >>>
+    >>> example
+    >>> #       BEGIN_DURATION_COL      END_DURATION_COL	EXPOSURE
+    >>> # 0	2020-02-10	        2020-03-10	        0.000000
+    >>> # 1	2020-03-10	        2020-04-10	        0.838710
+    >>> # 2	2020-04-10	        2020-05-10	        0.838710
+    >>> # 3	2020-05-10	        2020-06-10	        0.000000
+    """
+    if begin_duration_col not in frame.columns:
+        raise ValueError(
+            f"The begin_duration_col [{begin_duration_col}] is not in the frame."
+        )
+    if end_duration_col not in frame.columns:
+        raise ValueError(
+            f"The end_duration_col [{end_duration_col}] is not in the frame."
+        )
+
+    days_period = (frame[end_duration_col] - frame[begin_duration_col]).dt.days
+    condlist, choicelist = [], []
+
+    if begin_date is not None:
+        begin_days = (frame[end_duration_col] - begin_date).dt.days.clip(lower=0)
+        condlist.append(begin_days == 0)
+        choicelist.append(0)
+        condlist.append(begin_days <= days_period)
+        choicelist.append((begin_days) / days_period)
+
+    if end_date is not None:
+        end_days = (frame[end_duration_col] - end_date).dt.days.clip(lower=0)
+        condlist.append(end_days > 0)
+        choicelist.append((1 - ((end_days - 1) / days_period)).clip(lower=0, upper=1))
+
+    frame[exposure_name] = np.select(condlist, choicelist, default=1.0)
+    return frame
+
+
+def frame_add_weights(
+    frame: pd.DataFrame,
+    as_of_dt: pd.Timestamp,
+    *,
+    begin_duration_col: str = "DATE_BD",
+    end_duration_col: str = "DATE_ED",
+    wt_current_name: str = "WT_0",
+    wt_next_name: str = "WT_1",
+):
+    """Add cell weights to a duration based frame as an as of date.
+
+    Parameters
+    ----------
+    frame : pd.DataFrame
+        The frame to add an exposure value.
+    as_of_dt : pd.Timestamp
+        The as of date to assign weights.
+    begin_duration_col : str, optional
+        The column name representing the start of a duration, by default DATE_BD.
+    end_duration_col : str, optional
+        The column name representing the end of a duration, by default DATE_ED.
+    wt_currrent_name : str, optional
+        The name of the column representing the current duration, by default WT_0.
+    wt_next_name : str, optional
+        The name of the column representing the next duration, by default WT_1.
+
+    Raises
+    ------
+    ValueError
+        If begin_duration_col is not in frame.
+    ValueError
+        If end_duration_col is not in frame.
+
+    Returns
+    -------
+    pd.DataFrame
+        The frame with an additional column (name given to exposure) with the exposure value.
+
+    Notes
+    -----
+    As an example, with a date of 2020-02-15 and a duration covering the period
+    from 2020-02-10 through 2020-03-10, the current period weight would be
+    0.827586 = 24 / 29. Notice the 15th is included as a day in the numerator
+    and tend end date is excluded as a day in the numerator. The next period
+    weight would be 1 - 0.827586 or 0.172414.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from footings.model_tools import frame_add_weights
+    >>>
+    >>> frame = pd.DataFrame(
+    >>>     {
+    >>>         "BEGIN_DURATION_COL": pd.to_datetime(
+    >>>             ["2020-02-10", "2020-03-10", "2020-04-10", "2020-05-10",]
+    >>>         ),
+    >>>         "END_DURATION_COL": pd.to_datetime(
+    >>>             ["2020-03-10", "2020-04-10", "2020-05-10", "2020-06-10"]
+    >>>         ),
+    >>>     }
+    >>> )
+    >>>
+    >>> example = frame_add_weights(
+    >>>     frame.copy(),
+    >>>     begin_duration_col="BEGIN_DURATION_COL",
+    >>>     end_duration_col="END_DURATION_COL",
+    >>>     as_of_dt=pd.Timestamp("2020-02-15"),
+    >>>     wt_current_name="WT_0",
+    >>>     wt_next_name="WT_1",
+    >>> )
+    >>>
+    >>> example
+    >>> #     	    BEGIN_DURATION_COL  END_DURATION_COL        WT_0        WT_1
+    >>> # 0	    2020-02-10	        2020-03-10	        0.827586    0.172414
+    >>> # 1	    2020-03-10	        2020-04-10	        0.827586    0.172414
+    >>> # 2	    2020-04-10	        2020-05-10	        0.827586    0.172414
+    >>> # 3	    2020-05-10	        2020-06-10	        0.827586    0.172414
+    """
+    if begin_duration_col not in frame.columns:
+        raise ValueError(
+            f"The begin_duration_col [{begin_duration_col}] is not in the frame."
+        )
+    if end_duration_col not in frame.columns:
+        raise ValueError(
+            f"The end_duration_col [{end_duration_col}] is not in the frame."
+        )
+
+    query = f"{begin_duration_col} <= @as_of_dt and {end_duration_col} >= @as_of_dt"
+    src = frame[[begin_duration_col, end_duration_col]].query(query)
+    dur_n_days = (src[end_duration_col].iat[0] - src[begin_duration_col].iat[0]).days
+    wt_current = ((src[end_duration_col].iat[0] - as_of_dt).days) / dur_n_days
+    frame[wt_current_name] = wt_current
+    frame[wt_next_name] = 1 - wt_current
+    return frame
+
+
+def frame_filter(
+    frame,
+    *,
+    begin_date: pd.Timestamp = None,
+    end_date: pd.Timestamp = None,
+    begin_duration_col: str = "DATE_BD",
+    end_duration_col: str = "DATE_ED",
+):
+    """Filter a duration based frame based on a being and/or an end date.
+
+    Parameters
+    ----------
+    frame : pd.DataFrame
+        The frame to add an exposure value.
+    begin_date : pd.Timestamp, optional
+        Begin date for measuring exposure, by default None.
+    end_date : pd.Timestamp, optional
+        End date for measuring exposure, by default None.
+    begin_duration_col : str, optional
+        The column name representing the start of a duration, by default DATE_BD.
+    end_duration_col : str, optional
+        The column name representing the end of a duration, by default DATE_ED.
+
+    Raises
+    ------
+    ValueError
+        If begin_duration_col is not in frame.
+    ValueError
+        If end_duration_col is not in frame.
+
+    Returns
+    -------
+    pd.DataFrame
+        The frame with an additional column (name given to exposure) with the exposure value.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from footings.model_tools import frame_filter
+    >>>
+    >>> frame = pd.DataFrame(
+    >>>     {
+    >>>         "BEGIN_DURATION_COL": pd.to_datetime(
+    >>>             ["2020-02-10", "2020-03-10", "2020-04-10", "2020-05-10",]
+    >>>         ),
+    >>>         "END_DURATION_COL": pd.to_datetime(
+    >>>             ["2020-03-10", "2020-04-10", "2020-05-10", "2020-06-10"]
+    >>>         ),
+    >>>     }
+    >>> )
+    >>> frame
+    >>> #   BEGIN_DURATION_COL  END_DURATION_COL
+    >>> # 0 2020-02-10          2020-03-10
+    >>> # 1 2020-03-10          2020-04-10
+    >>> # 2 2020-04-10          2020-05-10
+    >>> # 3 2020-05-10          2020-06-10
+    >>>
+    >>> example = frame_filter(
+    >>>     frame,
+    >>>     begin_date=pd.Timestamp("2020-03-15"),
+    >>>     end_date=pd.Timestamp("2020-05-01"),
+    >>>     begin_duration_col="BEGIN_DURATION_COL",
+    >>>     end_duration_col="END_DURATION_COL",
+    >>> )
+    >>> example
+    >>> #   BEGIN_DURATION_COL  END_DURATION_COL
+    >>> # 1 2020-03-10          2020-04-10
+    >>> # 2 2020-04-10          2020-05-10
+    """
+    if begin_duration_col not in frame.columns:
+        raise ValueError(
+            f"The begin_duration_col [{begin_duration_col}] is not in the frame."
+        )
+    if end_duration_col not in frame.columns:
+        raise ValueError(
+            f"The end_duration_col [{end_duration_col}] is not in the frame."
+        )
+    if begin_date is not None and end_date is None:
+        query = f"{end_duration_col} >= @begin_date"
+    elif begin_date is None and end_date is not None:
+        query = f"{begin_duration_col} <= @end_date"
+    elif begin_date is not None and end_date is not None:
+        query = f"{end_duration_col} >= @begin_date and {begin_duration_col} <= @end_date"
+    else:
+        query = None
+
+    if query is not None:
+        return frame.query(query)
+    return frame

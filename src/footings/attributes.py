@@ -5,7 +5,7 @@ from attr._make import _CountingAttr
 from attr.validators import instance_of, in_
 from attr.setters import NO_OP
 
-from footings.core.validators import (
+from footings.validators import (
     custom_validator,
     min_len_validator,
     max_len_validator,
@@ -14,23 +14,23 @@ from footings.core.validators import (
 )
 
 
-class _Parameter:
+class Parameter:
     pass
 
 
-class _Modifier:
+class Sensitivity:
     pass
 
 
-class _Meta:
+class Meta:
     pass
 
 
-class _Placeholder:
+class Intermediate:
     pass
 
 
-class _Asset:
+class Return:
     pass
 
 
@@ -62,7 +62,7 @@ def _define(
 
     return attrib(
         init=init,
-        type=dtype.__qualname__ if hasattr(dtype, "__qualname__") else dtype,
+        type=dtype,
         repr=False,
         validator=validators,
         metadata=metadata,
@@ -71,10 +71,8 @@ def _define(
     )
 
 
-def define_asset(
-    *, dtype=None, description=None, default=None, **kwargs
-) -> _CountingAttr:
-    """Define an asset to the model where an asset is a non-frozen attribute that is
+def def_return(*, dtype=None, description=None, default=None, **kwargs) -> _CountingAttr:
+    """Define an return to the model where an return is a non-frozen attribute that is
     created by the model and when the model runs.
 
     Parameters
@@ -94,7 +92,7 @@ def define_asset(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=_Asset,
+        footing_group=Return(),
         init=False,
         dtype=dtype,
         description=description,
@@ -104,7 +102,7 @@ def define_asset(
     )
 
 
-def define_placeholder(
+def def_intermediate(
     *, dtype=None, description=None, default=None, **kwargs
 ) -> _CountingAttr:
     """Define a placeholder to the model where a placeholder is a non-frozen attribute that is
@@ -127,7 +125,7 @@ def define_placeholder(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=_Placeholder,
+        footing_group=Intermediate(),
         init=False,
         dtype=dtype,
         description=description,
@@ -137,7 +135,7 @@ def define_placeholder(
     )
 
 
-def define_meta(
+def def_meta(
     *, meta: Any, dtype=None, description=None, default=None, **kwargs
 ) -> _CountingAttr:
     """Define meta data for the model which is a frozen attribute that is passed on instantiation of the model.
@@ -161,7 +159,7 @@ def define_meta(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=_Meta,
+        footing_group=Meta(),
         init=False,
         dtype=dtype,
         description=description,
@@ -171,7 +169,7 @@ def define_meta(
     )
 
 
-def define_modifier(
+def def_sensitivity(
     *, default: Any, dtype=None, description=None, **kwargs
 ) -> _CountingAttr:
     """Define a modifer to the model where a modifier is a frozen attribute with a required default value.
@@ -195,7 +193,7 @@ def define_modifier(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=_Modifier,
+        footing_group=Sensitivity(),
         init=True,
         dtype=dtype,
         description=description,
@@ -205,7 +203,7 @@ def define_modifier(
     )
 
 
-def define_parameter(
+def def_parameter(
     *, dtype=None, description=None, default=None, **kwargs
 ) -> _CountingAttr:
     """Define a parameter to the model where a parameter is a frozen attribute that is passed on instantiation of the model.
@@ -227,7 +225,7 @@ def define_parameter(
         An attribute that is recognized by the model.
     """
     return _define(
-        footing_group=_Parameter,
+        footing_group=Parameter(),
         init=True,
         dtype=dtype,
         description=description,

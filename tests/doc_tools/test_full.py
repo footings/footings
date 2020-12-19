@@ -42,7 +42,7 @@ def sphinx_app(tmpdir_factory):
 
 
 class ParseSphinxHTML(HTMLParser):
-    sections = ["Parameters", "Modifiers", "Meta", "Assets", "Steps", "Methods"]
+    sections = ["Parameters", "Sensitivitys", "Meta", "Returns", "Steps", "Methods"]
 
     def __init__(self):
         HTMLParser.__init__(self)
