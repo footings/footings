@@ -171,3 +171,27 @@ def test_model_steps():
 
     test = Test(x=1, y=2, z=3)
     assert test.run() == 0
+
+
+def test_model_inheritance():
+    @model(steps=["_add"])
+    class ModelParent:
+        x = def_parameter()
+        y = def_parameter()
+        out = def_return()
+
+        @step(uses=["x", "y"], impacts=["out"])
+        def _add(self):
+            self.out = self.x + self.y
+
+    assert ModelParent(x=1, y=2).run() == 3
+
+    @model(steps=["_add", "_subtract"])
+    class ModelChild(ModelParent):
+        z = def_parameter()
+
+        @step(uses=["z", "out"], impacts=["out"])
+        def _subtract(self):
+            self.out = self.out - self.z
+
+    assert ModelChild(x=1, y=2, z=3).run() == 0

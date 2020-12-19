@@ -281,8 +281,10 @@ def model(cls: type = None, *, steps: List[str]):
         # 1. All attributes need to belong to a footings_group
         exclude = ["run", "audit", "visualize"]
         attributes = [x for x in cls.__dict__.keys() if x[0] != "_" and x not in exclude]
+
         if hasattr(cls, "__attrs_attrs__"):
-            attrs_attrs = {x.name: x for x in cls.__attrs_attrs__}
+            attributes += [x.name for x in cls.__attrs_attrs__ if x.name[0] != "_"]
+            attrs_attrs = {x.name: x for x in cls.__attrs_attrs__ if x.name[0] != "_"}
         else:
             attrs_attrs = {}
         parameters, sensitivities, meta, intermediates, returns = [], [], [], [], []
@@ -293,16 +295,12 @@ def model(cls: type = None, *, steps: List[str]):
             else:
                 if isinstance(attr, _CountingAttr) is False:
                     msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
-                    msg += "Use one of def_parameter, def_meta, def_sensitivity, def_intermediate "
-                    msg += "or def_return when building a model."
+                    msg += "Use one of def_* functions from the footings library when building a model."
                     raise ModelCreationError(msg)
             footing_group = attr.metadata.get("footing_group", None)
             if footing_group is None:
                 msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
-                msg += (
-                    "Use one of def_parameter, def_meta, def_sensitivity or def_return "
-                )
-                msg += "when building a model."
+                msg += "Use one of def_* functions from the footings library when building a model."
                 raise ModelCreationError(msg)
             if isinstance(footing_group, Parameter):
                 parameters.append(attribute)
@@ -365,14 +363,16 @@ def model(cls: type = None, *, steps: List[str]):
             **{p: f"intermediate.{p}" for p in intermediates},
             **{a: f"return.{a}" for a in returns},
         }
+
         for step in steps:
             use_old = getattr(cls, step).uses
-            use_new = [attribute_map[x] for x in use_old]
+            use_new = [attribute_map[x] if "." not in x else x for x in use_old]
             impact_old = getattr(cls, step).impacts
-            impact_new = [attribute_map[x] for x in impact_old]
-            setattr(
-                cls, step, evolve(getattr(cls, step), uses=use_new, impacts=impact_new)
+            impact_new = [attribute_map[x] if "." not in x else x for x in impact_old]
+            new_step = evolve(
+                getattr(cls, step), uses=tuple(use_new), impacts=tuple(impact_new)
             )
+            setattr(cls, step, new_step)
         cls.__footings_attribute_map__ = attrib(default=attribute_map, **kws)
 
         # Make attrs dataclass and update signature
