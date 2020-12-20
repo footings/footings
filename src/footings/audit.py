@@ -55,14 +55,19 @@ class AuditStepContainer:
     name = attrib(type=str)
     method_name = attrib(type=str, default=None)
     docstring = attrib(type=str, default=None)
-    uses = attrib(type=list, default=None)
-    impacts = attrib(type=list, default=None)
+    uses = attrib(type=tuple, default=None)
+    impacts = attrib(type=tuple, default=None)
     output = attrib(type=dict, default=None)
     metadata = attrib(type=dict, default=None)
+    config = attrib(
+        type=AuditStepConfig,
+        factory=AuditStepConfig,
+        validator=instance_of(AuditStepConfig),
+    )
 
     @classmethod
     def create(cls, step, output, config):
-        kwargs = {"name": step.name}
+        kwargs = {"name": step.name, "config": config}
         if config.show_method_name:
             kwargs.update({"method_name": step.method_name})
         if config.show_docstring:
@@ -77,8 +82,10 @@ class AuditStepContainer:
             kwargs.update({"metadata": step.metadata})
         return cls(**kwargs)
 
-    def as_audit(self):
-        return {k: v for k, v in asdict(self).items() if v is not None}
+    def as_dict(self):
+        d = asdict(self, recurse=True, retain_collection_types=True)
+        del d["config"]
+        return {k: v for k, v in d.items() if v is not None}
 
 
 @attrs(slots=True, frozen=True)
@@ -120,7 +127,7 @@ class AuditContainer:
             for step, output in zip(model.__footings_steps__, step_output):
                 step_dict = AuditStepContainer.create(
                     getattr(model, step).func, output, config.step_config
-                ).as_audit()
+                )
                 steps.append(step_dict)
             kwargs.update({"steps": steps})
 
@@ -128,7 +135,7 @@ class AuditContainer:
 
         return cls(**kwargs)
 
-    def as_audit(self, include_config=True):
+    def as_dict(self, include_config=True):
         d = {"name": self.name}
         if self.signature is not None:
             d.update({"signature": self.signature})
@@ -137,9 +144,11 @@ class AuditContainer:
         if self.instantiation is not None:
             d.update({"instantiation": self.instantiation})
         if self.steps is not None:
-            d.update({"steps": self.steps})
+            d.update({"steps": [step.as_dict() for step in self.steps]})
         if self.output is not None:
             d.update({"output": self.output})
+        if self.metadata is not None:
+            d.update({"metadata": self.metadata})
         if include_config is True:
             d.update({"config": asdict(self.config)})
         return d
@@ -153,28 +162,25 @@ class AuditContainer:
 def run_model_audit(model, file=None, **kwargs):
     config = kwargs.pop("config", None)
     if file is None:
-        return AuditContainer.create(model, config=config).as_audit()
+        return AuditContainer.create(model, config=config)
     file_ext = pathlib.Path(file).suffix
-    audit_dict = AuditContainer.create(model, config=config).as_audit()
-    _run_model_audit(file_ext=file_ext, audit_dict=audit_dict, file=file, **kwargs)
+    _run_model_audit(file_ext=file_ext, model=model, file=file, config=config, **kwargs)
 
 
 @dispatch_function(key_parameters=("file_ext",))
-def _run_model_audit(file_ext, audit_dict, file, **kwargs):
+def _run_model_audit(file_ext, model, file, config, **kwargs):
     """test run_model audit"""
     msg = "No registered function based on passed paramters and no default function."
     raise NotImplementedError(msg)
 
 
 @_run_model_audit.register(file_ext=".xlsx")
-def _(audit_dict, file, **kwargs):
-    """Run model audit"""
-
+def _(model, file, config, **kwargs):
+    audit_dict = AuditContainer.create(model, config=config).as_dict()
     create_audit_xlsx_file(audit_dict, file, **kwargs)
 
 
 @_run_model_audit.register(file_ext=".json")
-def _(audit_dict, file, **kwargs):
-    """Run model audit"""
-
+def _(model, file, config, **kwargs):
+    audit_dict = AuditContainer.create(model, config=config).as_dict()
     create_audit_json_file(audit_dict, file, **kwargs)

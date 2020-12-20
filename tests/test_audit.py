@@ -1,8 +1,6 @@
 import os
 from inspect import signature
 
-from attr import asdict
-
 from footings.model import model, step
 from footings.attributes import (
     def_parameter,
@@ -11,7 +9,7 @@ from footings.attributes import (
 )
 from footings.audit import (
     AuditContainer,
-    # AuditStepContainer,
+    AuditStepContainer,
     AuditConfig,
     AuditStepConfig,
 )
@@ -51,52 +49,58 @@ expected_step_1 = {
     "name": "_step_1",
     "method_name": "_step_1",
     "docstring": "Add a and b together.",
-    "uses": ["parameter.a", "parameter.b"],
-    "impacts": ["intermediate.ret_1"],
+    "uses": ("parameter.a", "parameter.b"),
+    "impacts": ("intermediate.ret_1",),
     "output": {"intermediate.ret_1": 2},
     "metadata": {},
+    "config": AuditStepConfig(),
 }
 
 expected_step_2 = {
     "name": "_step_2",
     "method_name": "_step_2",
     "docstring": "Subtract d from c",
-    "uses": ["parameter.c", "parameter.d"],
-    "impacts": ["intermediate.ret_2"],
+    "uses": ("parameter.c", "parameter.d"),
+    "impacts": ("intermediate.ret_2",),
     "output": {"intermediate.ret_2": 0},
     "metadata": {},
+    "config": AuditStepConfig(),
 }
 
 expected_step_3 = {
     "name": "_step_3",
     "method_name": "_step_3",
     "docstring": "Add total of steps 1 and 2.",
-    "uses": ["intermediate.ret_1", "intermediate.ret_2"],
-    "impacts": ["return.ret_3"],
+    "uses": ("intermediate.ret_1", "intermediate.ret_2"),
+    "impacts": ("return.ret_3",),
     "output": {"return.ret_3": 2},
     "metadata": {},
-}
-
-expected_default = {
-    "name": "IntegerModel",
-    "docstring": IntegerModel.__doc__,
-    "signature": f"IntegerModel{str(signature(IntegerModel))}",
-    "instantiation": {
-        "parameter.a": 1,
-        "parameter.b": 1,
-        "parameter.c": 2,
-        "parameter.d": 2,
-    },
-    "steps": [expected_step_1, expected_step_2, expected_step_3],
-    "output": {"ret_3": 2},
-    "config": asdict(AuditConfig()),
+    "config": AuditStepConfig(),
 }
 
 
 def test_audit():
     int_model = IntegerModel(a=1, b=1, c=2, d=2)
     test_default = AuditContainer.create(int_model)
-    assert test_default.as_audit() == expected_default
+    expected_default = AuditContainer(
+        name="IntegerModel",
+        docstring=IntegerModel.__doc__,
+        signature=f"IntegerModel{str(signature(IntegerModel))}",
+        instantiation={
+            "parameter.a": 1,
+            "parameter.b": 1,
+            "parameter.c": 2,
+            "parameter.d": 2,
+        },
+        steps=[
+            AuditStepContainer(**expected_step_1),
+            AuditStepContainer(**expected_step_2),
+            AuditStepContainer(**expected_step_3),
+        ],
+        output={"ret_3": 2},
+        config=AuditConfig(),
+    )
+    assert test_default == expected_default
 
     # test exclude all step detail
     step_config = AuditStepConfig(
@@ -120,15 +124,37 @@ def test_audit():
             "parameter.c": 2,
             "parameter.d": 2,
         },
-        "steps": [{"name": "_step_1"}, {"name": "_step_2"}, {"name": "_step_3"}],
+        "steps": [
+            AuditStepContainer(name="_step_1", config=step_config),
+            AuditStepContainer(name="_step_2", config=step_config),
+            AuditStepContainer(name="_step_3", config=step_config),
+        ],
         "output": {"ret_3": 2},
-        "config": asdict(AuditConfig(step_config=step_config)),
+        "config": AuditConfig(step_config=step_config),
     }
-    assert test_no_step_detail.as_audit() == expected_no_step_detail
+    assert test_no_step_detail == AuditContainer(**expected_no_step_detail)
 
 
 def test_audit_python():
-    assert IntegerModel(a=1, b=1, c=2, d=2).audit() == expected_default
+    expected = AuditContainer(
+        name="IntegerModel",
+        docstring=IntegerModel.__doc__,
+        signature=f"IntegerModel{str(signature(IntegerModel))}",
+        instantiation={
+            "parameter.a": 1,
+            "parameter.b": 1,
+            "parameter.c": 2,
+            "parameter.d": 2,
+        },
+        steps=[
+            AuditStepContainer(**expected_step_1),
+            AuditStepContainer(**expected_step_2),
+            AuditStepContainer(**expected_step_3),
+        ],
+        output={"ret_3": 2},
+        config=AuditConfig(),
+    )
+    assert IntegerModel(a=1, b=1, c=2, d=2).audit() == expected
 
 
 def test_audit_xlsx(tmp_path):
