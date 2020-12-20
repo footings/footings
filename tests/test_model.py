@@ -78,6 +78,46 @@ def test_model_instantiation():
             def _add(self):
                 self.ret = self.ret + self.parameter
 
+        # fail due to step not using uses
+        @model(steps=["_add"])  # noqa: F841
+        class FailStepNoUses:
+            parameter = def_parameter(dtype=int)
+            ret = def_return(default=0)
+
+            @step(impacts=["ret"])
+            def _add(self):
+                self.ret = self.ret + self.parameter
+
+        # fail due to step not using impacts
+        @model(steps=["_add"])  # noqa: F841
+        class FailStepNoImpacts:
+            parameter = def_parameter(dtype=int)
+            ret = def_return(default=0)
+
+            @step(uses=["ret", "parameter"], impacts=["ret"])
+            def _add(self):
+                self.ret = self.ret + self.parameter
+
+        # fail due to uses x not an attribute
+        @model(steps=["_add"])  # noqa: F841
+        class FailStepUsesWrong:
+            parameter = def_parameter(dtype=int)
+            ret = def_return(default=0)
+
+            @step(uses=["x"], impacts=["ret"])
+            def _add(self):
+                self.ret = self.ret + self.parameter
+
+        # fail due to step not using impacts
+        @model(steps=["_add"])  # noqa: F841
+        class FailStepImpactsWrong:
+            parameter = def_parameter(dtype=int)
+            ret = def_return(default=0)
+
+            @step(uses=["ret", "parameter"], impacts=["x"])
+            def _add(self):
+                self.ret = self.ret + self.parameter
+
 
 def test_model_documentation():
     @model(steps=["_add", "_subtract"])
@@ -154,6 +194,11 @@ def test_model_attributes():
 
 
 def test_model_steps():
+
+    # with pytest.raises(ModelCreationError):
+    #
+    #     @model(steps=["_step_1"])
+
     @model(steps=["_add", "_subtract"])
     class Test:
         x = def_parameter()
@@ -169,8 +214,7 @@ def test_model_steps():
         def _subtract(self):
             self.out = self.out - self.z
 
-    test = Test(x=1, y=2, z=3)
-    assert test.run() == 0
+    assert Test(x=1, y=2, z=3).run() == 0
 
 
 def test_model_inheritance():

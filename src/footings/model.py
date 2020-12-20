@@ -252,6 +252,20 @@ def _attr_doc(cls, steps):
     return cls
 
 
+def _update_uses_impacts(src, attribute_map):
+    flags = ["parameter.", "sensitivity.", "meta.", "intermediate.", "return."]
+
+    def inner(x):
+        if any([flag in x for flag in flags]):
+            return x
+        if x not in attribute_map:
+            msg = f"The attribute [{x}] does not belong to the model."
+            raise ModelCreationError(msg)
+        return attribute_map[x]
+
+    return tuple([inner(x) for x in src])
+
+
 def _prepare_signature(cls):
     old_sig = signature(cls)
     return old_sig.replace(return_annotation=f"{cls.__name__}")
@@ -366,12 +380,10 @@ def model(cls: type = None, *, steps: List[str]):
 
         for step in steps:
             use_old = getattr(cls, step).uses
-            use_new = [attribute_map[x] if "." not in x else x for x in use_old]
+            use_new = _update_uses_impacts(use_old, attribute_map)
             impact_old = getattr(cls, step).impacts
-            impact_new = [attribute_map[x] if "." not in x else x for x in impact_old]
-            new_step = evolve(
-                getattr(cls, step), uses=tuple(use_new), impacts=tuple(impact_new)
-            )
+            impact_new = _update_uses_impacts(impact_old, attribute_map)
+            new_step = evolve(getattr(cls, step), uses=use_new, impacts=tuple(impact_new))
             setattr(cls, step, new_step)
         cls.__footings_attribute_map__ = attrib(default=attribute_map, **kws)
 
