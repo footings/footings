@@ -1,5 +1,6 @@
 import json
 import pathlib
+from typing import Mapping
 
 import pandas as pd
 from openpyxl import load_workbook
@@ -12,41 +13,20 @@ class FootingsAuditLoadError(Exception):
     """Error raised when loading file."""
 
 
-def load_footings_file(file: str):
-    """Load footings file.
-
-    Currently .json and .xlsx file extensions are supported.
-
-    Parameters
-    ----------
-    file : str
-        The file to load.
-
-    Returns
-    -------
-    dict
-        A dict representing the respective file and extension. Note different file extensions
-        produce different dicts.
-    """
-    file_ext = pathlib.Path(file).suffix
-    return _load_footings_file(file_ext=file_ext, file=file)
+def flatten_dict(key, value):
+    if isinstance(value, Mapping):
+        pass
+    return (key, value)
 
 
-@dispatch_function(key_parameters=("file_ext",))
-def _load_footings_file(file_ext, file):
-    msg = f"No registered function to load a file with extension {file_ext}."
-    raise NotImplementedError(msg)
-
-
-@_load_footings_file.register(file_ext=".json")
-def _(file):
+def load_footings_json_file(file: str):
     with open(file, "r") as f:
-        ret = json.load(f)
+        loaded_json = json.load(f)
+    ret = dict([flatten_dict(k, v) for k, v in loaded_json.items()])
     return ret
 
 
-@_load_footings_file.register(file_ext=".xlsx")
-def _(file: str):
+def load_footings_xlsx_file(file: str):
     def _make_key(x: pd.Series):
         return FootingsXlsxEntry(
             worksheet=x.worksheet,
@@ -101,3 +81,39 @@ def _(file: str):
             )
 
     return values
+
+
+def load_footings_file(file: str):
+    """Load footings file.
+
+    Currently .json and .xlsx file extensions are supported.
+
+    Parameters
+    ----------
+    file : str
+        The file to load.
+
+    Returns
+    -------
+    dict
+        A dict representing the respective file and extension. Note different file extensions
+        produce different dicts.
+    """
+    file_ext = pathlib.Path(file).suffix
+    return _load_footings_file(file_ext=file_ext, file=file)
+
+
+@dispatch_function(key_parameters=("file_ext",))
+def _load_footings_file(file_ext, file):
+    msg = f"No registered function to load a file with extension {file_ext}."
+    raise NotImplementedError(msg)
+
+
+@_load_footings_file.register(file_ext=".json")
+def _(file):
+    return load_footings_json_file(file)
+
+
+@_load_footings_file.register(file_ext=".xlsx")
+def _(file: str):
+    return load_footings_xlsx_file(file)

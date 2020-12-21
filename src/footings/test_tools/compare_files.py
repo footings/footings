@@ -4,7 +4,9 @@ import pathlib
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
 
-from .load_file import load_footings_file
+from footings import dispatch_function
+
+from .load_file import load_footings_json_file, load_footings_xlsx_file
 
 #########################################################################################
 # comparison functions
@@ -93,6 +95,52 @@ def compare_file_dicts(result: dict, expected: dict, **kwargs):
     return test, message
 
 
+def _check_extensions_equal(result, expected):
+    result_ext = pathlib.Path(result).suffix
+    expected_ext = pathlib.Path(expected).suffix
+    if result_ext != expected_ext:
+        msg = f"The file extensions for result [{result_ext}] and expected [{expected_ext}] do not match."
+        raise ValueError(msg)
+    return True
+
+
+def assert_footings_json_files_equal(result: str, expected: str, **kwargs):
+    _check_extensions_equal(result, expected)
+    result = load_footings_json_file(result)
+    expected = load_footings_json_file(expected)
+    test, message = compare_file_dicts(result=result, expected=expected, **kwargs)
+    if test is False:
+        raise AssertionError(f"\n{message}")
+    return True
+
+
+def assert_footings_xlsx_files_equal(result: str, expected: str, **kwargs):
+    _check_extensions_equal(result, expected)
+    result = load_footings_xlsx_file(result)
+    expected = load_footings_xlsx_file(expected)
+    test, message = compare_file_dicts(result=result, expected=expected, **kwargs)
+    if test is False:
+        raise AssertionError(f"\n{message}")
+    return True
+
+
+@dispatch_function(key_parameters=("file_ext",))
+def _assert_footings_files_equal(file_ext, result, expected, **kwargs):
+    """test run_model audit"""
+    msg = "No registered function based on passed paramters and no default function."
+    raise NotImplementedError(msg)
+
+
+@_assert_footings_files_equal.register(file_ext=".json")
+def _(result: str, expected: str, **kwargs):
+    assert_footings_json_files_equal(result, expected, **kwargs)
+
+
+@_assert_footings_files_equal.register(file_ext=".xlsx")
+def _(result: str, expected: str, **kwargs):
+    assert_footings_xlsx_files_equal(result, expected, **kwargs)
+
+
 def assert_footings_files_equal(result: str, expected: str, **kwargs):
     """Test two files to determine if they are equal.
 
@@ -121,17 +169,7 @@ def assert_footings_files_equal(result: str, expected: str, **kwargs):
     AssertionError
         If the results and expected audit files are different.
     """
-    result_ext = pathlib.Path(result).suffix
-    expected_ext = pathlib.Path(expected).suffix
-
-    if result_ext != expected_ext:
-        msg = f"The file extensions for result [{result_ext}] and expected [{expected_ext}] do not match."
-        raise ValueError(msg)
-
-    result = load_footings_file(result)
-    expected = load_footings_file(expected)
-
-    test, message = compare_file_dicts(result=result, expected=expected, **kwargs)
-    if test is False:
-        raise AssertionError(f"\n{message}")
-    return True
+    file_ext = pathlib.Path(result).suffix
+    _assert_footings_files_equal(
+        file_ext=file_ext, result=result, expected=expected, **kwargs
+    )

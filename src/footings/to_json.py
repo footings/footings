@@ -1,6 +1,7 @@
 from datetime import date, datetime
 import json
 
+import numpy as np
 import pandas as pd
 
 
@@ -14,10 +15,12 @@ class AuditJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, "to_audit_json"):
             return obj.to_audit_json()
+        elif isinstance(obj, np.generic):
+            return obj.item()
         elif isinstance(obj, pd.DataFrame):
-            return [{col: obj[col].to_list()} for col in obj.columns]
+            return {col: obj[col].to_list() for col in obj.columns}
         elif isinstance(obj, pd.Series):
-            return [{obj.name: obj.to_list()}]
+            return {obj.name: obj.to_list()}
         elif isinstance(obj, (pd.Timestamp, date, datetime)):
             return str(obj)
         elif callable(obj):
