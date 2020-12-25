@@ -92,11 +92,11 @@ def test_audit():
             "parameter.c": 2,
             "parameter.d": 2,
         },
-        steps=[
-            AuditStepContainer(**expected_step_1),
-            AuditStepContainer(**expected_step_2),
-            AuditStepContainer(**expected_step_3),
-        ],
+        steps={
+            "_step_1": AuditStepContainer(**expected_step_1),
+            "_step_2": AuditStepContainer(**expected_step_2),
+            "_step_3": AuditStepContainer(**expected_step_3),
+        },
         output={"ret_3": 2},
         config=AuditConfig(),
     )
@@ -124,11 +124,11 @@ def test_audit():
             "parameter.c": 2,
             "parameter.d": 2,
         },
-        "steps": [
-            AuditStepContainer(name="_step_1", config=step_config),
-            AuditStepContainer(name="_step_2", config=step_config),
-            AuditStepContainer(name="_step_3", config=step_config),
-        ],
+        "steps": {
+            "_step_1": AuditStepContainer(name="_step_1", config=step_config),
+            "_step_2": AuditStepContainer(name="_step_2", config=step_config),
+            "_step_3": AuditStepContainer(name="_step_3", config=step_config),
+        },
         "output": {"ret_3": 2},
         "config": AuditConfig(step_config=step_config),
     }
@@ -146,11 +146,11 @@ def test_audit_python():
             "parameter.c": 2,
             "parameter.d": 2,
         },
-        steps=[
-            AuditStepContainer(**expected_step_1),
-            AuditStepContainer(**expected_step_2),
-            AuditStepContainer(**expected_step_3),
-        ],
+        steps={
+            "_step_1": AuditStepContainer(**expected_step_1),
+            "_step_2": AuditStepContainer(**expected_step_2),
+            "_step_3": AuditStepContainer(**expected_step_3),
+        },
         output={"ret_3": 2},
         config=AuditConfig(),
     )

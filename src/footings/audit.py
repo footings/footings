@@ -97,7 +97,7 @@ class AuditContainer:
     output = attrib(type=dict, validator=instance_of(dict))
     docstring = attrib(type=str, default=None, validator=optional(instance_of(str)))
     signature = attrib(type=str, default=None, validator=optional(instance_of(str)))
-    steps = attrib(type=list, default=None, validator=optional(instance_of(list)))
+    steps = attrib(type=dict, default=None, validator=optional(instance_of(dict)))
     metadata = attrib(type=dict, default=None, validator=optional(instance_of(dict)))
     config = attrib(
         type=AuditConfig, factory=AuditConfig, validator=instance_of(AuditConfig)
@@ -123,12 +123,12 @@ class AuditContainer:
         step_output, final_output = _get_model_output(model)
 
         if config.show_steps:
-            steps = []
-            for step, output in zip(model.__footings_steps__, step_output):
-                step_dict = AuditStepContainer.create(
+            steps = {
+                step: AuditStepContainer.create(
                     getattr(model, step).func, output, config.step_config
                 )
-                steps.append(step_dict)
+                for step, output in zip(model.__footings_steps__, step_output)
+            }
             kwargs.update({"steps": steps})
 
         kwargs.update({"output": final_output})
@@ -144,7 +144,7 @@ class AuditContainer:
         if self.instantiation is not None:
             d.update({"instantiation": self.instantiation})
         if self.steps is not None:
-            d.update({"steps": [step.as_dict() for step in self.steps]})
+            d.update({"steps": {k: v.as_dict() for k, v in self.steps.items()}})
         if self.output is not None:
             d.update({"output": self.output})
         if self.metadata is not None:

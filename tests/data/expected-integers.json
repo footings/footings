@@ -8,8 +8,8 @@
     "parameter.c": 2,
     "parameter.d": 2
   },
-  "steps": [
-    {
+  "steps": {
+    "_step_1": {
       "name": "_step_1",
       "method_name": "_step_1",
       "docstring": "Add a and b together.",
@@ -25,7 +25,7 @@
       },
       "metadata": {}
     },
-    {
+    "_step_2": {
       "name": "_step_2",
       "method_name": "_step_2",
       "docstring": "Subtract d from c",
@@ -41,7 +41,7 @@
       },
       "metadata": {}
     },
-    {
+    "_step_3": {
       "name": "_step_3",
       "method_name": "_step_3",
       "docstring": "Add total of steps 1 and 2.",
@@ -57,7 +57,7 @@
       },
       "metadata": {}
     }
-  ],
+  },
   "output": {
     "ret_3": 2
   },

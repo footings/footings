@@ -32,6 +32,6 @@ class AuditJSONEncoder(json.JSONEncoder):
                 raise TypeError(f"Object of type {type(obj)} is not serializable.")
 
 
-def create_audit_json_file(audit_dict, file, **kwargs):
+def create_audit_json_file(d, file, **kwargs):
     with open(file, "w") as data_file:
-        json.dump(obj=audit_dict, fp=data_file, cls=AuditJSONEncoder, indent=2, **kwargs)
+        json.dump(obj=d, fp=data_file, cls=AuditJSONEncoder, indent=2, **kwargs)

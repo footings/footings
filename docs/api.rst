@@ -62,8 +62,12 @@ test_tools
    :nosignatures:
    :toctree: generated
 
-   footings.test_tools.assert_footings_files_equal
    footings.test_tools.load_footings_file
+   footings.test_tools.load_footings_json_file
+   footings.test_tools.load_footings_xlsx_file
+   footings.test_tools.assert_footings_files_equal
+   footings.test_tools.assert_footings_json_files_equal
+   footings.test_tools.assert_footings_xlsx_files_equal
 
 |
 

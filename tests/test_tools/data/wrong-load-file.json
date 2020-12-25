@@ -1,0 +1,9 @@
+{
+  "outer": {
+    "inner": {
+      "endpoint1": 2,
+      "endpoint3": 3
+    }
+  },
+  "endpoint4": 4
+}

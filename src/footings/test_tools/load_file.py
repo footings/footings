@@ -1,4 +1,5 @@
 import json
+from operator import add
 import pathlib
 from typing import Mapping
 
@@ -9,24 +10,56 @@ from ..to_xlsx import FootingsXlsxEntry
 from ..utils import dispatch_function
 
 
-class FootingsAuditLoadError(Exception):
-    """Error raised when loading file."""
+def flatten_dict(d):
+    results = []
 
+    def lift(x):
+        return f"{str(x)}/"
 
-def flatten_dict(key, value):
-    if isinstance(value, Mapping):
-        pass
-    return (key, value)
+    def visit(subdict, results, partial_key=None):
+        for k, v in subdict.items():
+            new_key = f"/{str(k)}/" if partial_key is None else add(partial_key, lift(k))
+            if isinstance(v, Mapping):
+                visit(v, results, new_key)
+            else:
+                results.append((new_key, v))
+
+    visit(d, results, None)
+    return dict(results)
 
 
 def load_footings_json_file(file: str):
+    """Load footings generated json file.
+
+    Parameters
+    ----------
+    file : str
+        The path to the file.
+
+    Returns
+    -------
+    dict
+        A dict representing the respective file type.
+    """
     with open(file, "r") as f:
         loaded_json = json.load(f)
-    ret = dict([flatten_dict(k, v) for k, v in loaded_json.items()])
-    return ret
+    return flatten_dict(loaded_json)
 
 
 def load_footings_xlsx_file(file: str):
+    """Load footings generated xlsx file.
+
+    Parameters
+    ----------
+    file : str
+        The path to the file.
+
+    Returns
+    -------
+    dict
+        A dict representing the respective file type.
+    """
+
     def _make_key(x: pd.Series):
         return FootingsXlsxEntry(
             worksheet=x.worksheet,
@@ -55,9 +88,7 @@ def load_footings_xlsx_file(file: str):
     data = ws.values
     cols = next(data)
     if set(cols) != expected_cols:
-        raise FootingsAuditLoadError(
-            "The __footings__tab does not contain the correct columns."
-        )
+        raise ValueError("The __footings__tab does not contain the correct columns.")
     data = list(data)
     df_log = pd.DataFrame(data, columns=cols)
 
@@ -84,20 +115,22 @@ def load_footings_xlsx_file(file: str):
 
 
 def load_footings_file(file: str):
-    """Load footings file.
-
-    Currently .json and .xlsx file extensions are supported.
+    """Load footings generated file.
 
     Parameters
     ----------
     file : str
-        The file to load.
+        The path to the file.
 
     Returns
     -------
     dict
-        A dict representing the respective file and extension. Note different file extensions
-        produce different dicts.
+        A dict representing the respective file type.
+
+    See Also
+    --------
+    load_footings_json_file
+    load_footings_xlsx_file
     """
     file_ext = pathlib.Path(file).suffix
     return _load_footings_file(file_ext=file_ext, file=file)

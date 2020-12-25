@@ -96,24 +96,25 @@ def _obj_to_xlsx_dataframe(obj, worksheet, **kwargs):
 
 
 def _obj_to_xlsx_mapping(obj, worksheet, **kwargs):
+    def _make_key(mapping, key):
+        if mapping is None:
+            return f"/{str(key)}/"
+        return f"{mapping}{str(key)}/"
+
     ret = []
+    mapping = kwargs.pop("mapping", None)
     for k, v in obj.items():
         if not isinstance(k, str):
             try:
                 k = str(k)
             except:
                 raise ValueError("Converting key of mapping to string failed.")
-        mapping = kwargs.pop("mapping", "")
-        mapping += f"[{k}]"
         kwargs.pop("end_point", None)
-        key_entries = obj_to_xlsx(
-            k, worksheet, mapping=mapping, end_point="KEY", **kwargs
-        )
+        key = _make_key(mapping, k)
+        key_entries = obj_to_xlsx(k, worksheet, mapping=key, end_point="KEY", **kwargs)
         ret.extend(key_entries)
         worksheet.col += 1
-        val_entries = obj_to_xlsx(
-            v, worksheet, mapping=mapping, end_point="VALUE", **kwargs
-        )
+        val_entries = obj_to_xlsx(v, worksheet, mapping=key, end_point="VALUE", **kwargs)
         ret.extend(val_entries)
         worksheet.row = max([entry.row_end for entry in val_entries]) + 1
         worksheet.col -= 1
@@ -396,10 +397,10 @@ def create_audit_xlsx_file(audit_dict, file, **kwargs):
 
     # write steps
     if "steps" in audit_dict:
-        for step in audit_dict["steps"]:
-            name = step.get("name", None)
+        for k, v in audit_dict["steps"].items():
+            name = v.get("name", None)
             wb.create_sheet(name, start_row=2, start_col=2)
-            _write_sheet(wb, name, step)
+            _write_sheet(wb, name, v)
             _format_sheets(wb, name, format_beyond_c=True)
 
     # write output
