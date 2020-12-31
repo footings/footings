@@ -48,6 +48,10 @@ model_tools
    footings.model_tools.frame_add_weights
    footings.model_tools.frame_filter
    footings.model_tools.calculate_age
+   footings.model_tools.run_date_time
+   footings.model_tools.once
+   footings.model_tools.make_foreach_model
+   footings.model_tools.convert_to_records
 
 
 |
