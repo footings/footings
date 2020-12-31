@@ -230,7 +230,7 @@ def _parse_attriubtes(cls):
 
 def _generate_steps_sections(cls, steps):
     return [
-        f"{idx}) {step} - {getattr(cls, step).docstring}"
+        f"{idx}) {getattr(cls, step).name} - {getattr(cls, step).docstring}"
         for idx, step in enumerate(steps, start=1)
     ]
 
@@ -271,14 +271,14 @@ def _prepare_signature(cls):
     return old_sig.replace(return_annotation=f"{cls.__name__}")
 
 
-def model(cls: type = None, *, steps: List[str]):
+def model(cls: type = None, *, steps: List[str] = []):
     """Turn a class into a model within the footings framework.
 
     Parameters
     ----------
     cls : type
         The class to turn into a model.
-    steps : List[str]
+    steps : List[str], optional
         The list of steps to the model.
 
     Returns
@@ -327,18 +327,15 @@ def model(cls: type = None, *, steps: List[str]):
             elif isinstance(footing_group, Return):
                 returns.append(attribute)
 
-        # 2. Make sure at least one return
-        if len(returns) == 0:
-            raise ModelCreationError(
-                "No returns registered to model. At least one ret needs to be registered."
-            )
+        # # 2. Make sure at least one return
+        # if len(returns) == 0:
+        #     raise ModelCreationError(
+        #         "No returns registered to model. At least one ret needs to be registered."
+        #     )
 
         # 3. For steps -
-        #    - make sure at least one step in model
         #    - all steps are methods of cls
         #    - all steps have attributes uses and impacts
-        if len(steps) == 0:
-            raise ModelCreationError("Model needs to have at least one step.")
         missing_steps = []
         missing_attributes = []
         for step_nm in steps:
