@@ -24,7 +24,12 @@ class ModelCreationError(Exception):
 
 
 def _run(self, to_step):
-
+    if len(self.__footings_steps__) == 0:
+        raise ModelRunError("Not able to run model because no steps are registered.")
+    if len(self.__footings_returns__) == 0:
+        raise ModelRunError(
+            "Not able to run model because no return attributes are registered."
+        )
     if to_step is None:
         steps = self.__footings_steps__
     else:
@@ -327,13 +332,7 @@ def model(cls: type = None, *, steps: List[str] = []):
             elif isinstance(footing_group, Return):
                 returns.append(attribute)
 
-        # # 2. Make sure at least one return
-        # if len(returns) == 0:
-        #     raise ModelCreationError(
-        #         "No returns registered to model. At least one ret needs to be registered."
-        #     )
-
-        # 3. For steps -
+        # 2. For steps -
         #    - all steps are methods of cls
         #    - all steps have attributes uses and impacts
         missing_steps = []

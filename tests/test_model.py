@@ -2,7 +2,9 @@ from attr import attrib
 from numpydoc.docscrape import Parameter
 import pytest
 
-from footings.attributes import (
+from footings import (
+    model,
+    step,
     def_return,
     def_meta,
     def_sensitivity,
@@ -10,23 +12,12 @@ from footings.attributes import (
     def_intermediate,
 )
 
-from footings.model import FootingsDoc, model, step, ModelCreationError
+from footings.model import FootingsDoc, ModelCreationError, ModelRunError
 
 
 def test_model_instantiation():
 
     with pytest.raises(ModelCreationError):
-
-        # fails due to not subclass of Footing
-        @model(steps=["_add"])  # noqa: F841
-        class MissingFooting:
-            parameter = def_parameter(dtype=int)
-            ret = def_return(default=0)
-
-            @step(uses=["parameter"], impacts=["ret"])
-            def _add(self):
-                self.ret = self.ret + self.parameter
-
         # fails due to using a value vs using one of def_[return, meta, sensitivity, parameter]
         @model(steps=["_add"])
         class FailUsingValue:
@@ -37,6 +28,7 @@ def test_model_instantiation():
             def _add(self):
                 self.ret = self.ret + self.parameter
 
+    with pytest.raises(ModelCreationError):
         # fails due to using attrib() vs using one of def_[return, meta, sensitivity, parameter]
         @model(steps=["_add"])
         class FailUsingAttrib:
@@ -47,28 +39,14 @@ def test_model_instantiation():
             def _add(self):
                 self.ret = self.ret + self.parameter
 
-        # fail due to missing at least one attribute defined using def_return()
-        @model(steps=["_add"])
-        class FailMissingReturn:
-            parameter = def_parameter(dtype=int)
-            ret = def_parameter(default=0)
-
-            @step(uses=["parameter"], impacts=["ret"])
-            def _add(self):
-                self.ret = self.ret + self.parameter
-
-        # fail due to missing step as method
-        @model(steps=[])
-        class FailZeroSteps:
-            x = def_parameter()
-            y = def_return()
-
+    with pytest.raises(ModelCreationError):
         # fail due to missing step as method
         @model(steps=["_add"])
         class FailMissingStep:
             parameter = def_parameter(dtype=int)
             ret = def_return(default=0)
 
+    with pytest.raises(ModelCreationError):
         # fail due to step not decorated
         @model(steps=["_add"])  # noqa: F841
         class FailStepNotDecorated:
@@ -78,6 +56,7 @@ def test_model_instantiation():
             def _add(self):
                 self.ret = self.ret + self.parameter
 
+    with pytest.raises(TypeError):
         # fail due to step not using uses
         @model(steps=["_add"])  # noqa: F841
         class FailStepNoUses:
@@ -88,16 +67,18 @@ def test_model_instantiation():
             def _add(self):
                 self.ret = self.ret + self.parameter
 
+    with pytest.raises(TypeError):
         # fail due to step not using impacts
         @model(steps=["_add"])  # noqa: F841
         class FailStepNoImpacts:
             parameter = def_parameter(dtype=int)
             ret = def_return(default=0)
 
-            @step(uses=["ret", "parameter"], impacts=["ret"])
+            @step(uses=["ret", "parameter"])
             def _add(self):
                 self.ret = self.ret + self.parameter
 
+    with pytest.raises(ModelCreationError):
         # fail due to uses x not an attribute
         @model(steps=["_add"])  # noqa: F841
         class FailStepUsesWrong:
@@ -108,6 +89,7 @@ def test_model_instantiation():
             def _add(self):
                 self.ret = self.ret + self.parameter
 
+    with pytest.raises(ModelCreationError):
         # fail due to step not using impacts
         @model(steps=["_add"])  # noqa: F841
         class FailStepImpactsWrong:
@@ -239,3 +221,28 @@ def test_model_inheritance():
             self.out = self.out - self.z
 
     assert ModelChild(x=1, y=2, z=3).run() == 0
+
+
+def test_model_run():
+
+    with pytest.raises(ModelRunError):
+
+        @model
+        class ModelNoSteps:
+            parameter = def_parameter(dtype=int)
+            ret = def_return(default=0)
+
+        ModelNoSteps(parameter=1).run()
+
+    with pytest.raises(ModelRunError):
+
+        @model(steps=["_add"])
+        class ModelNoSteps:
+            parameter = def_parameter(dtype=int)
+            intermediate = def_intermediate(default=0)
+
+            @step(uses=["parameter"], impacts=["intermediate"])
+            def _add(self):
+                self.intermediate = self.parameter
+
+        ModelNoSteps(parameter=1).run()
