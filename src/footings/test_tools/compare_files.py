@@ -4,7 +4,6 @@ import pathlib
 from typing import Optional
 
 import pandas as pd
-from pandas.testing import assert_frame_equal, assert_series_equal
 
 from footings import dispatch_function
 
@@ -15,39 +14,82 @@ from ..to_xlsx import FootingsXlsxEntry
 # comparison functions
 #########################################################################################
 
+MAX_STR_LEN_TO_SHOW = 100
+
 
 @singledispatch
-def compare_values(val1, val2, tolerance=None):
+def compare_values(result_value, expected_value, tolerance=None):
     """A dispatch function to compare two values."""
-    result = val1 == val2
+    return compare_values(str(result_value), str(expected_value))
+
+
+@compare_values.register(str)
+def _(result_value, expected_value, tolerance=None):
+    result = result_value == expected_value
     if result:
         msg = ""
     else:
-        msg = "The values are different when tested generically."
+        if (
+            len(result_value) <= MAX_STR_LEN_TO_SHOW
+            and len(expected_value) <= MAX_STR_LEN_TO_SHOW
+        ):
+            msg = f"The result value [{result_value}] is not equal to the expected value [{expected_value}]."
+        else:
+            msg = "The result and expected strings are not equal and they are to long to display."
     return result, msg
 
 
-@compare_values.register(pd.DataFrame)
-def _(val1, val2, tolerance=None):
-    result = True
-    msg = ""
-    try:
-        assert_frame_equal(val1, val2)
-    except AssertionError:
-        result = False
-        msg = "The values are different when tested using pd.assert_frame_equal."
+@compare_values.register(bool)
+@compare_values.register(int)
+@compare_values.register(float)
+def _(result_value, expected_value, tolerance=None):
+    if tolerance is None:
+        result = result_value == expected_value
+    else:
+        result = abs(result_value - expected_value) < tolerance
+    if result:
+        msg = ""
+    else:
+        msg = f"The result value [{str(result_value)}] is not equal to the expected value [{str(expected_value)}]."
+        if tolerance is not None:
+            msg = msg[:-1] + f" using a tolerance of {str(tolerance)}."
+    return result, msg
+
+
+@compare_values.register(list)
+def _(result_value, expected_value, tolerance=None):
+    result = all(
+        compare_values(r, e, tolerance)[0] for r, e in zip(result_value, expected_value)
+    )
+    if result:
+        msg = ""
+    else:
+        msg = "The list values are different."
     return result, msg
 
 
 @compare_values.register(pd.Series)
-def _(val1, val2, tolerance=None):
-    result = True
-    msg = ""
-    try:
-        assert_series_equal(val1, val2)
-    except AssertionError:
-        result = False
-        msg = "The values are different when tested using pd.assert_series_equal."
+def _(result_value, expected_value, tolerance=None):
+    result = all(
+        compare_values(r, e, tolerance)[0] for r, e in zip(result_value, expected_value)
+    )
+    if result:
+        msg = ""
+    else:
+        msg = "The pd.Series values are different."
+    return result, msg
+
+
+@compare_values.register(pd.DataFrame)
+def _(result_value, expected_value, tolerance=None):
+    result = all(
+        compare_values(result_value[r], expected_value[e], tolerance)[0]
+        for r, e in zip(result_value.columns, expected_value.columns)
+    )
+    if result:
+        msg = ""
+    else:
+        msg = "The pd.DataFrame values are different."
     return result, msg
 
 
@@ -97,7 +139,7 @@ def compare_file_dicts(
         if temp:
             if type(res_val) != type(exp_val):
                 temp = False
-                msg = f"The value types are different at [{key}]."
+                msg = "The value types are different."
             else:
                 temp, msg = compare_values(res_val, exp_val, tolerance)
 

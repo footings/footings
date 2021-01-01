@@ -1,13 +1,99 @@
 import os
+from datetime import date
+
+import pandas as pd
 import pytest
 from footings.to_xlsx import FootingsXlsxEntry
 from footings.test_tools.compare_files import (
+    compare_values,
     make_key_checker,
     check_extensions_equal,
     assert_footings_files_equal,
     assert_footings_json_files_equal,
     assert_footings_xlsx_files_equal,
 )
+
+
+def test_compare_values():
+
+    # Test string
+    assert compare_values("str", "str")[0] is True
+    assert compare_values("str", "rts")[0] is False
+    assert (
+        compare_values("str", "rts")[1]
+        == "The result value [str] is not equal to the expected value [rts]."
+    )
+    long_str = str([x for x in range(0, 200)])
+    assert compare_values(long_str, "rts")[0] is False
+    assert (
+        compare_values(long_str, "rts")[1]
+        == "The result and expected strings are not equal and they are to long to display."
+    )
+
+    # Test bool
+    assert compare_values(True, True)[0] is True
+    assert compare_values(True, False)[0] is False
+    assert (
+        compare_values(True, False)[1]
+        == "The result value [True] is not equal to the expected value [False]."
+    )
+
+    # Test int
+    assert compare_values(0, 0)[0] is True
+    assert compare_values(0, 1)[0] is False
+    assert (
+        compare_values(0, 1)[1]
+        == "The result value [0] is not equal to the expected value [1]."
+    )
+
+    # Test float
+    assert compare_values(0.5, 0.5)[0] is True
+    assert compare_values(0.5, 0.6)[0] is False
+    assert (
+        compare_values(0.5, 0.6)[1]
+        == "The result value [0.5] is not equal to the expected value [0.6]."
+    )
+
+    # Test tolerance
+    assert compare_values(0.5, 0.6, tolerance=0.2)[0] is True
+    assert compare_values(0.5, 0.71, tolerance=0.2)[0] is False
+    assert (
+        compare_values(0.5, 0.71, tolerance=0.2)[1]
+        == "The result value [0.5] is not equal to the expected value [0.71] using a tolerance of 0.2."
+    )
+
+    # Test list
+    assert compare_values([0.5], [0.5])[0] is True
+    assert compare_values([0.5], [0.6])[0] is False
+    assert compare_values([0.5], [0.6])[1] == "The list values are different."
+
+    # Test pd.Series
+    assert compare_values(pd.Series([0.5]), pd.Series([0.5]))[0] is True
+    assert compare_values(pd.Series([0.5]), pd.Series([0.6]))[0] is False
+    assert (
+        compare_values(pd.Series([0.5]), pd.Series([0.6]))[1]
+        == "The pd.Series values are different."
+    )
+
+    # Test pd.DataFrame
+    assert (
+        compare_values(pd.DataFrame({"x": [0.5]}), pd.DataFrame({"x": [0.5]}))[0] is True
+    )
+    assert (
+        compare_values(pd.DataFrame({"x": [0.5]}), pd.DataFrame({"x": [0.6]}))[0] is False
+    )
+    assert (
+        compare_values(pd.DataFrame({"x": [0.5]}), pd.DataFrame({"x": [0.6]}))[1]
+        == "The pd.DataFrame values are different."
+    )
+
+    # test date
+    assert compare_values(date(2020, 1, 1), date(2020, 1, 1))[0] is True
+    assert compare_values(date(2020, 1, 1), date(2020, 1, 2))[0] is False
+    assert (
+        compare_values(date(2020, 1, 1), date(2020, 1, 2))[1]
+        == "The result value [2020-01-01] is not equal to the expected value [2020-01-02]."
+    )
 
 
 def test_key_checker():
