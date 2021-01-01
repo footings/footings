@@ -3,6 +3,13 @@
 
 *A Model Building Library*
 
+![build](https://github.com/dustindall/footings-core/workflows/CI/badge.svg)
+[![docs](https://readthedocs.org/projects/footings/badge/?version=master)](https://footings.readthedocs.io/en/master/?badge=latest)
+[![license](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![codecov](https://codecov.io/gh/dustindall/footings/branch/master/graph/badge.svg?token=SC5BHMYBSN)](https://codecov.io/gh/dustindall/footings)
+![version](https://img.shields.io/pypi/pyversions/footings.svg)
+[![PyPI version](https://badge.fury.io/py/footings.svg)](https://badge.fury.io/py/footings)
+
 ## Summary
 
 Footings is a model building Python library. No out-of-the box models are provided. Instead it is a framework library that provides key objects and functions to help users  construct custom models.
