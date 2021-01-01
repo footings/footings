@@ -1,6 +1,3 @@
-"""Audit API
-
-"""
 from copy import deepcopy
 import pathlib
 from inspect import getfullargspec

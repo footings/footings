@@ -81,13 +81,17 @@ def compare_file_dicts(
         try:
             res_val = result[key]
         except KeyError:
-            msg = f"The result file is missing the key [{key}] that exists in the expected file."
+            msg = (
+                "The result file is missing this key, but it exists in the expected file."
+            )
             temp = False
 
         try:
             exp_val = expected[key]
         except KeyError:
-            msg = f"The expected file is missing the key [{key}] that exists in the result file."
+            msg = (
+                "The expected file is missing this key, but it exists in the result file."
+            )
             temp = False
 
         if temp:
