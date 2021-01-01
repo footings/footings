@@ -14,11 +14,11 @@ def flatten_dict(d):
     results = []
 
     def lift(x):
-        return f"{str(x)}/"
+        return f"/{str(x)}"
 
     def visit(subdict, results, partial_key=None):
         for k, v in subdict.items():
-            new_key = f"/{str(k)}/" if partial_key is None else add(partial_key, lift(k))
+            new_key = f"/{str(k)}" if partial_key is None else add(partial_key, lift(k))
             if isinstance(v, Mapping):
                 visit(v, results, new_key)
             else:

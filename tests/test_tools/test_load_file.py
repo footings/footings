@@ -9,9 +9,9 @@ from footings.test_tools.load_file import (
 
 test_dict = {"outer": {"inner": {"endpoint1": 1, "endpoint2": 2}}, "endpoint3": 3}
 expected_dict = {
-    "/outer/inner/endpoint1/": 1,
-    "/outer/inner/endpoint2/": 2,
-    "/endpoint3/": 3,
+    "/outer/inner/endpoint1": 1,
+    "/outer/inner/endpoint2": 2,
+    "/endpoint3": 3,
 }
 
 
