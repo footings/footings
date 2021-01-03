@@ -1,6 +1,6 @@
 from typing import Any
 
-from attr import attrib, Factory
+from attr import attrib
 from attr._make import _CountingAttr
 from attr.validators import instance_of, in_
 from attr.setters import NO_OP
@@ -163,7 +163,7 @@ def def_meta(
         init=False,
         dtype=dtype,
         description=description,
-        default=Factory(meta) if callable(meta) else meta,
+        default=meta,
         frozen=True,
         **kwargs,
     )
