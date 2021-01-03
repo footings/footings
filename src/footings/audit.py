@@ -1,6 +1,6 @@
 from copy import deepcopy
 import pathlib
-from inspect import getfullargspec
+from inspect import getfullargspec, signature
 
 from attr import attrs, attrib, asdict
 from attr.validators import instance_of, optional
@@ -8,6 +8,12 @@ from attr.validators import instance_of, optional
 from .utils import dispatch_function
 from .to_xlsx import create_audit_xlsx_file
 from .to_json import create_audit_json_file
+
+
+def _make_signature(model):
+    sig = model.__class__.__qualname__
+    sig += str(signature(model.__class__))
+    return sig[: (sig.find(")") + 1)]
 
 
 @attrs(slots=True, frozen=True)
@@ -110,7 +116,7 @@ class AuditContainer:
         if config.show_docstring:
             kwargs.update({"docstring": model.__doc__})
         if config.show_signature:
-            kwargs.update({"signature": f"{name}{str(model.__signature__)}"})
+            kwargs.update({"signature": f"{_make_signature(model)}"})
 
         kws = getfullargspec(model.__class__).kwonlyargs
         attributes = model.__footings_attribute_map__

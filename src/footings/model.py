@@ -1,5 +1,4 @@
 from functools import partial
-from inspect import signature
 import sys
 from traceback import extract_tb, format_list
 from typing import List, Optional
@@ -271,11 +270,6 @@ def _update_uses_impacts(src, attribute_map):
     return tuple([inner(x) for x in src])
 
 
-def _prepare_signature(cls):
-    old_sig = signature(cls)
-    return old_sig.replace(return_annotation=f"{cls.__name__}")
-
-
 def model(cls: type = None, *, steps: List[str] = []):
     """Turn a class into a model within the footings framework.
 
@@ -300,7 +294,6 @@ def model(cls: type = None, *, steps: List[str] = []):
         # 1. All attributes need to belong to a footings_group
         exclude = ["run", "audit", "visualize"]
         attributes = [x for x in cls.__dict__.keys() if x[0] != "_" and x not in exclude]
-
         if hasattr(cls, "__attrs_attrs__"):
             attributes += [x.name for x in cls.__attrs_attrs__ if x.name[0] != "_"]
             attrs_attrs = {x.name: x for x in cls.__attrs_attrs__ if x.name[0] != "_"}
@@ -387,7 +380,6 @@ def model(cls: type = None, *, steps: List[str] = []):
         cls = attrs(
             maybe_cls=cls, kw_only=True, on_setattr=frozen, repr=False, slots=True
         )
-        cls.__signature__ = _prepare_signature(cls)
         return _attr_doc(cls, steps)
 
     return inner(cls)

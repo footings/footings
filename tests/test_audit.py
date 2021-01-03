@@ -1,5 +1,4 @@
 import os
-from inspect import signature
 
 from footings.model import model, step
 from footings.attributes import (
@@ -85,7 +84,7 @@ def test_audit():
     expected_default = AuditContainer(
         name="IntegerModel",
         docstring=IntegerModel.__doc__,
-        signature=f"IntegerModel{str(signature(IntegerModel))}",
+        signature="IntegerModel(*, a: int, b: int, c: int, d: int)",
         instantiation={
             "parameter.a": 1,
             "parameter.b": 1,
@@ -117,7 +116,7 @@ def test_audit():
     expected_no_step_detail = {
         "name": "IntegerModel",
         "docstring": IntegerModel.__doc__,
-        "signature": f"IntegerModel{str(signature(int_model.__class__))}",
+        "signature": "IntegerModel(*, a: int, b: int, c: int, d: int)",
         "instantiation": {
             "parameter.a": 1,
             "parameter.b": 1,
@@ -139,7 +138,7 @@ def test_audit_python():
     expected = AuditContainer(
         name="IntegerModel",
         docstring=IntegerModel.__doc__,
-        signature=f"IntegerModel{str(signature(IntegerModel))}",
+        signature="IntegerModel(*, a: int, b: int, c: int, d: int)",
         instantiation={
             "parameter.a": 1,
             "parameter.b": 1,
