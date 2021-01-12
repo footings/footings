@@ -4,14 +4,16 @@ API
 
 .. currentmodule:: footings
 
-The footings library has a core component and three sub-libraries -
+The footings library has a core component and four sub-libraries -
 
-- model_tools
-- test_tools
-- doc_tools
+- footings.model_tools
+- footings.parallel_tools
+- footings.test_tools
+- footings.doc_tools
 
-core
-----
+footings
+--------
+
 .. automodule:: footings
    :exclude-members:
 
@@ -19,20 +21,20 @@ core
    :nosignatures:
    :toctree: generated
 
-   footings.model
-   footings.step
-   footings.def_parameter
-   footings.def_sensitivity
-   footings.def_meta
-   footings.def_intermediate
-   footings.def_return
-   footings.dispatch_function
-   footings.audit
+   model
+   step
+   def_parameter
+   def_sensitivity
+   def_meta
+   def_intermediate
+   def_return
+   dispatch_function
+   audit
 
 |
 
-model_tools
------------
+footings.model_tools
+--------------------
 
 .. automodule:: footings.model_tools
    :exclude-members:
@@ -41,23 +43,40 @@ model_tools
    :nosignatures:
    :toctree: generated
 
-   footings.model_tools.create_frame
-   footings.model_tools.create_frame_from_record
-   footings.model_tools.expand_frame_per_record
-   footings.model_tools.frame_add_exposure
-   footings.model_tools.frame_add_weights
-   footings.model_tools.frame_filter
-   footings.model_tools.calculate_age
-   footings.model_tools.run_date_time
-   footings.model_tools.once
-   footings.model_tools.make_foreach_model
-   footings.model_tools.convert_to_records
+   create_frame
+   create_frame_from_record
+   expand_frame_per_record
+   frame_add_exposure
+   frame_add_weights
+   frame_filter
+   calculate_age
+   run_date_time
+   once
+   convert_to_records
 
 
 |
 
-test_tools
------------
+footings.parallel_tools
+-----------------------
+
+.. automodule:: footings.parallel_tools
+   :exclude-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated
+
+   WrappedModel
+   MappedModel
+   ForeachModel
+   create_foreach_model
+   create_dask_foreach_model
+   create_ray_foreach_model
+
+
+footings.test_tools
+-------------------
 
 .. automodule:: footings.test_tools
    :exclude-members:
@@ -66,17 +85,17 @@ test_tools
    :nosignatures:
    :toctree: generated
 
-   footings.test_tools.load_footings_file
-   footings.test_tools.load_footings_json_file
-   footings.test_tools.load_footings_xlsx_file
-   footings.test_tools.assert_footings_files_equal
-   footings.test_tools.assert_footings_json_files_equal
-   footings.test_tools.assert_footings_xlsx_files_equal
+   load_footings_file
+   load_footings_json_file
+   load_footings_xlsx_file
+   assert_footings_files_equal
+   assert_footings_json_files_equal
+   assert_footings_xlsx_files_equal
 
 |
 
-doc_tools
----------
+footins.doc_tools
+-----------------
 
 .. currentmodule:: footings.doc_tools
 
