@@ -65,15 +65,18 @@ def test_compare_values():
     # Test list
     assert compare_values([0.5], [0.5])[0] is True
     assert compare_values([0.5], [0.6])[0] is False
-    assert compare_values([0.5], [0.6])[1] == "The list values are different."
+    msg = "The result list values are different from the expected list values.\n\n"
+    msg += "The result list values are - \n\n[0.5]\n\n"
+    msg += "The expected list values are - \n\n[0.6]\n\n"
+    assert compare_values([0.5], [0.6])[1] == msg
 
     # Test pd.Series
     assert compare_values(pd.Series([0.5]), pd.Series([0.5]))[0] is True
     assert compare_values(pd.Series([0.5]), pd.Series([0.6]))[0] is False
-    assert (
-        compare_values(pd.Series([0.5]), pd.Series([0.6]))[1]
-        == "The pd.Series values are different."
-    )
+    msg = "The result pd.Series is different from the expected pd.Series.\n\n"
+    msg += "The result pd.Series is - \n\n[0.5]\n\n"
+    msg += "The expected pd.Series is - \n\n[0.6]\n\n"
+    assert compare_values(pd.Series([0.5]), pd.Series([0.6]))[1] == msg
 
     # Test pd.DataFrame
     assert (
@@ -82,9 +85,12 @@ def test_compare_values():
     assert (
         compare_values(pd.DataFrame({"x": [0.5]}), pd.DataFrame({"x": [0.6]}))[0] is False
     )
+    msg = "The result pd.DataFrame is different from the expected pd.DataFrame.\n\n"
+    msg += "The result pd.Series for column [x] is different from the expected pd.Series.\n\n"
+    msg += "The result pd.Series is - \n\n[0.5]\n\n"
+    msg += "The expected pd.Series is - \n\n[0.6]\n\n"
     assert (
-        compare_values(pd.DataFrame({"x": [0.5]}), pd.DataFrame({"x": [0.6]}))[1]
-        == "The pd.DataFrame values are different."
+        compare_values(pd.DataFrame({"x": [0.5]}), pd.DataFrame({"x": [0.6]}))[1] == msg
     )
 
     # test date

@@ -25,6 +25,8 @@ def compare_values(result_value, expected_value, tolerance=None):
 
 @compare_values.register(str)
 def _(result_value, expected_value, tolerance=None):
+    if type(result_value) != type(expected_value):
+        return compare_values(result_value, str(expected_value), tolerance)
     result = result_value == expected_value
     if result:
         msg = ""
@@ -43,6 +45,10 @@ def _(result_value, expected_value, tolerance=None):
 @compare_values.register(int)
 @compare_values.register(float)
 def _(result_value, expected_value, tolerance=None):
+    if type(result_value) != type(expected_value):
+        return compare_values(str(result_value), str(expected_value))
+    if result_value == float("nan") or expected_value == float("nan"):
+        return compare_values(str(result_value), str(expected_value))
     if tolerance is None:
         result = result_value == expected_value
     else:
@@ -64,7 +70,9 @@ def _(result_value, expected_value, tolerance=None):
     if result:
         msg = ""
     else:
-        msg = "The list values are different."
+        msg = "The result list values are different from the expected list values.\n\n"
+        msg += f"The result list values are - \n\n{str(result_value)}\n\n"
+        msg += f"The expected list values are - \n\n{str(expected_value)}\n\n"
     return result, msg
 
 
@@ -76,20 +84,28 @@ def _(result_value, expected_value, tolerance=None):
     if result:
         msg = ""
     else:
-        msg = "The pd.Series values are different."
+        if result_value.name is None:
+            msg = "The result pd.Series is different from the expected pd.Series.\n\n"
+        else:
+            msg = f"The result pd.Series for column [{result_value.name}] is different"
+            msg += " from the expected pd.Series.\n\n"
+        msg += f"The result pd.Series is - \n\n{str(result_value.values)}\n\n"
+        msg += f"The expected pd.Series is - \n\n{str(expected_value.values)}\n\n"
     return result, msg
 
 
 @compare_values.register(pd.DataFrame)
 def _(result_value, expected_value, tolerance=None):
-    result = all(
-        compare_values(result_value[r], expected_value[e], tolerance)[0]
+    series_compare = [
+        compare_values(result_value[r], expected_value[e], tolerance)
         for r, e in zip(result_value.columns, expected_value.columns)
-    )
+    ]
+    result = all(x[0] for x in series_compare)
     if result:
         msg = ""
     else:
-        msg = "The pd.DataFrame values are different."
+        msg = "The result pd.DataFrame is different from the expected pd.DataFrame.\n\n"
+        msg += "\n\n".join(x[1] for x in series_compare)
     return result, msg
 
 
