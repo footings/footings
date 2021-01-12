@@ -1,0 +1,74 @@
+from typing import Optional, Callable, Dict, Tuple
+
+import ray
+
+from .base import WrappedModel, MappedModel, ForeachModel
+
+__all__ = ["create_ray_foreach_model"]
+
+
+def ray_wrapper(func, **kwargs):
+    def inner(func, **kwargs):
+        return ray.remote(func, **kwargs)
+
+    return inner(func, **kwargs).remote
+
+
+def create_ray_foreach_model(
+    model,
+    *,
+    iterator_name: str,
+    iterator_keys: tuple,
+    constant_params: Optional[Tuple] = None,
+    pass_iterator_keys: Optional[Tuple] = None,
+    success_wrap: Optional[Callable] = None,
+    error_wrap: Optional[Callable] = None,
+    ray_remote_kwargs: Optional[Dict] = None,
+    ray_get_kwargs: Optional[Dict] = None,
+):
+    """Create a ray backed ForeachModel that runs a WrappedModel or MappedModels for each item in an iterator.
+
+    :param model: The models to call.
+    :type model: Union[WrappedModel, MappedModel]
+    :param str iterator_name: The name to assign the iterator to be passed (will be used in
+        signature of the returned model).
+    :param Optional[Tuple] constant_params: The parameter names which will be constant for all
+        items in the iterator.
+    :param Optional[Callable] success_wrap: An optional function to call upon running the model
+        on the items that returned without error (note if none return without error an empty
+        list is returned).
+    :param Optional[Callable] error_wrap: An optional function to call upon running the model
+        on the items that returned with error (note if none return with error an empty list is
+        returned).
+    :param Optional[Dict] ray_remote_kwargs: Optional kwargs to pass into ray.remote.
+    :param Optional[Dict] ray_get_kwargs: Optional kwargs to pass into ray.get.
+
+    :return: ForeachModel (with updated signature)
+    """
+
+    if isinstance(model, dict):
+        model = MappedModel.create(
+            model,
+            iterator_keys=iterator_keys,
+            pass_iterator_keys=pass_iterator_keys,
+            parallel_wrap=ray_wrapper,
+            parallel_kwargs=ray_remote_kwargs,
+        )
+    else:
+        model = WrappedModel.create(
+            model,
+            iterator_keys=iterator_keys,
+            pass_iterator_keys=pass_iterator_keys,
+            parallel_wrap=ray_wrapper,
+            parallel_kwargs=ray_remote_kwargs,
+        )
+
+    return ForeachModel.create(
+        model=model,
+        iterator_name=iterator_name,
+        constant_params=constant_params,
+        success_wrap=success_wrap,
+        error_wrap=error_wrap,
+        compute=ray.get,
+        compute_kwargs=ray_get_kwargs,
+    )

@@ -7,7 +7,6 @@ from footings.attributes import (
 )
 from footings.utils import dispatch_function
 from footings.model import model, step
-
 from ._version import get_versions
 
 versions = get_versions()
