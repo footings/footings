@@ -1,8 +1,12 @@
 from datetime import date, datetime
+from inspect import isclass
 import json
+import math
 
 import numpy as np
 import pandas as pd
+
+from .parallel_tools.base import ErrorCatch
 
 
 def _set_key(k):
@@ -11,25 +15,45 @@ def _set_key(k):
     return k
 
 
+def _column_to_list(col):
+    def _set_val(val):
+        if isinstance(val, (int, float, bool)):
+            if math.isnan(val):
+                return None
+            else:
+                return val
+        return val
+
+    col = col.to_list()
+    if any(math.isnan(val) for val in col if isinstance(val, (int, float, bool))):
+        col = [_set_val(val) for val in col]
+    return col
+
+
 class AuditJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, "to_audit_json"):
             return obj.to_audit_json()
+        elif isinstance(obj, (int, float, bool)):
+            if math.isnan(obj):
+                return None
+            return obj
+        elif isinstance(obj, ErrorCatch):
+            return obj.to_json()
         elif isinstance(obj, np.generic):
             return obj.item()
         elif isinstance(obj, pd.DataFrame):
-            return {col: obj[col].to_list() for col in obj.columns}
+            return {col: _column_to_list(obj[col]) for col in obj.columns}
         elif isinstance(obj, pd.Series):
-            return {obj.name: obj.to_list()}
+            return {obj.name: _column_to_list(obj)}
         elif isinstance(obj, (pd.Timestamp, date, datetime)):
             return str(obj)
         elif callable(obj):
             return "callable: " + obj.__module__ + "." + obj.__qualname__
+        elif isclass(obj) and issubclass(obj, Exception):
+            return obj.__name__
         else:
-            try:
-                return super().default(obj)
-            except:
-                raise TypeError(f"Object of type {type(obj)} is not serializable.")
+            return super().default(obj)
 
 
 def create_audit_json_file(d, file, **kwargs):

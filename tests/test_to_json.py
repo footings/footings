@@ -5,7 +5,9 @@ import json
 from attr import attrs, attrib
 import pandas as pd
 
+from footings import model, step, def_parameter, def_return
 from footings.to_json import create_audit_json_file
+from footings.parallel_tools import WrappedModel
 
 
 def test_footings_json(tmp_path):
@@ -77,6 +79,25 @@ def test_footings_json(tmp_path):
         return a, b
 
     test_dict.update({"test-function": test_func})
+
+    # test ErrorCatch
+    @model(steps=["_add_a_b"])
+    class Model1:
+        k1 = def_parameter()
+        k2 = def_parameter()
+        a = def_parameter()
+        b = def_parameter()
+        r = def_return()
+
+        @step(uses=["a", "b"], impacts=["r"])
+        def _add_a_b(self):
+            self.r = self.a + self.b
+
+    model1 = WrappedModel.create(
+        Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",)
+    )
+    output = model1(k1="1", a=1, b=2)
+    test_dict.update({"test-error-catch": output})
 
     test_dict_file = os.path.join(tmp_path, "test-footings-json.json")
     create_audit_json_file(test_dict, test_dict_file)
