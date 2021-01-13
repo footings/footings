@@ -4,7 +4,7 @@ from footings import (
     def_parameter,
     def_return,
 )
-from footings.parallel_tools import create_dask_foreach_model
+from footings.parallel_tools.dask import create_dask_foreach_model
 
 
 @model(steps=["_add_a_b"])

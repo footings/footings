@@ -6,7 +6,7 @@ from footings import (
     def_parameter,
     def_return,
 )
-from footings.parallel_tools import create_ray_foreach_model
+from footings.parallel_tools.ray import create_ray_foreach_model
 
 
 ray.init(local_mode=True)

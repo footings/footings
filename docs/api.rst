@@ -71,8 +71,8 @@ footings.parallel_tools
    MappedModel
    ForeachModel
    create_foreach_model
-   create_dask_foreach_model
-   create_ray_foreach_model
+   dask.create_dask_foreach_model
+   ray.create_ray_foreach_model
 
 
 footings.test_tools
