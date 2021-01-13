@@ -11,15 +11,8 @@ import numpydoc.docscrape as numpydoc
 from .attributes import Parameter, Sensitivity, Meta, Intermediate, Return
 from .audit import run_model_audit
 from .doc_tools.docscrape import FootingsDoc
+from .exceptions import ModelCreationError, ModelRunError
 from .visualize import visualize_model
-
-
-class ModelRunError(Exception):
-    """Error occured during model run."""
-
-
-class ModelCreationError(Exception):
-    """Error occured creating model object."""
 
 
 def _run(self, to_step):
