@@ -4,7 +4,7 @@ channels:
 dependencies:
   # required
   - pip
-  - attrs
+  - attrs>=20.0.0
   - numpy
   - pandas
   - numpydoc=1.0.*
