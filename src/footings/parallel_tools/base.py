@@ -38,12 +38,29 @@ def _make_foreach_signature(iterator_name: str, constant_params: tuple):
 
 @attrs(frozen=True, slots=True)
 class ErrorCatch:
-    """Catch for any errors generated when running WrappedModel."""
+    """Catch for any errors generated when running WrappedModel.
+
+    :param key: The key identifying the record which failed.
+    :param error_type: The error type.
+    :param error_value: The error value.
+    :param error_stacktrace: The stacktrace of the error.
+    """
 
     key = attrib()
     error_type = attrib()
     error_value = attrib()
     error_stacktrace = attrib()
+
+    def to_audit_json(self):
+        return {
+            "key": str(self.key),
+            "error_type": self.error_type.__qualname__,
+            "error_value": str(self.error_value.args),
+            "error_stacktrace": str(self.error_stacktrace),
+        }
+
+    def to_audit_xlsx(self):
+        return self.to_audit_json()
 
 
 @attrs(frozen=True, slots=True)

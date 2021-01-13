@@ -4,6 +4,8 @@ import datetime
 from attr import attrs, attrib
 import pandas as pd
 
+from footings import model, step, def_parameter, def_return
+from footings.parallel_tools import WrappedModel
 from footings.to_xlsx import FootingsXlsxWb
 from footings.test_tools import assert_footings_files_equal
 
@@ -79,6 +81,26 @@ def test_footings_xlsx_wb(tmp_path):
 
     wb.create_sheet("test-function", start_row=2, start_col=2)
     wb.write_obj("test-function", test_func)
+
+    # test ErrorCatch
+    @model(steps=["_add_a_b"])
+    class Model1:
+        k1 = def_parameter()
+        k2 = def_parameter()
+        a = def_parameter()
+        b = def_parameter()
+        r = def_return()
+
+        @step(uses=["a", "b"], impacts=["r"])
+        def _add_a_b(self):
+            self.r = self.a + self.b
+
+    model1 = WrappedModel.create(
+        Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",)
+    )
+    output = model1(k1="1", a=1, b=2)
+    wb.create_sheet("test-error-catch", start_row=2, start_col=2)
+    wb.write_obj("test-error-catch", output)
 
     test_wb = os.path.join(tmp_path, "test-footings-wb.xlsx")
     wb.save(test_wb)

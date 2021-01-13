@@ -6,8 +6,6 @@ import math
 import numpy as np
 import pandas as pd
 
-from .parallel_tools.base import ErrorCatch
-
 
 def _set_key(k):
     if type(k) not in [str, int, float, bool, None]:
@@ -38,8 +36,6 @@ class AuditJSONEncoder(json.JSONEncoder):
             if math.isnan(obj):
                 return None
             return obj
-        elif isinstance(obj, ErrorCatch):
-            return obj.to_json()
         elif isinstance(obj, np.generic):
             return obj.item()
         elif isinstance(obj, pd.DataFrame):
