@@ -1,7 +1,7 @@
 import os
 import datetime
 
-from attr import attrs, attrib
+from attr import attrs, attrib, evolve
 import pandas as pd
 
 from footings import model, step, def_parameter, def_return
@@ -95,10 +95,9 @@ def test_footings_xlsx_wb(tmp_path):
         def _add_a_b(self):
             self.r = self.a + self.b
 
-    model1 = WrappedModel.create(
-        Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",)
-    )
+    model1 = WrappedModel(Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",))
     output = model1(k1="1", a=1, b=2)
+    output = evolve(output, error_stacktrace="[]")
     wb.create_sheet("test-error-catch", start_row=2, start_col=2)
     wb.write_obj("test-error-catch", output)
 

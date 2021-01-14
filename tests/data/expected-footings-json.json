@@ -117,20 +117,20 @@
       "key": "{'k1': '1'}",
       "error_type": "TypeError",
       "error_value": "(\"__init__() missing 1 required keyword-only argument: 'k2'\",)",
-      "error_stacktrace": "['  File \"/home/dustintindall/anaconda3/lib/python3.7/site-packages/footings/parallel_tools/base.py\", line 108, in wrapper\\n    ret = model(**model_kwargs).run()\\n']"
+      "error_stacktrace": "[]"
     },
     "list": [
       {
         "key": "{'k1': '1'}",
         "error_type": "TypeError",
         "error_value": "(\"__init__() missing 1 required keyword-only argument: 'k2'\",)",
-        "error_stacktrace": "['  File \"/home/dustintindall/anaconda3/lib/python3.7/site-packages/footings/parallel_tools/base.py\", line 108, in wrapper\\n    ret = model(**model_kwargs).run()\\n']"
+        "error_stacktrace": "[]"
       },
       {
         "key": "{'k1': '1'}",
         "error_type": "TypeError",
         "error_value": "(\"__init__() missing 1 required keyword-only argument: 'k2'\",)",
-        "error_stacktrace": "['  File \"/home/dustintindall/anaconda3/lib/python3.7/site-packages/footings/parallel_tools/base.py\", line 108, in wrapper\\n    ret = model(**model_kwargs).run()\\n']"
+        "error_stacktrace": "[]"
       }
     ]
   }

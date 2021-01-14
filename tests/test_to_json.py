@@ -2,7 +2,7 @@ import os
 import datetime
 import json
 
-from attr import attrs, attrib
+from attr import attrs, attrib, evolve
 import pandas as pd
 
 from footings import model, step, def_parameter, def_return
@@ -93,10 +93,9 @@ def test_footings_json(tmp_path):
         def _add_a_b(self):
             self.r = self.a + self.b
 
-    model1 = WrappedModel.create(
-        Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",)
-    )
+    model1 = WrappedModel(Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",))
     output = model1(k1="1", a=1, b=2)
+    output = evolve(output, error_stacktrace="[]")
     test_dict.update({"test-error-catch": {"single": output, "list": [output, output]}})
 
     test_dict_file = os.path.join(tmp_path, "test-footings-json.json")
