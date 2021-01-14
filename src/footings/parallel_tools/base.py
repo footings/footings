@@ -3,7 +3,7 @@ from traceback import extract_tb, format_list
 from typing import Optional, Callable, Tuple, Dict, Iterable, Union
 import sys
 
-from attr import attrs, attrib
+from attr import attrs, attrib, asdict
 from attr.validators import instance_of, is_callable, optional
 
 __all__ = ["create_foreach_model"]
@@ -46,21 +46,16 @@ class ErrorCatch:
     :param error_stacktrace: The stacktrace of the error.
     """
 
-    key = attrib()
-    error_type = attrib()
-    error_value = attrib()
-    error_stacktrace = attrib()
+    key = attrib(converter=str)
+    error_type = attrib(converter=lambda x: x.__qualname__)
+    error_value = attrib(converter=lambda x: str(x.args))
+    error_stacktrace = attrib(converter=str)
 
     def to_audit_json(self):
-        return {
-            "key": str(self.key),
-            "error_type": self.error_type.__qualname__,
-            "error_value": str(self.error_value.args),
-            "error_stacktrace": str(self.error_stacktrace),
-        }
+        return asdict(self)
 
     def to_audit_xlsx(self):
-        return self.to_audit_json()
+        return asdict(self)
 
 
 @attrs(frozen=True, slots=True)
@@ -132,7 +127,7 @@ class MappedModel:
     """A mapping of models to choose from and run based on the specified iterator_keys.
 
     :param dict mapping: A dictonary mapping of keys to the WrappedModel to be called.
-    :param tuple iterator_keys: The key names identifying the record that will be passed to the model.
+    :param tuple mapped_keys: The keys to be used to lookup the model in mapping.
 
     :return: The output of the wrapped models when calling model.run() when no
         errors occur. If an error occurs during instantiation or running the model
@@ -140,7 +135,7 @@ class MappedModel:
     """
 
     mapping = attrib(type=dict, validator=instance_of(dict))
-    iterator_keys = attrib(type=tuple, validator=instance_of(tuple))
+    mapped_keys = attrib(type=tuple, validator=instance_of(tuple))
 
     @classmethod
     def create(
@@ -148,6 +143,7 @@ class MappedModel:
         mapping: dict,
         *,
         model_wrapper: callable,
+        mapped_keys: tuple,
         iterator_keys: tuple,
         pass_iterator_keys: Optional[Tuple] = None,
         parallel_wrap: Optional[Callable] = None,
@@ -157,10 +153,15 @@ class MappedModel:
 
         :param mapping: A mapping of keys to models to be called.
         :param model_wrapper: The function to be called to turn the model into a WrappedModel.
-        :param tuple iterator_keys: The keys identifying the record that will be passed to the model.
+        :param tuple mapped_keys: The keys to be used to lookup the model in mapping.
+        :param tuple iterator_keys: The keys identifying the record that will be passed to the model
+            (passed to model_wrapper).
         :param Optional[Tuple] pass_iterator_keys: The iterator keys to pass into the model.
+            (passed to model_wrapper).
         :param Optional[Callable] parallel_wrap: An optional wrapper to make the model parallel (e.g., dask.delayed).
+            (passed to model_wrapper).
         :param  Optional[Dict] parallel_kwargs: Optional kwargs to pass to parallel_wrap.
+            (passed to model_wrapper).
 
         :return: WrappedModel
         """
@@ -174,18 +175,18 @@ class MappedModel:
         sig = _make_mapping_signature(iterator_keys)
         cls.__signature__ = sig
 
-        return cls(iterator_keys=iterator_keys, mapping=mapping)
+        return cls(mapped_keys=mapped_keys, mapping=mapping)
 
     def get_model(self, **kwargs):
         """Get model based on pass kwargs."""
-        iter_key = _get_key(self.iterator_keys, **kwargs)
-        if iter_key is None:
-            msg = f"Key was not found using the passed kwargs and iterator keys of [{str(self.iterator_keys)}]."
+        key = _get_key(self.mapped_keys, **kwargs)
+        if key is None:
+            msg = f"Key was not found using the passed kwargs and iterator keys of [{str(self.mapped_keys)}]."
             raise ValueError(msg)
 
-        model = self.mapping.get(iter_key, None)
+        model = self.mapping.get(key, None)
         if model is None:
-            key = {k: kwargs[k] for k in self.iterator_keys}
+            key = {k: kwargs[k] for k in self.mapped_keys}
             msg = f"Model not found using the key of [{str(key)}]."
             raise KeyError(msg)
 
@@ -304,10 +305,11 @@ def create_foreach_model(
     *,
     iterator_name: str,
     iterator_keys: tuple,
-    constant_params: tuple = None,
-    pass_iterator_keys: tuple = None,
-    success_wrap: callable = None,
-    error_wrap: callable = None,
+    mapped_keys: Optional[Tuple] = None,
+    constant_params: Optional[Tuple] = None,
+    pass_iterator_keys: Optional[Tuple] = None,
+    success_wrap: Optional[Callable] = None,
+    error_wrap: Optional[Callable] = None,
 ):
     """Create a ForeachModel that runs a WrappedModel or MappedModels for each item in an iterator.
 
@@ -315,6 +317,7 @@ def create_foreach_model(
     :type model: Union[WrappedModel, MappedModel]
     :param str iterator_name: The name to assign the iterator to be passed (will be used in
         signature of the returned model).
+    :param Optional[Tuple] mapped_keys: The keys to be used to lookup the model in mapping.
     :param Optional[Tuple] constant_params: The parameter names which will be constant for all
         items in the iterator.
     :param Optional[Callable] success_wrap: An optional function to call upon running the model
@@ -332,7 +335,10 @@ def create_foreach_model(
     """
     if isinstance(model, dict):
         model = MappedModel.create(
-            model, iterator_keys=iterator_keys, pass_iterator_keys=pass_iterator_keys
+            model,
+            iterator_keys=iterator_keys,
+            mapped_keys=mapped_keys,
+            pass_iterator_keys=pass_iterator_keys,
         )
     else:
         model = WrappedModel.create(

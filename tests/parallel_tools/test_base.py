@@ -57,6 +57,7 @@ def test_mapped_model():
     model_mapping = MappedModel.create(
         mapping=mapping,
         iterator_keys=("k1",),
+        mapped_keys=("k1",),
         pass_iterator_keys=("k1",),
         model_wrapper=WrappedModel.create,
     )
@@ -86,6 +87,7 @@ def test_foreach_model():
     model_mapping = MappedModel.create(
         mapping=mapping,
         iterator_keys=("k1",),
+        mapped_keys=("k1",),
         pass_iterator_keys=("k1",),
         model_wrapper=WrappedModel.create,
     )
@@ -102,6 +104,7 @@ def test_create_foreach_model():
         Model1,
         iterator_name="records",
         iterator_keys=("k1",),
+        mapped_keys=("k1",),
         pass_iterator_keys=("k1",),
         constant_params=("b",),
     )
