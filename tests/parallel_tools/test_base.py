@@ -43,7 +43,7 @@ class Model2:
 
 
 def test_wrapped_model():
-    model = WrappedModel.create(Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",))
+    model = WrappedModel(Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",))
     assert model(k1="1", k2="2", a=1, b=2) == 3
     assert signature(model) == signature(Model1)
     assert isinstance(model(k1="k1", a=1, b=2), ErrorCatch)
@@ -59,7 +59,7 @@ def test_mapped_model():
         iterator_keys=("k1",),
         mapped_keys=("k1",),
         pass_iterator_keys=("k1",),
-        model_wrapper=WrappedModel.create,
+        model_wrapper=WrappedModel,
     )
     assert model_mapping(k1="1", k2="1", a=1, b=2) == 3
     assert model_mapping(k1="2", k2="2", a=1, b=2) == -1
@@ -72,7 +72,7 @@ def test_foreach_model():
     records = [{"k1": "1", "k2": "1", "a": 1}, {"k1": "2", "k2": "1", "a": 1}]
 
     # test model
-    model = WrappedModel.create(Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",))
+    model = WrappedModel(Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",))
     foreach1 = ForeachModel.create(
         model=model, iterator_name="records", constant_params=("b",)
     )
@@ -89,7 +89,7 @@ def test_foreach_model():
         iterator_keys=("k1",),
         mapped_keys=("k1",),
         pass_iterator_keys=("k1",),
-        model_wrapper=WrappedModel.create,
+        model_wrapper=WrappedModel,
     )
     foreach2 = ForeachModel.create(
         model=model_mapping, iterator_name="records", constant_params=("b",)

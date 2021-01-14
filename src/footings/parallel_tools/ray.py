@@ -19,6 +19,7 @@ def create_ray_foreach_model(
     *,
     iterator_name: str,
     iterator_keys: tuple,
+    mapped_keys: Optional[Tuple] = None,
     constant_params: Optional[Tuple] = None,
     pass_iterator_keys: Optional[Tuple] = None,
     success_wrap: Optional[Callable] = None,
@@ -32,6 +33,7 @@ def create_ray_foreach_model(
     :type model: Union[WrappedModel, MappedModel]
     :param str iterator_name: The name to assign the iterator to be passed (will be used in
         signature of the returned model).
+    :param Optional[Tuple] mapped_keys: The keys to be used to lookup the model in mapping.
     :param Optional[Tuple] constant_params: The parameter names which will be constant for all
         items in the iterator.
     :param Optional[Callable] success_wrap: An optional function to call upon running the model
@@ -47,15 +49,22 @@ def create_ray_foreach_model(
     """
 
     if isinstance(model, dict):
+        if mapped_keys is None:
+            msg = (
+                "When passing a dict of models, the keys used must be set in mapped_keys."
+            )
+            raise ValueError(msg)
         model = MappedModel.create(
             model,
+            model_wrapper=WrappedModel,
             iterator_keys=iterator_keys,
+            mapped_keys=mapped_keys,
             pass_iterator_keys=pass_iterator_keys,
             parallel_wrap=ray_wrapper,
             parallel_kwargs=ray_remote_kwargs,
         )
     else:
-        model = WrappedModel.create(
+        model = WrappedModel(
             model,
             iterator_keys=iterator_keys,
             pass_iterator_keys=pass_iterator_keys,

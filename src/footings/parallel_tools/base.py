@@ -6,6 +6,7 @@ import sys
 from attr import attrs, attrib, asdict
 from attr.validators import instance_of, is_callable, optional
 
+
 __all__ = ["create_foreach_model"]
 
 
@@ -46,10 +47,10 @@ class ErrorCatch:
     :param error_stacktrace: The stacktrace of the error.
     """
 
-    key = attrib(converter=str)
-    error_type = attrib(converter=lambda x: x.__qualname__)
-    error_value = attrib(converter=lambda x: str(x.args))
-    error_stacktrace = attrib(converter=str)
+    key = attrib(type=str, validator=instance_of(str))
+    error_type = attrib(type=str, validator=instance_of(str))
+    error_value = attrib(type=str, validator=instance_of(str))
+    error_stacktrace = attrib(type=str, validator=instance_of(str))
 
     def to_audit_json(self):
         return asdict(self)
@@ -58,68 +59,73 @@ class ErrorCatch:
         return asdict(self)
 
 
-@attrs(frozen=True, slots=True)
+@attrs(frozen=True)
 class WrappedModel:
     """Model wrapper to catch errors when instantiating and running a model.
 
-    :param callable model: A model built using the Footings framework.
+    :param model: The model to wrap.
+    :param tuple iterator_keys: The keys identifying the record that will be passed to the model.
+    :param Optional[Tuple] pass_iterator_keys: The iterator keys to pass into the model.
+    :param Optional[Callable] parallel_wrap: An optional wrapper to make the model parallel (e.g., dask.delayed).
+    :param  Optional[Dict] parallel_kwargs: Optional kwargs to pass to parallel_wrap.
 
     :return: The output of the wrapped model when calling model.run() when no
         errors occur. If an error occurs during instantiation or running the model
         an ErrorCatch object is returned.
-
     """
 
-    model = attrib(type=callable, validator=is_callable())
+    model = attrib()
+    iterator_keys = attrib(type=tuple, validator=instance_of(tuple))
+    pass_iterator_keys = attrib(
+        type=Optional[Tuple], kw_only=True, validator=instance_of(tuple), factory=tuple,
+    )
+    parallel_wrap = attrib(
+        type=Optional[Callable],
+        default=None,
+        kw_only=True,
+        validator=optional(is_callable()),
+    )
+    parallel_kwargs = attrib(
+        type=Optional[Dict],
+        default=None,
+        kw_only=True,
+        validator=optional(instance_of(dict)),
+    )
+    wrapped_model = attrib(default=None, init=False, repr=False)
 
-    @classmethod
-    def create(
-        cls,
-        model,
-        *,
-        iterator_keys: tuple,
-        pass_iterator_keys: Optional[Tuple] = None,
-        parallel_wrap: Optional[Callable] = None,
-        parallel_kwargs: Optional[Dict] = None,
-    ):
-        """Create a WrappedModel.
+    def __attrs_post_init__(self):
+        object.__setattr__(self, "__signature__", signature(self.model))
 
-        :param model: The model to wrap.
-        :param tuple iterator_keys: The keys identifying the record that will be passed to the model.
-        :param Optional[Tuple] pass_iterator_keys: The iterator keys to pass into the model.
-        :param Optional[Callable] parallel_wrap: An optional wrapper to make the model parallel (e.g., dask.delayed).
-        :param  Optional[Dict] parallel_kwargs: Optional kwargs to pass to parallel_wrap.
-
-        :return: WrappedModel
-        """
-        if pass_iterator_keys is None:
-            pass_iterator_keys = tuple()
-
+    def create_wrapped_model(self):
         def wrapper(**kwargs):
             try:
-                excluded_keys = _exclude_iterator_keys(iterator_keys, pass_iterator_keys)
+                excluded_keys = _exclude_iterator_keys(
+                    self.iterator_keys, self.pass_iterator_keys
+                )
                 model_kwargs = {k: v for k, v in kwargs.items() if k not in excluded_keys}
-                ret = model(**model_kwargs).run()
+                ret = self.model(**model_kwargs).run()
             except:
                 ex_type, ex_value, ex_trace = sys.exc_info()
                 ret = ErrorCatch(
-                    key={k: kwargs[k] for k in iterator_keys},
-                    error_type=ex_type,
-                    error_value=ex_value,
-                    error_stacktrace=format_list(extract_tb(ex_trace)),
+                    key=str({k: kwargs[k] for k in self.iterator_keys}),
+                    error_type=ex_type.__qualname__,
+                    error_value=str(ex_value.args),
+                    error_stacktrace=str(format_list(extract_tb(ex_trace))),
                 )
             return ret
 
-        if parallel_wrap is not None:
-            if parallel_kwargs is None:
-                wrapper = parallel_wrap(wrapper)
+        if self.parallel_wrap is not None:
+            if self.parallel_kwargs is None:
+                wrapper = self.parallel_wrap(wrapper)
             else:
-                wrapper = parallel_wrap(wrapper, **parallel_kwargs)
-        cls.__signature__ = signature(model)
-        return cls(model=wrapper)
+                wrapper = self.parallel_wrap(wrapper, **self.parallel_kwargs)
+
+        object.__setattr__(self, "wrapped_model", wrapper)
 
     def __call__(self, **kwargs):
-        return self.model(**kwargs)
+        if self.wrapped_model is None:
+            self.create_wrapped_model()
+        return self.wrapped_model(**kwargs)
 
 
 @attrs(slots=True, frozen=True)
@@ -341,7 +347,7 @@ def create_foreach_model(
             pass_iterator_keys=pass_iterator_keys,
         )
     else:
-        model = WrappedModel.create(
+        model = WrappedModel(
             model, iterator_keys=iterator_keys, pass_iterator_keys=pass_iterator_keys
         )
 
