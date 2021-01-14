@@ -97,7 +97,7 @@ def test_footings_json(tmp_path):
         Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",)
     )
     output = model1(k1="1", a=1, b=2)
-    test_dict.update({"test-error-catch": output})
+    test_dict.update({"test-error-catch": {"single": output, "list": [output, output]}})
 
     test_dict_file = os.path.join(tmp_path, "test-footings-json.json")
     create_audit_json_file(test_dict, test_dict_file)
