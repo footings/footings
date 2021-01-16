@@ -2,16 +2,16 @@ from typing import Optional, Callable, Dict, Tuple
 
 from dask import delayed, compute
 
-from .base import WrappedModel, MappedModel, ForeachModel
+from .base import WrappedModel, MappedModel, ForeachJig
 
-__all__ = ["create_dask_foreach_model"]
+__all__ = ["dask_foreach_jig"]
 
 
 def compute_wrapper(output, **compute_kwargs):
     return compute(output, **compute_kwargs)[0]
 
 
-def create_dask_foreach_model(
+def dask_foreach_jig(
     model,
     *,
     iterator_name: str,
@@ -24,7 +24,7 @@ def create_dask_foreach_model(
     dask_delayed_kwargs: Optional[Dict] = None,
     dask_compute_kwargs: Optional[Dict] = None,
 ):
-    """Create a dask backed ForeachModel that runs a WrappedModel or MappedModels for each item in an iterator.
+    """Create a dask backed ForeachJig that runs a WrappedModel or MappedModels for each item in an iterator.
 
     :param model: The models to call.
     :type model: Union[WrappedModel, MappedModel]
@@ -42,7 +42,7 @@ def create_dask_foreach_model(
     :param Optional[Dict] dask_delayed_kwargs: Optional kwargs to pass into dask.dealyed.
     :param Optional[Dict] dask_compute_kwargs: Optional kwargs to pass into dask.compute.
 
-    :return: ForeachModel (with updated signature)
+    :return: ForeachJig (with updated signature)
     """
 
     if isinstance(model, dict):
@@ -69,7 +69,7 @@ def create_dask_foreach_model(
             parallel_kwargs=dask_delayed_kwargs,
         )
 
-    return ForeachModel.create(
+    return ForeachJig.create(
         model=model,
         iterator_name=iterator_name,
         constant_params=constant_params,

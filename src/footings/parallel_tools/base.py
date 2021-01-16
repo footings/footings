@@ -7,7 +7,7 @@ from attr import attrs, attrib, asdict
 from attr.validators import instance_of, is_callable, optional
 
 
-__all__ = ["create_foreach_model"]
+__all__ = ["foreach_jig"]
 
 
 def _exclude_iterator_keys(iterator_keys: tuple, pass_iterator_keys: tuple):
@@ -204,7 +204,7 @@ class MappedModel:
 
 
 @attrs(frozen=True, slots=True)
-class ForeachModel:
+class ForeachJig:
     """A model runs a WrappedModel or MappedModels for each item in an iterator.
 
     :param model: The models to call.
@@ -306,7 +306,7 @@ class ForeachModel:
         return (successes, errors)
 
 
-def create_foreach_model(
+def foreach_jig(
     model,
     *,
     iterator_name: str,
@@ -317,7 +317,7 @@ def create_foreach_model(
     success_wrap: Optional[Callable] = None,
     error_wrap: Optional[Callable] = None,
 ):
-    """Create a ForeachModel that runs a WrappedModel or MappedModels for each item in an iterator.
+    """Create a ForeachJig that runs a WrappedModel or MappedModels for each item in an iterator.
 
     :param model: The models to call.
     :type model: Union[WrappedModel, MappedModel]
@@ -337,7 +337,7 @@ def create_foreach_model(
         dask.compute or ray.get.
     :param Optional[Dict] compute_kwargs: Optional kwargs to pass into compute.
 
-    :return: ForeachModel (with updated signature)
+    :return: ForeachJig (with updated signature)
     """
     if isinstance(model, dict):
         model = MappedModel.create(
@@ -351,7 +351,7 @@ def create_foreach_model(
             model, iterator_keys=iterator_keys, pass_iterator_keys=pass_iterator_keys
         )
 
-    return ForeachModel.create(
+    return ForeachJig.create(
         model=model,
         iterator_name=iterator_name,
         constant_params=constant_params,

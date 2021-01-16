@@ -11,8 +11,8 @@ from footings.parallel_tools.base import (
     ErrorCatch,
     WrappedModel,
     MappedModel,
-    ForeachModel,
-    create_foreach_model,
+    ForeachJig,
+    foreach_jig,
 )
 
 
@@ -73,7 +73,7 @@ def test_foreach_model():
 
     # test model
     model = WrappedModel(Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",))
-    foreach1 = ForeachModel.create(
+    foreach1 = ForeachJig.create(
         model=model, iterator_name="records", constant_params=("b",)
     )
     assert foreach1(records=records, b=2) == ([3, 3], [])
@@ -91,16 +91,16 @@ def test_foreach_model():
         pass_iterator_keys=("k1",),
         model_wrapper=WrappedModel,
     )
-    foreach2 = ForeachModel.create(
+    foreach2 = ForeachJig.create(
         model=model_mapping, iterator_name="records", constant_params=("b",)
     )
     assert foreach2(records=records, b=2) == ([3, -1], [])
     assert getfullargspec(foreach1).kwonlyargs == ["records", "b"]
 
 
-def test_create_foreach_model():
+def test_foreach_jig():
     records = [{"k1": "1", "k2": "1", "a": 1}, {"k1": "2", "k2": "1", "a": 1}]
-    foreach_model = create_foreach_model(
+    foreach_model = foreach_jig(
         Model1,
         iterator_name="records",
         iterator_keys=("k1",),

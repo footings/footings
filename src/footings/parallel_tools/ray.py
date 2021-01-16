@@ -2,9 +2,9 @@ from typing import Optional, Callable, Dict, Tuple
 
 import ray
 
-from .base import WrappedModel, MappedModel, ForeachModel
+from .base import WrappedModel, MappedModel, ForeachJig
 
-__all__ = ["create_ray_foreach_model"]
+__all__ = ["ray_foreach_jig"]
 
 
 def ray_wrapper(func, **kwargs):
@@ -14,7 +14,7 @@ def ray_wrapper(func, **kwargs):
     return inner(func, **kwargs).remote
 
 
-def create_ray_foreach_model(
+def ray_foreach_jig(
     model,
     *,
     iterator_name: str,
@@ -27,7 +27,7 @@ def create_ray_foreach_model(
     ray_remote_kwargs: Optional[Dict] = None,
     ray_get_kwargs: Optional[Dict] = None,
 ):
-    """Create a ray backed ForeachModel that runs a WrappedModel or MappedModels for each item in an iterator.
+    """Create a ray backed ForeachJig that runs a WrappedModel or MappedModels for each item in an iterator.
 
     :param model: The models to call.
     :type model: Union[WrappedModel, MappedModel]
@@ -45,7 +45,7 @@ def create_ray_foreach_model(
     :param Optional[Dict] ray_remote_kwargs: Optional kwargs to pass into ray.remote.
     :param Optional[Dict] ray_get_kwargs: Optional kwargs to pass into ray.get.
 
-    :return: ForeachModel (with updated signature)
+    :return: ForeachJig (with updated signature)
     """
 
     if isinstance(model, dict):
@@ -72,7 +72,7 @@ def create_ray_foreach_model(
             parallel_kwargs=ray_remote_kwargs,
         )
 
-    return ForeachModel.create(
+    return ForeachJig.create(
         model=model,
         iterator_name=iterator_name,
         constant_params=constant_params,

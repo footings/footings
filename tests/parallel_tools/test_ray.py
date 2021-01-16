@@ -6,7 +6,7 @@ from footings import (
     def_parameter,
     def_return,
 )
-from footings.parallel_tools.ray import create_ray_foreach_model
+from footings.parallel_tools.ray import ray_foreach_jig
 
 
 ray.init(local_mode=True)
@@ -25,9 +25,9 @@ class Model1:
         self.r = self.a + self.b
 
 
-def test_create_foreach_model():
+def test_ray_foreach_jig():
     records = [{"k1": "1", "k2": "1", "a": 1}, {"k1": "2", "k2": "1", "a": 1}]
-    foreach_model = create_ray_foreach_model(
+    foreach_model = ray_foreach_jig(
         Model1,
         iterator_name="records",
         iterator_keys=("k1",),

@@ -1,1 +1,1 @@
-from .base import WrappedModel, MappedModel, ForeachModel, create_foreach_model
+from .base import WrappedModel, MappedModel, ForeachJig, foreach_jig

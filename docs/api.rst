@@ -69,10 +69,10 @@ footings.parallel_tools
 
    WrappedModel
    MappedModel
-   ForeachModel
-   create_foreach_model
-   dask.create_dask_foreach_model
-   ray.create_ray_foreach_model
+   ForeachJig
+   foreach_jig
+   dask.dask_foreach_jig
+   ray.ray_foreach_jig
 
 
 footings.test_tools
