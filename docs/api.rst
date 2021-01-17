@@ -33,6 +33,34 @@ footings
 
 |
 
+
+footings.validators
+--------------------
+
+.. automodule:: footings.validators
+   :exclude-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated
+
+   value_min
+   value_max
+   value_in_range
+   len_min
+   len_max
+   len_in_range
+   and_
+   deep_iterable
+   deep_mapping
+   in_
+   instance_of
+   is_callable
+   matches_re
+   provides
+
+|
+
 footings.model_tools
 --------------------
 

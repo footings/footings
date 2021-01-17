@@ -2,20 +2,21 @@ from attr import attrs, attrib
 import pytest
 
 from footings.validators import (
-    custom_validator,
-    min_len_validator,
-    max_len_validator,
-    min_val_validator,
-    max_val_validator,
+    value_min,
+    value_max,
+    value_in_range,
+    len_min,
+    len_max,
+    len_in_range,
 )
 
 
 def test_val_validator():
     @attrs
     class TestVal:
-        x_min = attrib(validator=min_val_validator(1))
-        x_max = attrib(validator=max_val_validator(5))
-        x_min_max = attrib(validator=[min_val_validator(1), max_val_validator(5)])
+        x_min = attrib(validator=value_min(1))
+        x_max = attrib(validator=value_max(5))
+        x_in_range = attrib(validator=value_in_range(1, 5))
 
     with pytest.raises(ValueError):
         TestVal(0, 1, 2)
@@ -28,9 +29,9 @@ def test_val_validator():
 def test_len_validator():
     @attrs
     class TestLen:
-        x_min = attrib(validator=min_len_validator(1))
-        x_max = attrib(validator=max_len_validator(5))
-        x_min_max = attrib(validator=[min_len_validator(1), max_len_validator(5)])
+        x_min = attrib(validator=len_min(1))
+        x_max = attrib(validator=len_max(5))
+        x_min_max = attrib(validator=len_in_range(1, 5))
 
     with pytest.raises(ValueError):
         TestLen("", "abc", "abc")
@@ -38,15 +39,3 @@ def test_len_validator():
         TestLen("abc", "abc", "abcdef")
 
     assert isinstance(TestLen("abc", "abc", "abc"), TestLen)
-
-
-def test_custom_validator():
-    def custom_func(value):
-        return value < 5
-
-    @attrs
-    class TestCustom:
-        x = attrib(validator=custom_validator(custom_func))
-
-    pytest.raises(ValueError, TestCustom, 7)
-    assert isinstance(TestCustom(1), TestCustom)

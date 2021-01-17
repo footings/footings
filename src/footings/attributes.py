@@ -1,62 +1,34 @@
-from typing import Any
+from enum import Enum, auto
+from typing import Any, Optional
 
-from attr import attrib
-from attr._make import _CountingAttr
-from attr.validators import instance_of, in_
+from attr import attrib, NOTHING
 from attr.setters import NO_OP
 
-from footings.validators import (
-    custom_validator,
-    min_len_validator,
-    max_len_validator,
-    min_val_validator,
-    max_val_validator,
-)
 
+class FootingsAttributeType(Enum):
+    """"""
 
-class Parameter:
-    pass
-
-
-class Sensitivity:
-    pass
-
-
-class Meta:
-    pass
-
-
-class Intermediate:
-    pass
-
-
-class Return:
-    pass
-
-
-VALIDATOR_MAPPING = {
-    "dtype": instance_of,
-    "allowed": in_,
-    "custom": custom_validator,
-    "min_len": min_len_validator,
-    "max_len": max_len_validator,
-    "min_val": min_val_validator,
-    "max_val": max_val_validator,
-}
-
-
-def _get_validators(**kwargs):
-    return [VALIDATOR_MAPPING[k](v) for k, v in kwargs.items() if k in VALIDATOR_MAPPING]
+    Parameter = auto()
+    Sensitivity = auto()
+    Meta = auto()
+    Intermediate = auto()
+    Return = auto()
 
 
 def _define(
-    footing_group: str, init: bool, dtype: type, description: str, frozen: bool, **kwargs,
+    attribute_type: FootingsAttributeType,
+    init: bool,
+    frozen: bool,
+    dtype: Optional[Any] = None,
+    description: Optional[str] = None,
+    default: Optional[Any] = NOTHING,
+    validator: Optional[callable] = None,
+    converter: Optional[callable] = None,
+    **kwargs,
 ):
-    validators = _get_validators(**kwargs)
-    kwargs = {k: v for k, v in kwargs.items() if k not in VALIDATOR_MAPPING}
     metadata = {
         "description": description if description is not None else "",
-        "footing_group": footing_group,
+        "footings_attribute_type": attribute_type,
     }
     on_setattr = NO_OP if frozen is False else None
 
@@ -64,171 +36,169 @@ def _define(
         init=init,
         type=dtype,
         repr=False,
-        validator=validators,
+        default=default,
+        validator=validator,
+        converter=converter,
         metadata=metadata,
         on_setattr=on_setattr,
+        kw_only=True,
         **kwargs,
     )
 
 
-def def_return(*, dtype=None, description=None, default=None, **kwargs) -> _CountingAttr:
-    """Define an return to the model where an return is a non-frozen attribute that is
-    created by the model and when the model runs.
+def def_parameter(
+    *,
+    dtype: Optional[Any] = None,
+    description: Optional[str] = None,
+    converter: Optional[callable] = None,
+    validator: Optional[callable] = None,
+    **kwargs,
+):
+    """Define a parameter attribute under the model.
 
-    Parameters
-    ----------
-    dtype : type
-        The expected type of the attribute. If not None, value will be validated on instantiation.
-    description : str
-        The description of the attribute.
-    default : Any
-        The default value of the attribute.
-    kwargs : dict
-        Any one of the following validators - allowed, custom, min_val, max_val, min_len, and max_len.
+    A parameter attribute is a frozen attribute that is passed on instantiation of the model.
 
-    Returns
-    -------
-    _CoutningAttr
-        An attribute that is recognized by the model.
+    :param Optional[Any] dtype: The expected type of the attribute. If not None, value will be
+        validated on instantiation.
+    :param Optional[str] description: Optional description to add.
+    :param Optional[callable] converter: Optional callable that is used to convert value to desired format.
+    :param Optional[callable] validator: Optional callaable that is used to validate value.
+    :param kwargs: Advanced options to pass through to `attrs.attrib`.
     """
     return _define(
-        footing_group=Return(),
-        init=False,
+        attribute_type=FootingsAttributeType.Parameter,
+        init=True,
         dtype=dtype,
         description=description,
-        default=default,
-        frozen=False,
-        **kwargs,
-    )
-
-
-def def_intermediate(
-    *, dtype=None, description=None, default=None, **kwargs
-) -> _CountingAttr:
-    """Define a placeholder to the model where a placeholder is a non-frozen attribute that is
-    created by the model and not returned when the model runs.
-
-    Parameters
-    ----------
-    dtype : type
-        The expected type of the attribute. If not None, value will be validated on instantiation.
-    description : str
-        The description of the attribute.
-    default : Any
-        The default value of the attribute.
-    kwargs : dict
-        Any one of the following validators - allowed, custom, min_val, max_val, min_len, and max_len.
-
-    Returns
-    -------
-    _CoutningAttr
-        An attribute that is recognized by the model.
-    """
-    return _define(
-        footing_group=Intermediate(),
-        init=False,
-        dtype=dtype,
-        description=description,
-        default=default,
-        frozen=False,
-        **kwargs,
-    )
-
-
-def def_meta(
-    *, meta: Any, dtype=None, description=None, default=None, **kwargs
-) -> _CountingAttr:
-    """Define meta data for the model which is a frozen attribute that is passed on instantiation of the model.
-
-    Parameters
-    ----------
-    meta : Any
-        Any value to be defined as meta data for the model.
-    dtype : type
-        The expected type of the attribute. If not None, value will be validated on instantiation.
-    description : str
-        The description of the attribute.
-    default : Any
-        The default value of the attribute.
-    kwargs : dict
-        Any one of the following validators - allowed, custom, min_val, max_val, min_len, and max_len.
-
-    Returns
-    -------
-    _CoutningAttr
-        An attribute that is recognized by the model.
-    """
-    return _define(
-        footing_group=Meta(),
-        init=False,
-        dtype=dtype,
-        description=description,
-        default=meta,
+        converter=converter,
+        validator=validator,
         frozen=True,
         **kwargs,
     )
 
 
 def def_sensitivity(
-    *, default: Any, dtype=None, description=None, **kwargs
-) -> _CountingAttr:
-    """Define a modifer to the model where a modifier is a frozen attribute with a required default value.
+    *,
+    default: Any = NOTHING,
+    dtype: Optional[Any] = None,
+    description: Optional[str] = None,
+    converter: Optional[callable] = None,
+    validator: Optional[callable] = None,
+    **kwargs,
+):
+    """Define a sensitivity attribute under the model.
 
-    A modifier is intended to be used to modify or test sensitvities of parameters within the model.
+    A sensitivity attribute is a frozen attribute with a default value that is passed on
+    instantiation of the model.
 
-    Parameters
-    ----------
-    default : Any
-        The default value of the attribute.
-    dtype : type
-        The expected type of the attribute. If not None, value will be validated on instantiation.
-    description : str
-        The description of the attribute.
-    kwargs : dict
-        Any one of the following validators - allowed, custom, min_val, max_val, min_len, and max_len.
-
-    Returns
-    -------
-    _CoutningAttr
-        An attribute that is recognized by the model.
+    :param Any default: The default value of the sensitivity.
+    :param Optional[Any] dtype: The expected type of the attribute. If not None, value will be
+        validated on instantiation.
+    :param Optional[str] description: Optional description to add.
+    :param Optional[callable] converter: Optional callable that is used to convert value to desired format.
+    :param Optional[callable] validator: Optional callaable that is used to validate value.
+    :param kwargs: Advanced options to pass through to `attrs.attrib`.
     """
     return _define(
-        footing_group=Sensitivity(),
+        attribute_type=FootingsAttributeType.Sensitivity,
         init=True,
         dtype=dtype,
         description=description,
         default=default,
+        converter=converter,
+        validator=validator,
         frozen=True,
         **kwargs,
     )
 
 
-def def_parameter(
-    *, dtype=None, description=None, default=None, **kwargs
-) -> _CountingAttr:
-    """Define a parameter to the model where a parameter is a frozen attribute that is passed on instantiation of the model.
+def def_meta(
+    *,
+    meta: Any,
+    dtype: Optional[Any] = None,
+    description: Optional[str] = None,
+    converter: Optional[callable] = None,
+    validator: Optional[callable] = None,
+    **kwargs,
+):
+    """Define a meta attribute under the model.
 
-    Parameters
-    ----------
-    dtype : type
-        The expected type of the attribute. If not None, value will be validated on instantiation.
-    description : str
-        The description of the attribute.
-    default : Any
-        The default value of the attribute.
-    kwargs : dict
-        Any one of the following validators - allowed, custom, min_val, max_val, min_len, and max_len.
+    A meta attribute is a frozen attribute that is passed on instantiation of the model.
 
-    Returns
-    -------
-    _CoutningAttr
-        An attribute that is recognized by the model.
+    :param Any meta: The meta value to pass to the model.
+    :param Optional[Any] dtype: The expected type of the attribute. If not None, value will be
+        validated on instantiation.
+    :param Optional[str] description: Optional description to add.
+    :param Optional[callable] converter: Optional callable that is used to convert value to desired format.
+    :param Optional[callable] validator: Optional callaable that is used to validate value.
+    :param kwargs: Advanced options to pass through to `attrs.attrib`.
     """
     return _define(
-        footing_group=Parameter(),
-        init=True,
+        attribute_type=FootingsAttributeType.Meta,
+        init=False,
         dtype=dtype,
         description=description,
+        default=meta,
+        converter=converter,
+        validator=validator,
         frozen=True,
+        **kwargs,
+    )
+
+
+def def_intermediate(
+    *,
+    dtype: Optional[Any] = None,
+    description: Optional[str] = None,
+    init_value: Optional[Any] = None,
+    **kwargs,
+):
+    """Define an intermediate attribute under the model.
+
+    A placeholder is a non-frozen attribute that is created by the model and not returned when
+    the model runs. It can be used to hold intermediate values for calculation.
+
+    :param Optional[Any] dtype: The expected type of the attribute. If not None, value will be
+        validated on instantiation.
+    :param Optional[str] description: Optional description to add.
+    :param Optional[Any] init_value: Optional initival value to assign.
+    :param kwargs: Advanced options to pass through to `attrs.attrib`.
+    """
+    return _define(
+        attribute_type=FootingsAttributeType.Intermediate,
+        init=False,
+        dtype=dtype,
+        description=description,
+        default=init_value,
+        frozen=False,
+        **kwargs,
+    )
+
+
+def def_return(
+    *,
+    dtype: Optional[Any] = None,
+    description: Optional[str] = None,
+    init_value: Optional[Any] = None,
+    **kwargs,
+):
+    """Define an intermediate attribute under the model.
+
+    A placeholder is a non-frozen attribute that is created by the model and returned when
+    the model runs.
+
+    :param Optional[Any] dtype: The expected type of the attribute. If not None, value will be
+        validated on instantiation.
+    :param Optional[str] description: Optional description to add.
+    :param Optional[Any] init_value: Optional initival value to assign.
+    :param kwargs: Advanced options to pass through to `attrs.attrib`.
+    """
+    return _define(
+        attribute_type=FootingsAttributeType.Return,
+        init=False,
+        dtype=dtype,
+        description=description,
+        default=init_value,
+        frozen=False,
         **kwargs,
     )

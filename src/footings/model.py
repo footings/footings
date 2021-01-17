@@ -8,7 +8,7 @@ from attr._make import _CountingAttr
 from attr.setters import frozen
 import numpydoc.docscrape as numpydoc
 
-from .attributes import Parameter, Sensitivity, Meta, Intermediate, Return
+from .attributes import FootingsAttributeType
 from .audit import run_model_audit
 from .doc_tools.docscrape import FootingsDoc
 from .exceptions import ModelCreationError, ModelRunError
@@ -210,16 +210,16 @@ def _parse_attriubtes(cls):
     parsed_attributes = {section: [] for section in sections}
 
     for attribute in cls.__attrs_attrs__:
-        grp = attribute.metadata.get("footing_group", None)
-        if isinstance(grp, Parameter):
+        attribute_type = attribute.metadata.get("footings_attribute_type", None)
+        if attribute_type is FootingsAttributeType.Parameter:
             parsed_attributes["Parameters"].append(_make_doc_parameter(attribute))
-        elif isinstance(grp, Sensitivity):
+        elif attribute_type is FootingsAttributeType.Sensitivity:
             parsed_attributes["Sensitivities"].append(_make_doc_parameter(attribute))
-        elif isinstance(grp, Meta):
+        elif attribute_type is FootingsAttributeType.Meta:
             parsed_attributes["Meta"].append(_make_doc_parameter(attribute))
-        elif isinstance(grp, Intermediate):
+        elif attribute_type is FootingsAttributeType.Intermediate:
             parsed_attributes["Intermediates"].append(_make_doc_parameter(attribute))
-        elif isinstance(grp, Return):
+        elif attribute_type is FootingsAttributeType.Return:
             parsed_attributes["Returns"].append(_make_doc_parameter(attribute))
 
     return parsed_attributes
@@ -284,7 +284,7 @@ def model(cls: type = None, *, steps: List[str] = []):
     def inner(cls):
         # In order to be instantiated as a model, need to pass the following test.
 
-        # 1. All attributes need to belong to a footings_group
+        # 1. All attributes need to belong to a footings_attribute_type
         exclude = ["run", "audit", "visualize"]
         attributes = [x for x in cls.__dict__.keys() if x[0] != "_" and x not in exclude]
         if hasattr(cls, "__attrs_attrs__"):
@@ -302,20 +302,23 @@ def model(cls: type = None, *, steps: List[str] = []):
                     msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
                     msg += "Use one of def_* functions from the footings library when building a model."
                     raise ModelCreationError(msg)
-            footing_group = attr.metadata.get("footing_group", None)
-            if footing_group is None:
-                msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
+            attribute_type = attr.metadata.get("footings_attribute_type", None)
+            if (
+                attribute_type is None
+                or isinstance(attribute_type, FootingsAttributeType) is False
+            ):
+                msg = f"The attribute {attribute} is not registered to a known Footings attribute type.\n"
                 msg += "Use one of def_* functions from the footings library when building a model."
                 raise ModelCreationError(msg)
-            if isinstance(footing_group, Parameter):
+            if attribute_type is FootingsAttributeType.Parameter:
                 parameters.append(attribute)
-            elif isinstance(footing_group, Sensitivity):
+            elif attribute_type is FootingsAttributeType.Sensitivity:
                 sensitivities.append(attribute)
-            elif isinstance(footing_group, Meta):
+            elif attribute_type is FootingsAttributeType.Meta:
                 meta.append(attribute)
-            elif isinstance(footing_group, Intermediate):
+            elif attribute_type is FootingsAttributeType.Intermediate:
                 intermediates.append(attribute)
-            elif isinstance(footing_group, Return):
+            elif attribute_type is FootingsAttributeType.Return:
                 returns.append(attribute)
 
         # 2. For steps -

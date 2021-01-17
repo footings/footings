@@ -138,11 +138,13 @@ When calling the `def_*` functions we did not pass any arguments. These function
 Below is an example of how we can add validation to the model when adding arguments to `def_parameter`.
 
 ```{code-cell} ipython3
+from footings.validators import value_min, value_max, in_
+
 @model(steps=["_add_a_b", "_add_ab_c"])
 class AddABC:
-    a = def_parameter(dtype=int, min_val=0)
-    b = def_parameter(dtype=int, max_val=0)
-    c = def_parameter(dtype=int, allowed=[1, 2])
+    a = def_parameter(dtype=int, validator=value_min(0))
+    b = def_parameter(dtype=int, validator=value_max(0))
+    c = def_parameter(dtype=int, validator=in_([1, 2]))
     ab = def_intermediate()
     abc = def_return()
 

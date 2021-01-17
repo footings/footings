@@ -10,11 +10,7 @@ from footings.attributes import (
     def_meta,
     def_sensitivity,
     def_parameter,
-    Return,
-    Intermediate,
-    Meta,
-    Sensitivity,
-    Parameter,
+    FootingsAttributeType,
 )
 
 
@@ -33,12 +29,15 @@ def test_attributes():
     assert inspect.getfullargspec(Test).kwonlyargs == ["modifier", "parameter"]
 
     # test fields
+    def _get_type(attribute):
+        return attribute.metadata["footings_attribute_type"]
+
     attributes = {x.name: x for x in Test.__attrs_attrs__}
-    attributes["ret"].metadata["footing_group"] is Return
-    attributes["placeholder"].metadata["footing_group"] is Intermediate
-    attributes["meta"].metadata["footing_group"] is Meta
-    attributes["modifier"].metadata["footing_group"] is Sensitivity
-    attributes["parameter"].metadata["footing_group"] is Parameter
+    _get_type(attributes["ret"]) is FootingsAttributeType.Return
+    _get_type(attributes["placeholder"]) is FootingsAttributeType.Intermediate
+    _get_type(attributes["meta"]) is FootingsAttributeType.Meta
+    _get_type(attributes["modifier"]) is FootingsAttributeType.Sensitivity
+    _get_type(attributes["parameter"]) is FootingsAttributeType.Parameter
 
     # test values
     assert test.parameter == "parameter"

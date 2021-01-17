@@ -1,4 +1,32 @@
 from attr import attrs, attrib
+from attr.validators import (
+    and_,
+    deep_iterable,
+    deep_mapping,
+    in_,
+    instance_of,
+    is_callable,
+    matches_re,
+    provides,
+)
+
+
+__all__ = [
+    "value_min",
+    "value_max",
+    "value_in_range",
+    "len_min",
+    "len_max",
+    "len_in_range",
+    "and_",
+    "deep_iterable",
+    "deep_mapping",
+    "in_",
+    "instance_of",
+    "is_callable",
+    "matches_re",
+    "provides",
+]
 
 
 @attrs(repr=False, slots=True, hash=True)
@@ -22,10 +50,12 @@ class _InstanceValueValidator:
             raise ValueError(msg, attr, self, value)
 
     def __repr__(self):
-        return f"<value validator using {self.test} test with value {str(self.value)}>"
+        return (
+            f"<value validator using {str(self.test)} test with value {str(self.value)}>"
+        )
 
 
-def min_val_validator(value):
+def value_min(value):
     """A validator to set as a minimum.
 
     Parameters
@@ -41,7 +71,7 @@ def min_val_validator(value):
     return _InstanceValueValidator(value=value, test="min")
 
 
-def max_val_validator(value):
+def value_max(value):
     """A validator to set as a maximum.
 
     Parameters
@@ -55,6 +85,11 @@ def max_val_validator(value):
         If a passed attribute is greater than value.
     """
     return _InstanceValueValidator(value=value, test="max")
+
+
+def value_in_range(lower, upper):
+    """ """
+    pass
 
 
 @attrs(repr=False, slots=True, hash=True)
@@ -80,7 +115,7 @@ class _InstanceLengthValidator:
         return f"<length validator using {self.test} test with value {str(self.value)}>"
 
 
-def min_len_validator(value):
+def len_min(value):
     """A validator to set as a minimum length.
 
     Parameters
@@ -96,7 +131,7 @@ def min_len_validator(value):
     return _InstanceLengthValidator(value=value, test="min")
 
 
-def max_len_validator(value):
+def len_max(value):
     """A validator to set as a maximum length.
 
     Parameters
@@ -112,30 +147,13 @@ def max_len_validator(value):
     return _InstanceLengthValidator(value=value, test="max")
 
 
-@attrs(repr=False, slots=True, hash=True)
-class _InstanceCustomValidator:
-    custom = attrib()
-
-    def __call__(self, inst, attr, value):
-        if self.custom(value) is False:
-            msg = f"The custom validator failed using {value}."
-            raise ValueError(msg, attr, self, value)
-
-    def __repr__(self):
-        return f"<custom validator for {str(self.custom)}>"
+def len_in_range(lower, upper):
+    pass
 
 
-def custom_validator(custom: callable):
-    """A custom validator.
+def schema_structure(schema):
+    pass
 
-    Parameters
-    ----------
-    custom : callable
-        A custom callable that returns true or false when a value is passed to it.
 
-    Raises
-    ------
-    ValueError
-        If a passed attribute failes when passed into the custom function.
-    """
-    return _InstanceCustomValidator(custom=custom)
+def schema_all(schema):
+    pass

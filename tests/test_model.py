@@ -44,14 +44,14 @@ def test_model_instantiation():
         @model(steps=["_add"])
         class FailMissingStep:
             parameter = def_parameter(dtype=int)
-            ret = def_return(default=0)
+            ret = def_return(init_value=0)
 
     with pytest.raises(ModelCreationError):
         # fail due to step not decorated
         @model(steps=["_add"])  # noqa: F841
         class FailStepNotDecorated:
             parameter = def_parameter(dtype=int)
-            ret = def_return(default=0)
+            ret = def_return(init_value=0)
 
             def _add(self):
                 self.ret = self.ret + self.parameter
@@ -61,7 +61,7 @@ def test_model_instantiation():
         @model(steps=["_add"])  # noqa: F841
         class FailStepNoUses:
             parameter = def_parameter(dtype=int)
-            ret = def_return(default=0)
+            ret = def_return(init_value=0)
 
             @step(impacts=["ret"])
             def _add(self):
@@ -72,7 +72,7 @@ def test_model_instantiation():
         @model(steps=["_add"])  # noqa: F841
         class FailStepNoImpacts:
             parameter = def_parameter(dtype=int)
-            ret = def_return(default=0)
+            ret = def_return(init_value=0)
 
             @step(uses=["ret", "parameter"])
             def _add(self):
@@ -83,7 +83,7 @@ def test_model_instantiation():
         @model(steps=["_add"])  # noqa: F841
         class FailStepUsesWrong:
             parameter = def_parameter(dtype=int)
-            ret = def_return(default=0)
+            ret = def_return(init_value=0)
 
             @step(uses=["x"], impacts=["ret"])
             def _add(self):
@@ -94,7 +94,7 @@ def test_model_instantiation():
         @model(steps=["_add"])  # noqa: F841
         class FailStepImpactsWrong:
             parameter = def_parameter(dtype=int)
-            ret = def_return(default=0)
+            ret = def_return(init_value=0)
 
             @step(uses=["ret", "parameter"], impacts=["x"])
             def _add(self):
@@ -230,7 +230,7 @@ def test_model_run():
         @model
         class ModelNoSteps:
             parameter = def_parameter(dtype=int)
-            ret = def_return(default=0)
+            ret = def_return(init_value=0)
 
         ModelNoSteps(parameter=1).run()
 
@@ -239,7 +239,7 @@ def test_model_run():
         @model(steps=["_add"])
         class ModelNoSteps:
             parameter = def_parameter(dtype=int)
-            intermediate = def_intermediate(default=0)
+            intermediate = def_intermediate(init_value=0)
 
             @step(uses=["parameter"], impacts=["intermediate"])
             def _add(self):
