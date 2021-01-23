@@ -1,9 +1,12 @@
 import inspect
 import types
 from itertools import product
-from functools import partial, update_wrapper
+from functools import partial, update_wrapper, wraps
 from collections.abc import Iterable
 from typing import Callable, Tuple
+
+
+__all__ = ["dispatch_function", "once"]
 
 
 class DispatchMissingArgumentError(ValueError):
@@ -209,3 +212,17 @@ def loaded_function(function: Callable = None):
     if need_to_register is True:
         wrapper.register(position="end", function=function)
     return wrapper
+
+
+# https://discuss.python.org/t/reduce-the-overhead-of-functools-lru-cache-for-functions-with-no-parameters/3956/3
+def once(function):
+    obj = None
+
+    @wraps(function)
+    def inner():
+        nonlocal obj
+        if obj is None:
+            obj = function()
+        return obj
+
+    return inner
