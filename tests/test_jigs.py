@@ -12,7 +12,7 @@ from footings.jigs import (
     WrappedModel,
     MappedModel,
     ForeachJig,
-    foreach_jig,
+    create_foreach_jig,
 )
 
 
@@ -98,9 +98,9 @@ def test_foreach_model():
     assert getfullargspec(foreach1).kwonlyargs == ["records", "b"]
 
 
-def test_foreach_jig():
+def test_create_foreach_jig():
     records = [{"k1": "1", "k2": "1", "a": 1}, {"k1": "2", "k2": "1", "a": 1}]
-    foreach_model = foreach_jig(
+    foreach_model = create_foreach_jig(
         Model1,
         iterator_name="records",
         iterator_keys=("k1",),

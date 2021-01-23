@@ -1,13 +1,13 @@
 from inspect import signature, Signature, Parameter
-from traceback import extract_tb, format_list
 from typing import Optional, Callable, Tuple, Dict, Iterable, Union
 import sys
 
-from attr import attrs, attrib, asdict
+from attr import attrs, attrib
 from attr.validators import instance_of, is_callable, optional
 
+from .exceptions import Error
 
-__all__ = ["foreach_jig"]
+__all__ = ["create_foreach_jig"]
 
 
 def _exclude_iterator_keys(iterator_keys: tuple, pass_iterator_keys: tuple):
@@ -37,28 +37,6 @@ def _make_foreach_signature(iterator_name: str, constant_params: tuple):
     return Signature(parameters=params, return_annotation=tuple)
 
 
-@attrs(frozen=True, slots=True)
-class ErrorCatch:
-    """Catch for any errors generated when running WrappedModel.
-
-    :param key: The key identifying the record which failed.
-    :param error_type: The error type.
-    :param error_value: The error value.
-    :param error_stacktrace: The stacktrace of the error.
-    """
-
-    key = attrib(type=str, validator=instance_of(str))
-    error_type = attrib(type=str, validator=instance_of(str))
-    error_value = attrib(type=str, validator=instance_of(str))
-    error_stacktrace = attrib(type=str, validator=instance_of(str))
-
-    def to_audit_json(self):
-        return asdict(self)
-
-    def to_audit_xlsx(self):
-        return asdict(self)
-
-
 @attrs(frozen=True)
 class WrappedModel:
     """Model wrapper to catch errors when instantiating and running a model.
@@ -71,7 +49,7 @@ class WrappedModel:
 
     :return: The output of the wrapped model when calling model.run() when no
         errors occur. If an error occurs during instantiation or running the model
-        an ErrorCatch object is returned.
+        an Error object is returned.
     """
 
     model = attrib()
@@ -106,12 +84,8 @@ class WrappedModel:
                 ret = self.model(**model_kwargs).run()
             except:
                 ex_type, ex_value, ex_trace = sys.exc_info()
-                ret = ErrorCatch(
-                    key=str({k: kwargs[k] for k in self.iterator_keys}),
-                    error_type=ex_type.__qualname__,
-                    error_value=str(ex_value.args),
-                    error_stacktrace=str(format_list(extract_tb(ex_trace))),
-                )
+                key = ({k: kwargs[k] for k in self.iterator_keys},)
+                ret = Error.create(key=key, sys_info=sys.exc_info())
             return ret
 
         if self.parallel_wrap is not None:
@@ -137,7 +111,7 @@ class MappedModel:
 
     :return: The output of the wrapped models when calling model.run() when no
         errors occur. If an error occurs during instantiation or running the model
-        an ErrorCatch object is returned.
+        an Error object is returned.
     """
 
     mapping = attrib(type=dict, validator=instance_of(dict))
@@ -298,7 +272,7 @@ class ForeachJig:
             output = self.compute(output, **self.compute_kwargs)
         successes, errors = [], []
         for result in output:
-            (errors if isinstance(result, ErrorCatch) else successes).append(result)
+            (errors if isinstance(result, Error) else successes).append(result)
         if self.success_wrap is not None and len(successes) > 0:
             successes = self.success_wrap(successes)
         if self.error_wrap is not None and len(errors) > 0:
@@ -306,7 +280,7 @@ class ForeachJig:
         return (successes, errors)
 
 
-def foreach_jig(
+def create_foreach_jig(
     model,
     *,
     iterator_name: str,

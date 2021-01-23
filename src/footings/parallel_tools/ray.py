@@ -2,9 +2,9 @@ from typing import Optional, Callable, Dict, Tuple
 
 import ray
 
-from .base import WrappedModel, MappedModel, ForeachJig
+from ..jigs import WrappedModel, MappedModel, ForeachJig
 
-__all__ = ["ray_foreach_jig"]
+__all__ = ["create_ray_foreach_jig"]
 
 
 def ray_wrapper(func, **kwargs):
@@ -14,7 +14,7 @@ def ray_wrapper(func, **kwargs):
     return inner(func, **kwargs).remote
 
 
-def ray_foreach_jig(
+def create_ray_foreach_jig(
     model,
     *,
     iterator_name: str,

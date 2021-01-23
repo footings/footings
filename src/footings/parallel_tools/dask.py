@@ -2,16 +2,16 @@ from typing import Optional, Callable, Dict, Tuple
 
 from dask import delayed, compute
 
-from .base import WrappedModel, MappedModel, ForeachJig
+from ..jigs import WrappedModel, MappedModel, ForeachJig
 
-__all__ = ["dask_foreach_jig"]
+__all__ = ["create_dask_foreach_jig"]
 
 
 def compute_wrapper(output, **compute_kwargs):
     return compute(output, **compute_kwargs)[0]
 
 
-def dask_foreach_jig(
+def create_dask_foreach_jig(
     model,
     *,
     iterator_name: str,
