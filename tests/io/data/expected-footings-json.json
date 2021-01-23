@@ -114,20 +114,20 @@
   "test-function": "callable: test_to_json.test_footings_json.<locals>.test_func",
   "test-error-catch": {
     "single": {
-      "key": "{'k1': '1'}",
+      "key": "({'k1': '1'},)",
       "error_type": "TypeError",
       "error_value": "(\"__init__() missing 1 required keyword-only argument: 'k2'\",)",
       "error_stacktrace": "[]"
     },
     "list": [
       {
-        "key": "{'k1': '1'}",
+        "key": "({'k1': '1'},)",
         "error_type": "TypeError",
         "error_value": "(\"__init__() missing 1 required keyword-only argument: 'k2'\",)",
         "error_stacktrace": "[]"
       },
       {
-        "key": "{'k1': '1'}",
+        "key": "({'k1': '1'},)",
         "error_type": "TypeError",
         "error_value": "(\"__init__() missing 1 required keyword-only argument: 'k2'\",)",
         "error_stacktrace": "[]"

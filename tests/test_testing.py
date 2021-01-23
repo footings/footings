@@ -3,8 +3,8 @@ from datetime import date
 
 import pandas as pd
 import pytest
-from footings.to_xlsx import FootingsXlsxEntry
-from footings.test_tools.compare_files import (
+from footings.io.to_xlsx import FootingsXlsxEntry
+from footings.testing import (
     compare_values,
     make_key_checker,
     check_extensions_equal,
@@ -158,8 +158,8 @@ def test_check_extensions_equal():
 
 
 def test_assert_footings_json_files_equal():
-    expected_file = os.path.join("tests", "test_tools", "data", "expected-load-file.json")
-    wrong_file = os.path.join("tests", "test_tools", "data", "wrong-load-file.json")
+    expected_file = os.path.join("tests", "io", "data", "expected-load-file.json")
+    wrong_file = os.path.join("tests", "io", "data", "wrong-load-file.json")
 
     assert_footings_json_files_equal(expected_file, expected_file)
     assert_footings_files_equal(expected_file, expected_file)
@@ -176,8 +176,8 @@ def test_assert_footings_json_files_equal():
 
 
 def test_assert_footings_xlsx_files_equal():
-    expected_file = os.path.join("tests", "test_tools", "data", "expected-load-file.xlsx")
-    wrong_file = os.path.join("tests", "test_tools", "data", "wrong-load-file.xlsx")
+    expected_file = os.path.join("tests", "io", "data", "expected-load-file.xlsx")
+    wrong_file = os.path.join("tests", "io", "data", "wrong-load-file.xlsx")
 
     assert_footings_xlsx_files_equal(expected_file, expected_file)
     assert_footings_files_equal(expected_file, expected_file)

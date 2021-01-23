@@ -5,9 +5,9 @@ from attr import attrs, attrib, evolve
 import pandas as pd
 
 from footings import model, step, def_parameter, def_return
-from footings.parallel_tools import WrappedModel
-from footings.to_xlsx import FootingsXlsxWb
-from footings.test_tools import assert_footings_files_equal
+from footings.jigs import WrappedModel
+from footings.io.to_xlsx import FootingsXlsxWb
+from footings.testing import assert_footings_files_equal
 
 
 def test_footings_xlsx_wb(tmp_path):
@@ -82,7 +82,7 @@ def test_footings_xlsx_wb(tmp_path):
     wb.create_sheet("test-function", start_row=2, start_col=2)
     wb.write_obj("test-function", test_func)
 
-    # test ErrorCatch
+    # test Error
     @model(steps=["_add_a_b"])
     class Model1:
         k1 = def_parameter()
@@ -104,6 +104,6 @@ def test_footings_xlsx_wb(tmp_path):
     test_wb = os.path.join(tmp_path, "test-footings-wb.xlsx")
     wb.save(test_wb)
 
-    expected_wb = os.path.join("tests", "data", "expected-footings-wb.xlsx")
+    expected_wb = os.path.join("tests", "io", "data", "expected-footings-wb.xlsx")
 
     assert_footings_files_equal(test_wb, expected_wb)

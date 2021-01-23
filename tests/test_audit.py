@@ -13,7 +13,7 @@ from footings.audit import (
     AuditStepConfig,
 )
 
-from footings.test_tools import assert_footings_files_equal
+from footings.testing import assert_footings_files_equal
 
 
 @model(steps=["_step_1", "_step_2", "_step_3"])

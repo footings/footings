@@ -1,9 +1,0 @@
-name: "test schema"
-columns:
-  - name: "test1"
-    dtype: "str"
-    description:
-
-  - name: "test2"
-    dtype: "int"
-enforce_strict: True

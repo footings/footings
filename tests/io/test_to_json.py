@@ -6,8 +6,8 @@ from attr import attrs, attrib, evolve
 import pandas as pd
 
 from footings import model, step, def_parameter, def_return
-from footings.to_json import create_audit_json_file
-from footings.parallel_tools import WrappedModel
+from footings.io.to_json import create_audit_json_file
+from footings.jigs import WrappedModel
 
 
 def test_footings_json(tmp_path):
@@ -80,7 +80,7 @@ def test_footings_json(tmp_path):
 
     test_dict.update({"test-function": test_func})
 
-    # test ErrorCatch
+    # test Error
     @model(steps=["_add_a_b"])
     class Model1:
         k1 = def_parameter()
@@ -103,7 +103,9 @@ def test_footings_json(tmp_path):
     with open(test_dict_file, "r") as file:
         test_json = json.load(file)
 
-    expected_json_file = os.path.join("tests", "data", "expected-footings-json.json")
+    expected_json_file = os.path.join(
+        "tests", "io", "data", "expected-footings-json.json"
+    )
     with open(expected_json_file, "r") as file:
         expected_json = json.load(file)
 

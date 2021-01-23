@@ -7,8 +7,8 @@ from footings import (
     def_return,
 )
 
-from footings.parallel_tools.base import (
-    ErrorCatch,
+from footings.jigs import (
+    Error,
     WrappedModel,
     MappedModel,
     ForeachJig,
@@ -46,7 +46,7 @@ def test_wrapped_model():
     model = WrappedModel(Model1, iterator_keys=("k1",), pass_iterator_keys=("k1",))
     assert model(k1="1", k2="2", a=1, b=2) == 3
     assert signature(model) == signature(Model1)
-    assert isinstance(model(k1="k1", a=1, b=2), ErrorCatch)
+    assert isinstance(model(k1="k1", a=1, b=2), Error)
 
 
 def test_mapped_model():
@@ -65,7 +65,7 @@ def test_mapped_model():
     assert model_mapping(k1="2", k2="2", a=1, b=2) == -1
     assert getfullargspec(model_mapping).kwonlyargs == ["k1"]
     assert getfullargspec(model_mapping).varkw == "kwargs"
-    assert isinstance(model_mapping(k1="1", a=1, b=2), ErrorCatch)
+    assert isinstance(model_mapping(k1="1", a=1, b=2), Error)
 
 
 def test_foreach_model():

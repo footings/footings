@@ -1,11 +1,6 @@
 import os
-from footings.to_xlsx import FootingsXlsxEntry
-from footings.test_tools.load_file import (
-    flatten_dict,
-    load_footings_file,
-    load_footings_json_file,
-    load_footings_xlsx_file,
-)
+from footings.io import load_footings_file, load_footings_xlsx_file
+from footings.io.to_xlsx import FootingsXlsxEntry
 
 test_dict = {"outer": {"inner": {"endpoint1": 1, "endpoint2": 2}}, "endpoint3": 3}
 expected_dict = {
@@ -15,20 +10,8 @@ expected_dict = {
 }
 
 
-def test_flatten_dict():
-    assert flatten_dict(test_dict) == expected_dict
-
-
-def test_load_json_file():
-    # from footings.to_json import create_audit_json_file
-    # create_audit_json_file(test_dict, "test-load-json-file.json")
-    test_file = os.path.join("tests", "test_tools", "data", "expected-load-file.json")
-    assert load_footings_file(test_file) == expected_dict
-    assert load_footings_json_file(test_file) == expected_dict
-
-
 def test_load_xlsx_file():
-    # from footings.to_xlsx import FootingsXlsxWb
+    # from footings.io.to_xlsx import FootingsXlsxWb
     # wb = FootingsXlsxWb.create()
     # wb.create_sheet("test_dict", start_row=2, start_col=2)
     # wb.write_obj("test_dict", test_dict)
@@ -112,6 +95,6 @@ def test_load_xlsx_file():
         ): 3,
     }
 
-    test_file = os.path.join("tests", "test_tools", "data", "expected-load-file.xlsx")
+    test_file = os.path.join("tests", "io", "data", "expected-load-file.xlsx")
     assert load_footings_file(test_file) == expected_dict
     assert load_footings_xlsx_file(test_file) == expected_dict
