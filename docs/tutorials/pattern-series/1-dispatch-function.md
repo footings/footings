@@ -35,7 +35,7 @@ The `footings` library has a function called [dispatch_function](../../generated
 
 ```{code-cell} ipython3
 import pandas as pd
-from footings import dispatch_function
+from footings.utils import dispatch_function
 
 @dispatch_function(key_parameters=("reporting_type",))
 def add_ctr(reporting_type, frame):

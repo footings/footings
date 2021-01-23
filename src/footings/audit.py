@@ -6,8 +6,8 @@ from attr import attrs, attrib, asdict
 from attr.validators import instance_of, optional
 
 from .utils import dispatch_function
-from .to_xlsx import create_audit_xlsx_file
-from .to_json import create_audit_json_file
+from .io import create_audit_xlsx_file
+from .io import create_audit_json_file
 
 
 def _make_signature(model):

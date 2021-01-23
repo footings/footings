@@ -2,15 +2,6 @@
 API
 ===
 
-.. currentmodule:: footings
-
-The footings library has a core component and four sub-libraries -
-
-- footings.model_tools
-- footings.parallel_tools
-- footings.test_tools
-- footings.doc_tools
-
 footings
 --------
 
@@ -29,7 +20,106 @@ footings
    def_intermediate
    def_return
    dispatch_function
-   audit
+
+|
+
+
+footings.audit
+--------------
+
+.. automodule:: footings.audit
+   :exclude-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated
+
+   AuditConfig
+   AuditStepConfig
+
+|
+
+
+footings.data_dictionary
+------------------------
+
+.. automodule:: footings.data_dictionary
+   :exclude-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated
+
+   PandasDtype
+   data_dictionary
+   def_column
+
+|
+
+
+footings.io
+-----------
+
+.. automodule:: footings.io
+   :exclude-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated
+
+   create_audit_json_file
+   create_audit_xlsx_file
+   load_footings_file
+   load_footings_json_file
+   load_footings_xlsx_file
+
+|
+
+
+footings.jigs
+-------------
+
+.. automodule:: footings.jigs
+   :exclude-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated
+
+   create_foreach_jig
+
+|
+
+
+footings.utils
+--------------
+
+.. automodule:: footings.utils
+   :exclude-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated
+
+   dispatch_function
+   once
+
+|
+
+
+footings.testing
+----------------
+
+.. automodule:: footings.testing
+   :exclude-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated
+
+   assert_footings_files_equal
+   assert_footings_json_files_equal
+   assert_footings_xlsx_files_equal
 
 |
 
@@ -44,22 +134,10 @@ footings.validators
    :nosignatures:
    :toctree: generated
 
-   value_min
-   value_max
-   value_in_range
-   len_min
-   len_max
-   len_in_range
-   and_
-   deep_iterable
-   deep_mapping
-   in_
-   instance_of
-   is_callable
-   matches_re
-   provides
+   equal_to
 
 |
+
 
 footings.model_tools
 --------------------
@@ -85,6 +163,7 @@ footings.model_tools
 
 |
 
+
 footings.parallel_tools
 -----------------------
 
@@ -95,32 +174,9 @@ footings.parallel_tools
    :nosignatures:
    :toctree: generated
 
-   WrappedModel
-   MappedModel
-   ForeachJig
-   foreach_jig
-   dask.dask_foreach_jig
-   ray.ray_foreach_jig
+   dask.create_dask_foreach_jig
+   ray.create_ray_foreach_jig
 
-
-footings.test_tools
--------------------
-
-.. automodule:: footings.test_tools
-   :exclude-members:
-
-.. autosummary::
-   :nosignatures:
-   :toctree: generated
-
-   load_footings_file
-   load_footings_json_file
-   load_footings_xlsx_file
-   assert_footings_files_equal
-   assert_footings_json_files_equal
-   assert_footings_xlsx_files_equal
-
-|
 
 footins.doc_tools
 -----------------

@@ -3,7 +3,7 @@ from typing import Union
 
 import pandas as pd
 
-from footings import dispatch_function
+from footings.utils import dispatch_function
 
 
 @dispatch_function(key_parameters=("type_birth_dt", "type_as_of_dt",))

@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pandas as pd
 
-from footings import dispatch_function
+from footings.utils import dispatch_function
 
 
 def _month_diff(start, end):

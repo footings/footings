@@ -5,9 +5,9 @@ from footings.attributes import (
     def_parameter,
     def_intermediate,
 )
-from footings.utils import dispatch_function
 from footings.model import model, step
 from ._version import get_versions
+from . import audit, data_dictionary, jigs, utils, testing, validators
 
 versions = get_versions()
 __version__ = versions["version"]
