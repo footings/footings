@@ -5,10 +5,10 @@ from typing import Optional
 
 import pandas as pd
 
-from footings import dispatch_function
+from footings.utils import dispatch_function
 
-from .load_file import load_footings_json_file, load_footings_xlsx_file
-from ..to_xlsx import FootingsXlsxEntry
+from .io import load_footings_json_file, load_footings_xlsx_file
+from .io.to_xlsx import FootingsXlsxEntry
 
 #########################################################################################
 # comparison functions
