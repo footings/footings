@@ -1,49 +1,7 @@
-import json
-from operator import add
-import pathlib
-from typing import Mapping
-
 import pandas as pd
 from openpyxl import load_workbook
 
-from ..to_xlsx import FootingsXlsxEntry
-from ..utils import dispatch_function
-
-
-def flatten_dict(d):
-    results = []
-
-    def lift(x):
-        return f"/{str(x)}"
-
-    def visit(subdict, results, partial_key=None):
-        for k, v in subdict.items():
-            new_key = f"/{str(k)}" if partial_key is None else add(partial_key, lift(k))
-            if isinstance(v, Mapping):
-                visit(v, results, new_key)
-            else:
-                results.append((new_key, v))
-
-    visit(d, results, None)
-    return dict(results)
-
-
-def load_footings_json_file(file: str):
-    """Load footings generated json file.
-
-    Parameters
-    ----------
-    file : str
-        The path to the file.
-
-    Returns
-    -------
-    dict
-        A dict representing the respective file type.
-    """
-    with open(file, "r") as f:
-        loaded_json = json.load(f)
-    return flatten_dict(loaded_json)
+from ..io.to_xlsx import FootingsXlsxEntry
 
 
 def load_footings_xlsx_file(file: str):
@@ -112,41 +70,3 @@ def load_footings_xlsx_file(file: str):
             )
 
     return values
-
-
-def load_footings_file(file: str):
-    """Load footings generated file.
-
-    Parameters
-    ----------
-    file : str
-        The path to the file.
-
-    Returns
-    -------
-    dict
-        A dict representing the respective file type.
-
-    See Also
-    --------
-    load_footings_json_file
-    load_footings_xlsx_file
-    """
-    file_ext = pathlib.Path(file).suffix
-    return _load_footings_file(file_ext=file_ext, file=file)
-
-
-@dispatch_function(key_parameters=("file_ext",))
-def _load_footings_file(file_ext, file):
-    msg = f"No registered function to load a file with extension {file_ext}."
-    raise NotImplementedError(msg)
-
-
-@_load_footings_file.register(file_ext=".json")
-def _(file):
-    return load_footings_json_file(file)
-
-
-@_load_footings_file.register(file_ext=".xlsx")
-def _(file: str):
-    return load_footings_xlsx_file(file)

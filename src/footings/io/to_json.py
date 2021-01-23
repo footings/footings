@@ -5,7 +5,8 @@ import math
 
 import numpy as np
 import pandas as pd
-from .parallel_tools.base import ErrorCatch
+
+# from ..exceptions import Error
 
 
 def _set_key(k):
@@ -45,15 +46,13 @@ class AuditJSONEncoder(json.JSONEncoder):
             return {obj.name: _column_to_list(obj)}
         elif isinstance(obj, (pd.Timestamp, date, datetime)):
             return str(obj)
-        elif isinstance(obj, ErrorCatch):
-            return obj.to_audit_json()
+        # elif isinstance(obj, Error):
+        #     return obj.to_audit_json()
         elif callable(obj):
             return "callable: " + obj.__module__ + "." + obj.__qualname__
         elif isclass(obj) and issubclass(obj, Exception):
             return obj.__name__
         else:
-            print(obj)
-            print(type(obj))
             return super().default(obj)
 
 
