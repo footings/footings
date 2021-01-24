@@ -25,7 +25,7 @@ To start, it is important to note that the `Footings framework` supports numpy s
 Below is the code for `AddABC` from the prior two tutorials with documentations.
 
 ```{code-cell} ipython3
-from footings import (
+from footings.model import (
     model,
     step,
     def_parameter,

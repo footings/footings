@@ -24,7 +24,7 @@ We will continue to use the AddABC model with documentation for the prior tutori
 We will start with the code from the [prior tutorial](3-documenting-models.md).
 
 ```{code-cell} ipython3
-from footings import (
+from footings.model import (
     model,
     step,
     def_parameter,

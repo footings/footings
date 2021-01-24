@@ -23,7 +23,7 @@ This is the fourth tutorial in the [Intro Series](index.md) where we do a deeper
 We will start with the code from the [prior tutorial](3-documenting-models.md).
 
 ```{code-cell} ipython3
-from footings import (
+from footings.model import (
     model,
     step,
     def_parameter,

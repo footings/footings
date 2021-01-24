@@ -21,7 +21,7 @@ This is the second tutorial in the [Intro Series](index.md). Here we will do a d
 We will start with the model code from the [prior tutorial](1-building-a-model.md) which is shown below.
 
 ```{code-cell} ipython3
-from footings import (
+from footings.model import (
     model,
     step,
     def_parameter,
@@ -108,7 +108,7 @@ model.ab
 Returning to the code of our example model -
 
 ```{code-cell} ipython3
-from footings import (
+from footings.model import (
     model,
     step,
     def_parameter,
@@ -182,7 +182,7 @@ The `footings` library also contains two additional define functions. Both of th
 Both of these are demonstrated in the code below.
 
 ```{code-cell} ipython3
-from footings import (
+from footings.model import (
     model,
     step,
     def_parameter,

@@ -27,7 +27,7 @@ We will start by building a simple model that takes 3 parameters - `a`, `b`, and
 The code for the  model is below.
 
 ```{code-cell} ipython3
-from footings import (
+from footings.model import (
     model,
     step,
     def_parameter,
