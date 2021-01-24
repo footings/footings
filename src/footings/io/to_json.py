@@ -56,6 +56,6 @@ class AuditJSONEncoder(json.JSONEncoder):
             return super().default(obj)
 
 
-def create_audit_json_file(d, file, **kwargs):
+def create_footings_json_file(d, file, **kwargs):
     with open(file, "w") as data_file:
         json.dump(obj=d, fp=data_file, cls=AuditJSONEncoder, indent=2, **kwargs)

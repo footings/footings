@@ -6,7 +6,7 @@ from attr import attrs, attrib, evolve
 import pandas as pd
 
 from footings import model, step, def_parameter, def_return
-from footings.io.to_json import create_audit_json_file
+from footings.io.to_json import create_footings_json_file
 from footings.jigs import WrappedModel
 
 
@@ -99,7 +99,7 @@ def test_footings_json(tmp_path):
     test_dict.update({"test-error-catch": {"single": output, "list": [output, output]}})
 
     test_dict_file = os.path.join(tmp_path, "test-footings-json.json")
-    create_audit_json_file(test_dict, test_dict_file)
+    create_footings_json_file(test_dict, test_dict_file)
     with open(test_dict_file, "r") as file:
         test_json = json.load(file)
 

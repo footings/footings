@@ -16,8 +16,8 @@ def test_flatten_dict():
 
 
 def test_load_json_file():
-    # from footings.io.to_json import create_audit_json_file
-    # create_audit_json_file(test_dict, "test-load-json-file.json")
+    # from footings.io.to_json import create_footings_json_file
+    # create_footings_json_file(test_dict, "test-load-json-file.json")
     test_file = os.path.join("tests", "io", "data", "expected-load-file.json")
     assert load_footings_file(test_file) == expected_dict
     assert load_footings_json_file(test_file) == expected_dict

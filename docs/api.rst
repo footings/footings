@@ -67,8 +67,8 @@ footings.io
    :nosignatures:
    :toctree: generated
 
-   create_audit_json_file
-   create_audit_xlsx_file
+   create_footings_json_file
+   create_footings_xlsx_file
    load_footings_file
    load_footings_json_file
    load_footings_xlsx_file

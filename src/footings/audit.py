@@ -6,8 +6,8 @@ from attr import attrs, attrib, asdict
 from attr.validators import instance_of, optional
 
 from .utils import dispatch_function
-from .io import create_audit_xlsx_file
-from .io import create_audit_json_file
+from .io import create_footings_xlsx_file
+from .io import create_footings_json_file
 
 
 def _make_signature(model):
@@ -180,10 +180,10 @@ def _run_model_audit(file_ext, model, file, config, **kwargs):
 @_run_model_audit.register(file_ext=".xlsx")
 def _(model, file, config, **kwargs):
     audit_dict = AuditContainer.create(model, config=config).as_dict()
-    create_audit_xlsx_file(audit_dict, file, **kwargs)
+    create_footings_xlsx_file(audit_dict, file, **kwargs)
 
 
 @_run_model_audit.register(file_ext=".json")
 def _(model, file, config, **kwargs):
     audit_dict = AuditContainer.create(model, config=config).as_dict()
-    create_audit_json_file(audit_dict, file, **kwargs)
+    create_footings_json_file(audit_dict, file, **kwargs)
