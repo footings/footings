@@ -5,7 +5,7 @@ from attr import asdict
 import pandas as pd
 import pytest
 
-from footings import model
+from footings.model import model
 from footings.data_dictionary import (
     PandasDtype,
     Column,
@@ -250,7 +250,7 @@ class TestDataDictionary:
         assert DD._validators_valid(df_correct) == ([True], [],)
         assert DD._validators_valid(df_fail_validator) == (
             [False],
-            ["The column [COL1] failed equal_to validator using 1 as the test."],
+            ["The column [COL1] failed equal_to(value=1) validator."],
         )
 
     def test_validate(self, DD, df_correct, df_wrong_multiple):
@@ -267,7 +267,7 @@ class TestDataDictionary:
                         " which is different from type in the dataframe passed [int64].",
                     ]
                 ),
-                "The column [COL1] failed equal_to validator using 1 as the test.",
+                "The column [COL1] failed equal_to(value=1) validator.",
             ]
         )
         exp_str = clean_str(errors)
@@ -306,7 +306,7 @@ class TestDataDictionary:
 
         repr_str = """TestDD(DataDictionary)
         Column(name='COL1', dtype=<PandasDtype.Int: 'int64'>, description='This is column 1.', validator=
-        [<equal_tovalidatorusing1asthetest>], metadata={})
+        [<equal_to(value=1) validator>], metadata={})
         Column(name='COL2', dtype=<PandasDtype.String: 'string'>, description='This is column 2.', validator=[],
         metadata={})
         """
