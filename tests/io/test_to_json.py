@@ -5,7 +5,7 @@ import json
 from attr import attrs, attrib, evolve
 import pandas as pd
 
-from footings import model, step, def_parameter, def_return
+from footings.model import model, step, def_parameter, def_return
 from footings.io.to_json import create_footings_json_file
 from footings.jigs import WrappedModel
 

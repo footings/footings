@@ -1,7 +1,8 @@
 import os
 
-from footings.model import model, step
-from footings.attributes import (
+from footings.model import (
+    model,
+    step,
     def_parameter,
     def_intermediate,
     def_return,

@@ -36,7 +36,7 @@ class AuditConfig:
 
 def _get_model_output(model):
     steps = []
-    for step in model.__footings_steps__:
+    for step in model.__model_steps__:
         method = getattr(model, step)
         step_obj = method.func
         method()
@@ -48,7 +48,7 @@ def _get_model_output(model):
         }
         steps.append(step_output)
 
-    final_output = {ret: getattr(model, ret) for ret in model.__footings_returns__}
+    final_output = {ret: getattr(model, ret) for ret in model.__model_returns__}
 
     return steps, final_output
 
@@ -119,7 +119,7 @@ class AuditContainer:
             kwargs.update({"signature": f"{_make_signature(model)}"})
 
         kws = getfullargspec(model.__class__).kwonlyargs
-        attributes = model.__footings_attribute_map__
+        attributes = model.__model_attribute_map__
         instantiation = {attributes[kw]: deepcopy(getattr(model, kw)) for kw in kws}
         kwargs.update({"instantiation": instantiation})
 
@@ -130,7 +130,7 @@ class AuditContainer:
                 step: AuditStepContainer.create(
                     getattr(model, step).func, output, config.step_config
                 )
-                for step, output in zip(model.__footings_steps__, step_output)
+                for step, output in zip(model.__model_steps__, step_output)
             }
             kwargs.update({"steps": steps})
 

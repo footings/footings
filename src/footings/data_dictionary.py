@@ -7,7 +7,7 @@ from attr.validators import instance_of, optional
 import numpy as np
 import pandas as pd
 
-from .attributes import def_parameter
+from .model import def_parameter
 from .exceptions import (
     DataDictionaryValidatorsConversionError,
     DataDictionaryPandasDtypeConversionError,

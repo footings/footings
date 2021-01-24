@@ -1,33 +1,245 @@
+from enum import Enum, auto
 from functools import partial
 import sys
 from traceback import extract_tb, format_list
-from typing import List, Optional
+from typing import Any, List, Optional
 
-from attr import attrs, attrib, evolve
+from attr import attrs, attrib, make_class, evolve, NOTHING
+from attr.setters import NO_OP
 from attr._make import _CountingAttr
 from attr.setters import frozen
 import numpydoc.docscrape as numpydoc
 
-from .attributes import FootingsAttributeType
 from .audit import run_model_audit
 from .doc_tools.docscrape import FootingsDoc
 from .exceptions import ModelCreationError, ModelRunError
 from .visualize import visualize_model
 
 
+__all__ = [
+    "Model",
+    "model",
+    "step",
+    "def_parameter",
+    "def_sensitivity",
+    "def_meta",
+    "def_intermediate",
+    "def_return",
+]
+
+
+class ModelAttributeType(Enum):
+    """Allowed dodel attribute types belonging to a model."""
+
+    Parameter = auto()
+    Sensitivity = auto()
+    Meta = auto()
+    Intermediate = auto()
+    Return = auto()
+
+
+def _define(
+    attribute_type: ModelAttributeType,
+    init: bool,
+    frozen: bool,
+    dtype: Optional[Any] = None,
+    description: Optional[str] = None,
+    default: Optional[Any] = NOTHING,
+    validator: Optional[callable] = None,
+    converter: Optional[callable] = None,
+    **kwargs,
+):
+    metadata = {
+        "description": description if description is not None else "",
+        "footings_attribute_type": attribute_type,
+    }
+    on_setattr = NO_OP if frozen is False else None
+
+    return attrib(
+        init=init,
+        type=dtype,
+        repr=False,
+        default=default,
+        validator=validator,
+        converter=converter,
+        metadata=metadata,
+        on_setattr=on_setattr,
+        kw_only=True,
+        **kwargs,
+    )
+
+
+def def_parameter(
+    *,
+    dtype: Optional[Any] = None,
+    description: Optional[str] = None,
+    converter: Optional[callable] = None,
+    validator: Optional[callable] = None,
+    **kwargs,
+):
+    """Define a parameter attribute under the model.
+
+    A parameter attribute is a frozen attribute that is passed on instantiation of the model.
+
+    :param Optional[Any] dtype: The expected type of the attribute. If not None, value will be
+        validated on instantiation.
+    :param Optional[str] description: Optional description to add.
+    :param Optional[callable] converter: Optional callable that is used to convert value to desired format.
+    :param Optional[callable] validator: Optional callaable that is used to validate value.
+    :param kwargs: Advanced options to pass through to `attrs.attrib`.
+    """
+    return _define(
+        attribute_type=ModelAttributeType.Parameter,
+        init=True,
+        dtype=dtype,
+        description=description,
+        converter=converter,
+        validator=validator,
+        frozen=True,
+        **kwargs,
+    )
+
+
+def def_sensitivity(
+    *,
+    default: Any = NOTHING,
+    dtype: Optional[Any] = None,
+    description: Optional[str] = None,
+    converter: Optional[callable] = None,
+    validator: Optional[callable] = None,
+    **kwargs,
+):
+    """Define a sensitivity attribute under the model.
+
+    A sensitivity attribute is a frozen attribute with a default value that is passed on
+    instantiation of the model.
+
+    :param Any default: The default value of the sensitivity.
+    :param Optional[Any] dtype: The expected type of the attribute. If not None, value will be
+        validated on instantiation.
+    :param Optional[str] description: Optional description to add.
+    :param Optional[callable] converter: Optional callable that is used to convert value to desired format.
+    :param Optional[callable] validator: Optional callaable that is used to validate value.
+    :param kwargs: Advanced options to pass through to `attrs.attrib`.
+    """
+    return _define(
+        attribute_type=ModelAttributeType.Sensitivity,
+        init=True,
+        dtype=dtype,
+        description=description,
+        default=default,
+        converter=converter,
+        validator=validator,
+        frozen=True,
+        **kwargs,
+    )
+
+
+def def_meta(
+    *,
+    meta: Any,
+    dtype: Optional[Any] = None,
+    description: Optional[str] = None,
+    converter: Optional[callable] = None,
+    validator: Optional[callable] = None,
+    **kwargs,
+):
+    """Define a meta attribute under the model.
+
+    A meta attribute is a frozen attribute that is passed on instantiation of the model.
+
+    :param Any meta: The meta value to pass to the model.
+    :param Optional[Any] dtype: The expected type of the attribute. If not None, value will be
+        validated on instantiation.
+    :param Optional[str] description: Optional description to add.
+    :param Optional[callable] converter: Optional callable that is used to convert value to desired format.
+    :param Optional[callable] validator: Optional callaable that is used to validate value.
+    :param kwargs: Advanced options to pass through to `attrs.attrib`.
+    """
+    return _define(
+        attribute_type=ModelAttributeType.Meta,
+        init=False,
+        dtype=dtype,
+        description=description,
+        default=meta,
+        converter=converter,
+        validator=validator,
+        frozen=True,
+        **kwargs,
+    )
+
+
+def def_intermediate(
+    *,
+    dtype: Optional[Any] = None,
+    description: Optional[str] = None,
+    init_value: Optional[Any] = None,
+    **kwargs,
+):
+    """Define an intermediate attribute under the model.
+
+    A placeholder is a non-frozen attribute that is created by the model and not returned when
+    the model runs. It can be used to hold intermediate values for calculation.
+
+    :param Optional[Any] dtype: The expected type of the attribute. If not None, value will be
+        validated on instantiation.
+    :param Optional[str] description: Optional description to add.
+    :param Optional[Any] init_value: Optional initival value to assign.
+    :param kwargs: Advanced options to pass through to `attrs.attrib`.
+    """
+    return _define(
+        attribute_type=ModelAttributeType.Intermediate,
+        init=False,
+        dtype=dtype,
+        description=description,
+        default=init_value,
+        frozen=False,
+        **kwargs,
+    )
+
+
+def def_return(
+    *,
+    dtype: Optional[Any] = None,
+    description: Optional[str] = None,
+    init_value: Optional[Any] = None,
+    **kwargs,
+):
+    """Define an intermediate attribute under the model.
+
+    A placeholder is a non-frozen attribute that is created by the model and returned when
+    the model runs.
+
+    :param Optional[Any] dtype: The expected type of the attribute. If not None, value will be
+        validated on instantiation.
+    :param Optional[str] description: Optional description to add.
+    :param Optional[Any] init_value: Optional initival value to assign.
+    :param kwargs: Advanced options to pass through to `attrs.attrib`.
+    """
+    return _define(
+        attribute_type=ModelAttributeType.Return,
+        init=False,
+        dtype=dtype,
+        description=description,
+        default=init_value,
+        frozen=False,
+        **kwargs,
+    )
+
+
 def _run(self, to_step):
-    if len(self.__footings_steps__) == 0:
+    if len(self.__model_steps__) == 0:
         raise ModelRunError("Not able to run model because no steps are registered.")
-    if len(self.__footings_returns__) == 0:
+    if len(self.__model_returns__) == 0:
         raise ModelRunError(
             "Not able to run model because no return attributes are registered."
         )
     if to_step is None:
-        steps = self.__footings_steps__
+        steps = self.__model_steps__
     else:
         try:
-            position = self.__footings_steps__.index(to_step)
-            steps = self.__footings_steps__[: (position + 1)]
+            position = self.__model_steps__.index(to_step)
+            steps = self.__model_steps__[: (position + 1)]
         except ValueError as e:
             msg = f"The step passed to to_step '{to_step}' does not exist as a step."
             raise e(msg)
@@ -48,22 +260,22 @@ def _run(self, to_step):
 
     if to_step is not None:
         return self
-    if len(self.__footings_returns__) > 1:
-        return tuple(getattr(self, ret) for ret in self.__footings_returns__)
-    return getattr(self, self.__footings_returns__[0])
+    if len(self.__model_returns__) > 1:
+        return tuple(getattr(self, ret) for ret in self.__model_returns__)
+    return getattr(self, self.__model_returns__[0])
 
 
 @attrs(slots=True, repr=False)
-class Footing:
+class Model:
     """The parent modeling class providing the key methods of run, audit, and visualize."""
 
-    __footings_steps__: tuple = attrib(init=False, repr=False)
-    __footings_parameters__: tuple = attrib(init=False, repr=False)
-    __footings_sensitivities__: tuple = attrib(init=False, repr=False)
-    __footings_meta__: tuple = attrib(init=False, repr=False)
-    __footings_intermediates__: tuple = attrib(init=False, repr=False)
-    __footings_returns__: tuple = attrib(init=False, repr=False)
-    __footings_attribute_map__: dict = attrib(init=False, repr=False)
+    __model_steps__: tuple = attrib(init=False, repr=False)
+    __model_parameters__: tuple = attrib(init=False, repr=False)
+    __model_sensitivities__: tuple = attrib(init=False, repr=False)
+    __model_meta__: tuple = attrib(init=False, repr=False)
+    __model_intermediates__: tuple = attrib(init=False, repr=False)
+    __model_returns__: tuple = attrib(init=False, repr=False)
+    __model_attribute_map__: dict = attrib(init=False, repr=False)
 
     def visualize(self):
         """Visualize the model to get an understanding of what model attributes are used and when."""
@@ -211,15 +423,15 @@ def _parse_attriubtes(cls):
 
     for attribute in cls.__attrs_attrs__:
         attribute_type = attribute.metadata.get("footings_attribute_type", None)
-        if attribute_type is FootingsAttributeType.Parameter:
+        if attribute_type is ModelAttributeType.Parameter:
             parsed_attributes["Parameters"].append(_make_doc_parameter(attribute))
-        elif attribute_type is FootingsAttributeType.Sensitivity:
+        elif attribute_type is ModelAttributeType.Sensitivity:
             parsed_attributes["Sensitivities"].append(_make_doc_parameter(attribute))
-        elif attribute_type is FootingsAttributeType.Meta:
+        elif attribute_type is ModelAttributeType.Meta:
             parsed_attributes["Meta"].append(_make_doc_parameter(attribute))
-        elif attribute_type is FootingsAttributeType.Intermediate:
+        elif attribute_type is ModelAttributeType.Intermediate:
             parsed_attributes["Intermediates"].append(_make_doc_parameter(attribute))
-        elif attribute_type is FootingsAttributeType.Return:
+        elif attribute_type is ModelAttributeType.Return:
             parsed_attributes["Returns"].append(_make_doc_parameter(attribute))
 
     return parsed_attributes
@@ -299,26 +511,26 @@ def model(cls: type = None, *, steps: List[str] = []):
                 attr = attrs_attrs[attribute]
             else:
                 if isinstance(attr, _CountingAttr) is False:
-                    msg = f"The attribute {attribute} is not registered to a known Footings group.\n"
+                    msg = f"The attribute {attribute} is not registered to a known Models group.\n"
                     msg += "Use one of def_* functions from the footings library when building a model."
                     raise ModelCreationError(msg)
             attribute_type = attr.metadata.get("footings_attribute_type", None)
             if (
                 attribute_type is None
-                or isinstance(attribute_type, FootingsAttributeType) is False
+                or isinstance(attribute_type, ModelAttributeType) is False
             ):
-                msg = f"The attribute {attribute} is not registered to a known Footings attribute type.\n"
+                msg = f"The attribute {attribute} is not registered to a known Models attribute type.\n"
                 msg += "Use one of def_* functions from the footings library when building a model."
                 raise ModelCreationError(msg)
-            if attribute_type is FootingsAttributeType.Parameter:
+            if attribute_type is ModelAttributeType.Parameter:
                 parameters.append(attribute)
-            elif attribute_type is FootingsAttributeType.Sensitivity:
+            elif attribute_type is ModelAttributeType.Sensitivity:
                 sensitivities.append(attribute)
-            elif attribute_type is FootingsAttributeType.Meta:
+            elif attribute_type is ModelAttributeType.Meta:
                 meta.append(attribute)
-            elif attribute_type is FootingsAttributeType.Intermediate:
+            elif attribute_type is ModelAttributeType.Intermediate:
                 intermediates.append(attribute)
-            elif attribute_type is FootingsAttributeType.Return:
+            elif attribute_type is ModelAttributeType.Return:
                 returns.append(attribute)
 
         # 2. For steps -
@@ -341,19 +553,13 @@ def model(cls: type = None, *, steps: List[str] = []):
                 f"The followings steps listed do not appear to be decorated steps - {str(missing_attributes)}."
             )
 
-        # Add Footings methods
-        cls.run = Footing.run
-        cls.audit = Footing.audit
-        cls.visualize = Footing.visualize
-
         # If all test pass, update steps and returns with known values as defaults.
-        kws = {"init": False, "repr": False}
-        cls.__footings_steps__ = attrib(default=tuple(steps), **kws)
-        cls.__footings_parameters__ = attrib(default=tuple(parameters), **kws)
-        cls.__footings_sensitivities__ = attrib(default=tuple(sensitivities), **kws)
-        cls.__footings_meta__ = attrib(default=tuple(meta), **kws)
-        cls.__footings_intermediates__ = attrib(default=tuple(intermediates), **kws)
-        cls.__footings_returns__ = attrib(default=tuple(returns), **kws)
+        cls.__model_steps__ = tuple(steps)
+        cls.__model_parameters__ = tuple(parameters)
+        cls.__model_sensitivities__ = tuple(sensitivities)
+        cls.__model_meta__ = tuple(meta)
+        cls.__model_intermediates__ = tuple(intermediates)
+        cls.__model_returns__ = tuple(returns)
 
         attribute_map = {
             **{p: f"parameter.{p}" for p in parameters},
@@ -370,11 +576,24 @@ def model(cls: type = None, *, steps: List[str] = []):
             impact_new = _update_uses_impacts(impact_old, attribute_map)
             new_step = evolve(getattr(cls, step), uses=use_new, impacts=tuple(impact_new))
             setattr(cls, step, new_step)
-        cls.__footings_attribute_map__ = attrib(default=attribute_map, **kws)
+        cls.__model_attribute_map__ = attribute_map
+
+        exclude = [x for x in Model.__dict__.keys() if x[0] != "_"]
+        attrs = {
+            x: getattr(cls, x)
+            for x in cls.__dict__.keys()
+            if x[0] != "_" and x not in exclude
+        }
 
         # Make attrs dataclass and update signature
-        cls = attrs(
-            maybe_cls=cls, kw_only=True, on_setattr=frozen, repr=False, slots=True
+        cls = make_class(
+            cls.__name__,
+            attrs=attrs,
+            bases=(cls, Model,),
+            kw_only=True,
+            on_setattr=frozen,
+            repr=False,
+            slots=True,
         )
         return _attr_doc(cls, steps)
 

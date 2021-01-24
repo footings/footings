@@ -4,7 +4,7 @@ import datetime
 from attr import attrs, attrib, evolve
 import pandas as pd
 
-from footings import model, step, def_parameter, def_return
+from footings.model import model, step, def_parameter, def_return
 from footings.jigs import WrappedModel
 from footings.io.to_xlsx import FootingsXlsxWb
 from footings.testing import assert_footings_files_equal

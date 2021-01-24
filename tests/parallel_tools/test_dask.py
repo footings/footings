@@ -1,4 +1,4 @@
-from footings import (
+from footings.model import (
     model,
     step,
     def_parameter,

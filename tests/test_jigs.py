@@ -1,6 +1,6 @@
 from inspect import getfullargspec, signature
 
-from footings import (
+from footings.model import (
     model,
     step,
     def_parameter,
