@@ -1,17 +1,17 @@
 from typing import Optional, Callable, Dict, Tuple
 
-import ray
-
-from ..jigs import WrappedModel, MappedModel, ForeachJig
-
-__all__ = ["create_ray_foreach_jig"]
-
-
-def ray_wrapper(func, **kwargs):
-    def inner(func, **kwargs):
-        return ray.remote(func, **kwargs)
-
-    return inner(func, **kwargs).remote
+# import ray
+#
+# from ..jigs import WrappedModel, MappedModel, ForeachJig
+#
+# __all__ = ["create_ray_foreach_jig"]
+#
+#
+# def ray_wrapper(func, **kwargs):
+#     def inner(func, **kwargs):
+#         return ray.remote(func, **kwargs)
+#
+#     return inner(func, **kwargs).remote
 
 
 def create_ray_foreach_jig(
@@ -47,37 +47,40 @@ def create_ray_foreach_jig(
 
     :return: ForeachJig (with updated signature)
     """
+    pass
 
-    if isinstance(model, dict):
-        if mapped_keys is None:
-            msg = (
-                "When passing a dict of models, the keys used must be set in mapped_keys."
-            )
-            raise ValueError(msg)
-        model = MappedModel.create(
-            model,
-            model_wrapper=WrappedModel,
-            iterator_keys=iterator_keys,
-            mapped_keys=mapped_keys,
-            pass_iterator_keys=pass_iterator_keys,
-            parallel_wrap=ray_wrapper,
-            parallel_kwargs=ray_remote_kwargs,
-        )
-    else:
-        model = WrappedModel(
-            model,
-            iterator_keys=iterator_keys,
-            pass_iterator_keys=pass_iterator_keys,
-            parallel_wrap=ray_wrapper,
-            parallel_kwargs=ray_remote_kwargs,
-        )
 
-    return ForeachJig.create(
-        model=model,
-        iterator_name=iterator_name,
-        constant_params=constant_params,
-        success_wrap=success_wrap,
-        error_wrap=error_wrap,
-        compute=ray.get,
-        compute_kwargs=ray_get_kwargs,
-    )
+#     if isinstance(model, dict):
+#         if mapped_keys is None:
+#             msg = (
+#                 "When passing a dict of models, the keys used must be set in mapped_keys."
+#             )
+#             raise ValueError(msg)
+#         model = MappedModel.create(
+#             model,
+#             model_wrapper=WrappedModel,
+#             iterator_keys=iterator_keys,
+#             mapped_keys=mapped_keys,
+#             pass_iterator_keys=pass_iterator_keys,
+#             parallel_wrap=ray_wrapper,
+#             parallel_kwargs=ray_remote_kwargs,
+#         )
+#     else:
+#         model = WrappedModel(
+#             model,
+#             iterator_keys=iterator_keys,
+#             pass_iterator_keys=pass_iterator_keys,
+#             parallel_wrap=ray_wrapper,
+#             parallel_kwargs=ray_remote_kwargs,
+#         )
+#
+#     return ForeachJig.create(
+#         model=model,
+#         iterator_name=iterator_name,
+#         constant_params=constant_params,
+#         success_wrap=success_wrap,
+#         error_wrap=error_wrap,
+#         compute=ray.get,
+#         compute_kwargs=ray_get_kwargs,
+#     )
+#
