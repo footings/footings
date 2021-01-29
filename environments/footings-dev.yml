@@ -3,7 +3,6 @@ channels:
   - conda-forge
 dependencies:
   # required
-  - pip
   - attrs>=20.0.0
   - numpy
   - pandas
@@ -24,6 +23,6 @@ dependencies:
   - ipython
   - ipykernel
   - dask
+  - pip
   - pip:
     - nox
-    - ray

@@ -2,27 +2,6 @@
 API
 ===
 
-footings
---------
-
-.. automodule:: footings
-   :exclude-members:
-
-.. autosummary::
-   :nosignatures:
-   :toctree: generated
-
-   model
-   step
-   def_parameter
-   def_sensitivity
-   def_meta
-   def_intermediate
-   def_return
-   dispatch_function
-
-|
-
 
 footings.audit
 --------------
@@ -87,6 +66,28 @@ footings.jigs
    :toctree: generated
 
    create_foreach_jig
+
+|
+
+
+footings.model
+--------------
+
+.. automodule:: footings.model
+   :exclude-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated
+
+   Model
+   model
+   step
+   def_parameter
+   def_sensitivity
+   def_meta
+   def_intermediate
+   def_return
 
 |
 
@@ -157,9 +158,7 @@ footings.model_tools
    frame_filter
    calculate_age
    run_date_time
-   once
    convert_to_records
-
 
 |
 

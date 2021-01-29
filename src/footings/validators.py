@@ -1,159 +1,136 @@
 from attr import attrs, attrib
-from attr.validators import (
-    and_,
-    deep_iterable,
-    deep_mapping,
-    in_,
-    instance_of,
-    is_callable,
-    matches_re,
-    provides,
-)
+from .data_dictionary import DataDictionary
+
+# from attr.validators import (
+#     and_,
+#     deep_iterable,
+#     deep_mapping,
+#     in_,
+#     instance_of,
+#     is_callable,
+#     matches_re,
+#     provides,
+# )
 
 
 __all__ = [
-    "value_min",
-    "value_max",
-    "value_in_range",
-    "len_min",
-    "len_max",
-    "len_in_range",
-    "and_",
-    "deep_iterable",
-    "deep_mapping",
-    "in_",
-    "instance_of",
-    "is_callable",
-    "matches_re",
-    "provides",
+    "equal_to",
+    "not_equal_to",
+    "isin",
 ]
 
-
-@attrs(repr=False, slots=True, hash=True)
-class _InstanceValueValidator:
-    value = attrib()
-    test = attrib()
-
-    def __call__(self, inst, attr, value):
-        error = False
-        msg = ""
-        if self.test == "min":
-            if self.value > value:
-                error = True
-                msg += f"The value {value} is less than {self.value}."
-        if self.test == "max":
-            if self.value < value:
-                error = True
-                msg += f"The value {value} is greater than {self.value}."
-
-        if error:
-            raise ValueError(msg, attr, self, value)
-
-    def __repr__(self):
-        return (
-            f"<value validator using {str(self.test)} test with value {str(self.value)}>"
-        )
-
-
-def value_min(value):
-    """A validator to set as a minimum.
-
-    Parameters
-    ----------
-    value : Any object with rich comparison methods
-        The minimum to establish as a validator.
-
-    Raises
-    ------
-    ValueError
-        If a passed attribute is less than value.
-    """
-    return _InstanceValueValidator(value=value, test="min")
-
-
-def value_max(value):
-    """A validator to set as a maximum.
-
-    Parameters
-    ----------
-    value : Any object with rich comparison methods
-        The maximum to establish as a validator.
-
-    Raises
-    ------
-    ValueError
-        If a passed attribute is greater than value.
-    """
-    return _InstanceValueValidator(value=value, test="max")
-
-
-def value_in_range(lower, upper):
-    """ """
-    pass
+# "greater_than",
+# "greater_than_or_equal_to",
+# "less_than",
+# "less_than_or_equal_to",
+# "in_range",
+# "is_in",
+# "not_in",
+# "str_contains",
+# "str_ends_with",
+# "str_length",
+# "str_matches",
+# "str_starts_with",
+# "deep_iterable",
+# "deep_mapping",
+# "is_callable",
 
 
 @attrs(repr=False, slots=True, hash=True)
-class _InstanceLengthValidator:
+class _EqualToValidator:
     value = attrib()
-    test = attrib()
+
+    def _call_data_dictionary(self, inst, attr, value):
+        test = value != self.value
+        fails = sum(test)
+        if fails > 0:
+            msg = f"{attr.name} failed {repr(self)[1:-1]} {fails} out of {str(len(value))} rows."
+            raise ValueError(msg)
 
     def __call__(self, inst, attr, value):
-        error = False
-        msg = ""
-        if self.test == "min":
-            if self.value > len(value):
-                error = True
-                msg += f"The value {value} has length less than {self.value}."
-        if self.test == "max":
-            if self.value < len(value):
-                error = True
-                msg += f"The value {value} has length greater than {self.value}."
-        if error:
-            raise ValueError(msg, attr, self, value)
+        if isinstance(inst, DataDictionary):
+            return self._call_data_dictionary(inst, attr, value)
+        if value != self.value:
+            msg = f"{attr.name} value of {str(value)} does not equal {str(self.value)}."
+            raise ValueError(msg)
 
     def __repr__(self):
-        return f"<length validator using {self.test} test with value {str(self.value)}>"
+        return f"<equal_to(value={str(self.value)}) validator>"
 
 
-def len_min(value):
-    """A validator to set as a minimum length.
+def equal_to(value):
+    """A validator that raises a `ValueError` if the initializer is called with a value
+    that is not equal to the value provided.
+
+    Can be used under both a `DataDictionary` and a `Model`.
 
     Parameters
     ----------
-    value : Any object with a __len__ method
-        The minimum len to establish as a validator.
+    value : Any
+        The value to compare for equality.
 
     Raises
     ------
     ValueError
-        If a passed attribute has length less than value.
+        With a human readable error message, the attribute (of type `attr.Attribute`), the
+        equality value, and the value passed.
     """
-    return _InstanceLengthValidator(value=value, test="min")
+    return _EqualToValidator(value)
 
 
-def len_max(value):
-    """A validator to set as a maximum length.
+@attrs(repr=False, slots=True, hash=True)
+class _NotEqualToValidator:
+    value = attrib()
+
+    def _call_data_dictionary(self, inst, attr, value):
+        test = value == self.value
+        fails = sum(test)
+        if fails > 0:
+            msg = f"{attr.name} failed {repr(self)[1:-1]} {fails} out of {str(len(value))} rows."
+            raise ValueError(msg)
+
+    def __call__(self, inst, attr, value):
+        if isinstance(inst, DataDictionary):
+            return self._call_data_dictionary(inst, attr, value)
+        if value == self.value:
+            msg = f"{attr.name} value of {str(value)} does equal {str(self.value)}."
+            raise ValueError(msg)
+
+    def __repr__(self):
+        return f"<not_equal_to(value={str(self.value)}) validator>"
+
+
+def not_equal_to(value):
+    """A validator that raises a `ValueError` if the initializer is called with a value
+    that is equal to the value provided.
+
+    Can be used under both a `DataDictionary` and a `Model`.
 
     Parameters
     ----------
-    value : Any object with a __len__ method
-        The maximum len to establish as a validator.
+    value : Any
+        The value to compare for equality.
 
     Raises
     ------
     ValueError
-        If a passed attribute has length greater than value.
+        With a human readable error message, the attribute (of type `attr.Attribute`), the
+        equality value, and the value passed.
     """
-    return _InstanceLengthValidator(value=value, test="max")
+    return _NotEqualToValidator(value)
 
 
-def len_in_range(lower, upper):
+def isin(options):
     pass
 
 
-def schema_structure(schema):
+def data_dictionary_types(data_dictionary):
     pass
 
 
-def schema_all(schema):
+def data_dictionary_validators(data_dictionary):
+    pass
+
+
+def data_dictionary_valid(data_dictionary):
     pass

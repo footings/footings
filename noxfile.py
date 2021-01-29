@@ -12,7 +12,7 @@ def update_environments(session):
         "--prefix",
         session.virtualenv.location,
         "--file",
-        "environments/environment-dev.yml",
+        "environments/footings-dev.yml",
         # options
         silent=False,
     )

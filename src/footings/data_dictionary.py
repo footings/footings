@@ -2,7 +2,7 @@ from enum import Enum
 from functools import partial
 from typing import List, Mapping, Optional, Union
 
-from attr import attrs, attrib, make_class
+from attr import attrs, attrib, make_class, evolve
 from attr.validators import instance_of, optional
 import numpy as np
 import pandas as pd
@@ -170,6 +170,23 @@ class Column:
         type=Mapping, factory=dict, kw_only=True, validator=instance_of(Mapping)
     )
 
+    def __str__(self):
+        string = self.name + " : "
+        if self.dtype is not None:
+            string += str(self.dtype)
+        string += "\n"
+        if self.description is not None:
+            string += "    " + self.description
+        string += "\n"
+        if len(self.validator) > 0:
+            for val in self.validator:
+                string += str(val)
+            string += "\n"
+        if len(self.metadata) > 0:
+            string += str(self.metadata)
+            string += "\n"
+        return string
+
 
 def def_column(
     dtype: Optional[Union[str, PandasDtype]] = None,
@@ -208,18 +225,24 @@ class DataDictionary:
 
     __columns__ = attrib(init=False, repr=False)
 
+    @property
     def columns(self):
+        """Show column names."""
+        return self.__columns__
+
+    def list_columns(self):
+        """List all columns."""
         return [getattr(self, col) for col in self.__columns__]
 
-    def __repr__(self):
-        name = self.__class__.__qualname__
-        cols = "\n\t".join([str(getattr(self, col)) for col in self.__columns__])
-        return f"{name}(DataDictionary)\n\t{cols}\n"
+    # def __repr__(self):
+    #     name = self.__class__.__qualname__
+    #     cols = "\n\t".join([repr(getattr(self, col)) for col in self.__columns__])
+    #     return f"{name}[DataDictionary]\n\t{cols}\n"
 
     def _cols_valid(self, dataframe: pd.DataFrame):
         """Test match of columns in datadictionary vs dataframe."""
         results, msgs = [], []
-        col_dict = {col.name: col for col in self.columns()}
+        col_dict = {col.name: col for col in self.list_columns()}
         cols = list(dict.fromkeys(list(col_dict) + list(dataframe.columns)))
         for col in cols:
             dd_col = col_dict.get(col, None)
@@ -239,7 +262,7 @@ class DataDictionary:
     def _types_valid(self, dataframe: pd.DataFrame):
         """Test column types in dataframe."""
         results, msgs = [], []
-        for dd_col in self.columns():
+        for dd_col in self.list_columns():
             df_col = dataframe.get(dd_col.name, None)
             test_eq = dd_col.dtype.value == df_col.dtype.name
             if test_eq is False:
@@ -253,7 +276,7 @@ class DataDictionary:
     def _validators_valid(self, dataframe: pd.DataFrame):
         """Test validators for columns in dataframe."""
         results, msgs = [], []
-        for col in self.columns():
+        for col in self.list_columns():
             df_col = dataframe.get(col.name)
             if len(col.validator) > 0:
                 for validator in col.validator:
@@ -332,10 +355,29 @@ class DataDictionary:
     def def_meta(self, column):
         raise NotImplementedError("This feature is not implemented yet.")
 
+    def def_column(self, column):
+        """Define a column for another data dictionary using an existing data dictioanry column.
 
-def make_col_attrib(cls, col):
-    column = getattr(cls, col)(name=col)
-    return attrib(default=column, init=False)
+        :param str column: The column name.
+        """
+        col = getattr(self, column, None)
+        if col is None:
+            msg = f"The column [{column}] does not belong to the data dictionary."
+            raise AttributeError(msg)
+        return col
+
+
+def make_data_doc(cls_doc, cols):
+    if cls_doc is None:
+        doc = ""
+    else:
+        doc = str(cls_doc) + "\n\n"
+    doc += "Columns\n"
+    doc += "-------\n"
+    for col in cols:
+        doc += str(col)
+        doc += "\n"
+    return doc
 
 
 def data_dictionary(cls: type = None):
@@ -344,11 +386,19 @@ def data_dictionary(cls: type = None):
         return partial(data_dictionary)
 
     def make_data_dictionary(cls):
+        def set_column(x):
+            col = getattr(cls, x)
+            if isinstance(col, Column):
+                return evolve(col, name=x)
+            return col(name=x)
+
         exclude = [x for x in DataDictionary.__dict__.keys() if x[0] != "_"]
-        cols = [x for x in cls.__dict__.keys() if x[0] != "_" and x not in exclude]
-        attrs = {col: make_col_attrib(cls, col) for col in cols}
-        attrs.update({"__columns__": attrib(default=cols, init=False, repr=False)})
-        return make_class(
+        cols = [
+            set_column(x) for x in cls.__dict__.keys() if x[0] != "_" and x not in exclude
+        ]
+        attrs = {col.name: attrib(default=col, init=False) for col in cols}
+        orig_doc = str(cls.__doc__)
+        cls = make_class(
             cls.__name__,
             attrs,
             bases=(DataDictionary,),
@@ -356,5 +406,8 @@ def data_dictionary(cls: type = None):
             frozen=True,
             repr=False,
         )
+        cls.__columns__ = tuple(col.name for col in cols)
+        cls.__doc__ = make_data_doc(orig_doc, cols)
+        return cls
 
     return make_data_dictionary(cls)()  # note an instance is returned
