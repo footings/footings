@@ -5,24 +5,27 @@ dependencies:
   # required
   - attrs>=20.0.0
   - numpy
-  - pandas
+  - pandas>=1.0.*
   - numpydoc=1.0.*
   - openpyxl
+
+  # parallel tools
+  - dask
 
   # testing
   - pytest
   - pytest-cov
 
-  # development
-  - flake8
-  - black==19.*
-  - pre-commit
+  # docs
   - sphinx
   - myst-nb
   - pydata-sphinx-theme
   - ipython
   - ipykernel
-  - dask
+
+  # development
   - pip
-  - pip:
-    - nox
+  - flake8
+  - black==19.*
+  - pre-commit
+  - nox
