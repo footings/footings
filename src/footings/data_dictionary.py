@@ -264,29 +264,30 @@ class DataDictionary:
         results, msgs = [], []
         for dd_col in self.list_columns():
             df_col = dataframe.get(dd_col.name, None)
-            test_eq = dd_col.dtype.value == df_col.dtype.name
-            if test_eq is False:
-                msg = f"The column [{dd_col.name}] in the DataDictionary has type [{dd_col.dtype.value}] "
-                msg += f"which is different from type in the dataframe passed [{df_col.dtype.name}]."
-                msgs.append(msg)
-            results.append(test_eq)
+            if df_col is not None:
+                test_eq = dd_col.dtype.value == df_col.dtype.name
+                if test_eq is False:
+                    msg = f"The column [{dd_col.name}] in the DataDictionary has type [{dd_col.dtype.value}] "
+                    msg += f"which is different from type in the dataframe passed [{df_col.dtype.name}]."
+                    msgs.append(msg)
+                results.append(test_eq)
 
         return results, msgs
 
     def _validators_valid(self, dataframe: pd.DataFrame):
         """Test validators for columns in dataframe."""
         results, msgs = [], []
-        for col in self.list_columns():
-            df_col = dataframe.get(col.name)
-            if len(col.validator) > 0:
-                for validator in col.validator:
+        for dd_col in self.list_columns():
+            df_col = dataframe.get(dd_col.name, None)
+            if df_col is not None and len(dd_col.validator) > 0:
+                for validator in dd_col.validator:
                     try:
-                        validator(inst=self, attr=col, value=df_col)
+                        validator(inst=self, attr=dd_col, value=df_col)
                         results.append(True)
                     except:
                         results.append(False)
                         msgs.append(
-                            f"The column [{col.name}] failed {str(validator)[1:-1]}."
+                            f"The column [{dd_col.name}] failed {str(validator)[1:-1]}."
                         )
 
         return results, msgs
