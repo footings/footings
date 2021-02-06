@@ -3,38 +3,19 @@ import shutil
 
 import nox
 
-#
-# @nox.session(python=PYTHON_TEST_VERSIONS, venv_backend="conda")
-# def update_environments(session):
-#     session.run(
-#         "conda",
-#         "env",
-#         "update",
-#         "--prefix",
-#         session.virtualenv.location,
-#         "--file",
-#         "environments/footings-dev.yml",
-#         # options
-#         silent=False,
-#     )
-#
-#
-# @nox.session(python=PYTHON_TEST_VERSIONS, venv_backend="conda")
-# def test(session):
-#     session.install("-e", ".", "--no-deps")
-#     session.run("pytest", "-vv")
+
+@nox.session(venv_backend="none")
+def run_tests(session):
+    session.run("poetry", "install")
+    session.run("poetry", "run", "pip", "show", "footings")
+    session.run("poetry", "run", "pytest", "-vv")
 
 
 @nox.session(venv_backend="none")
-def test_ci(session):
-    session.install("-e", ".", "--no-deps")
-    session.run("pytest", "-vv")
-
-
-@nox.session(venv_backend="none")
-def coverage_ci(session):
-    session.install("-e", ".", "--no-deps")
-    session.run("pytest", "--cov=./", "--cov-report=xml")
+def run_coverage(session):
+    session.run("poetry", "install")
+    session.run("poetry", "run", "pip", "show", "footings")
+    session.run("poetry", "run", "pytest", "--cov=./", "--cov-report=xml")
 
 
 @nox.session(venv_backend="none")

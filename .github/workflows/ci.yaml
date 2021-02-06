@@ -9,7 +9,7 @@ on:
 jobs:
   pre-commit:
     name: pre-commit
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.7", "3.8"]
+        python-version: ["3.7", "3.8", "3.9"]
         os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
       - uses: actions/checkout@v2
@@ -37,24 +37,26 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: "${{ matrix.python-version }}"
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
-          environment-file: environments/footings-dev.yml
-          activate-environment: footings-dev
-          auto-activate-base: false
-      - name: Conda info
+      - name: Install pipx
         run: |
-          conda info
-          conda list
+          python -m pip install pipx
+      - name: Install poetry, nox
+        run: |
+          pipx install poetry
+          pipx install nox
+      - name: Poetry show
+        run: |
+          poetry show
+      - name: Pip show footings
+        run: |
+          poetry run pip show footings
       - name: Run tests
-        run:  nox -s test_ci
+        run:  nox -s run_tests
+
   coverage:
     needs: [tests]
     name: Run coverage
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -l {0}
@@ -64,25 +66,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: 3.8
-          environment-file: environments/footings-dev.yml
-          activate-environment: footings-dev
-          auto-activate-base: false
-      - name: Conda info
+      - name: Install pipx
         run: |
-          conda info
-          conda list
+          python -m pip install pipx
+      - name: Install poetry, nox
+        run: |
+          pipx install poetry
+          pipx install nox
+      - name: Poetry show
+        run: |
+          poetry show
+      - name: Pip show footings
+        run: |
+          poetry run pip show footings
       - name: Run coverage
-        run:  nox -s coverage_ci
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
-          flags: PYTHON37
-          name: codecov-reports-37
-          fail_ci_if_error: true
+        run:  nox -s run_coverage
