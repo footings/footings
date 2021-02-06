@@ -1,4 +1,5 @@
 [flake8]
+exclude = __init__.py
 ignore =
     E231, # missing whitespace after
     E722, # bare except
