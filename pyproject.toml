@@ -37,7 +37,7 @@ flake8 = "^3.7"
 black = "^19.10b"
 pre-commit = "^2.1"
 nox = ">=2020.0.0"
-cytoolz = "^0.11"
+cytoolz = {version = "^0.11", markers = "sys_platform != 'win32' or sys_platform != 'win64'"}
 toolz = "^0.11"
 dask = ">=2021.0"
 ray = "^1.0"
