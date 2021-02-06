@@ -1,0 +1,6 @@
+[flake8]
+ignore =
+    E231, # missing whitespace after
+    E722, # bare except
+    W503 # line break before binary operator
+max-line-length = 120
