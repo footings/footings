@@ -1,4 +1,4 @@
-name: CI
+name: Main
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.7", "3.8", "3.9"]
+        python-version: ["3.7", "3.8"]
         os: [ubuntu-latest, macOS-latest, windows-latest]
     steps:
       - uses: actions/checkout@v2
@@ -39,7 +39,12 @@ jobs:
           python-version: "${{ matrix.python-version }}"
       - name: Install pipx
         run: |
-          python3 -m pip install pipx
+
+          if [ "$RUNNER_OS" == "Windows" ]; then
+               python -m pip install pipx
+          else
+               python3 -m pip install pipx
+          fi
       - name: Install poetry, nox
         run: |
           pipx install poetry
