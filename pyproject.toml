@@ -1,11 +1,55 @@
+[tool.poetry]
+name = "footings"
+packages = [
+    { include = "footings", from = "src" }
+]
+version = "0.10.0rc1"
+description = "A model building library"
+authors = ["Dustin Tindall <dustin.tindall@gmail.com>"]
+license = "BSD 3-Clause License"
+readme = 'README.md'
+homepage = "https://footings.readthedocs.io/en/master/"
+repository = "https://github.com/footings/footings"
+documentation = "https://footings.readthedocs.io/en/master/"
+classifiers = [
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+]
+
+
+[tool.poetry.dependencies]
+python = "^3.7"
+attrs = "^20.0"
+numpy = "^1.11"
+pandas = "^1.0"
+numpydoc = "^1.0"
+openpyxl = "^3.0"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^4.6"
+pytest-cov = "^2.5"
+sphinx = "^3.0"
+myst-nb = "^0.10"
+pydata-sphinx-theme = "^0.4.0"
+flake8 = "^3.7"
+black = "^19.10b"
+pre-commit = "^2.1"
+nox = ">=2020.0.0"
+cytoolz = "^0.11" 
+toolz = "^0.11"
+dask = ">=2021.0"
+ray = "^1.0"
+
+
+[tool.poetry.extras]
+parallel_tools = ["dask", "ray"]
+
 
 [build-system]
-requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=3.4"]
-build-backend = "setuptools.build_meta"
-
-
-[tool.setuptools_scm]
-write_to = "src/footings/_version.py"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 
 [tool.black]
@@ -26,3 +70,8 @@ exclude = '''
   | dist
 )/
 '''
+
+[tool.isort]
+profile = "black"
+src_paths = ["src", "tests"]
+known_first_party = "footings"
