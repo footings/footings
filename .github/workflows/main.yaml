@@ -20,6 +20,7 @@ jobs:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
       - uses: pre-commit/action@v2.0.0
+
   tests:
     name: "Python ${{ matrix.python-version }}"
     runs-on: ${{ matrix.os }}
@@ -91,3 +92,49 @@ jobs:
           poetry run pip show footings
       - name: Run coverage
         run:  nox -s run_coverage
+
+  create-and-publish-docs:
+    name: Create Documentation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install pipx
+        run: |
+          python3 -m pip install pipx
+      - name: Install poetry, nox
+        run: |
+          pipx install poetry
+          pipx install nox
+      - name: Install footings
+        run: |
+          poetry install
+      - name: Poetry show libraries
+        run: |
+          poetry show
+      - name: Pip show footings
+        run: |
+          poetry run pip show footings
+      - name: Run sphinx
+        run:  nox -s create_docs
+      - name: Deploy docs to github pages - master
+        if: github.ref == 'refs/heads/master'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./docs/_build
+          destination_dir: ./master
+      - name: Deploy docs to github pages - dev
+        if: github.ref == 'refs/heads/dev'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./docs/_build
+          destination_dir: ./dev
