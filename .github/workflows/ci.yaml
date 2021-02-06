@@ -44,7 +44,10 @@ jobs:
         run: |
           pipx install poetry
           pipx install nox
-      - name: Poetry show
+      - name: Install footings
+        run: |
+          poetry install
+      - name: Poetry show libraries
         run: |
           poetry show
       - name: Pip show footings
@@ -73,7 +76,10 @@ jobs:
         run: |
           pipx install poetry
           pipx install nox
-      - name: Poetry show
+      - name: Install footings
+        run: |
+          poetry install
+      - name: Poetry show libraries
         run: |
           poetry show
       - name: Pip show footings
