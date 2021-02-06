@@ -1,19 +1,12 @@
 import os
 
-from footings.model import (
-    model,
-    step,
-    def_parameter,
-    def_intermediate,
-    def_return,
-)
 from footings.audit import (
-    AuditContainer,
-    AuditStepContainer,
     AuditConfig,
+    AuditContainer,
     AuditStepConfig,
+    AuditStepContainer,
 )
-
+from footings.model import def_intermediate, def_parameter, def_return, model, step
 from footings.testing import assert_footings_files_equal
 
 

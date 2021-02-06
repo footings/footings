@@ -3,14 +3,15 @@ from datetime import date
 
 import pandas as pd
 import pytest
+
 from footings.io.to_xlsx import FootingsXlsxEntry
 from footings.testing import (
-    compare_values,
-    make_key_checker,
-    check_extensions_equal,
     assert_footings_files_equal,
     assert_footings_json_files_equal,
     assert_footings_xlsx_files_equal,
+    check_extensions_equal,
+    compare_values,
+    make_key_checker,
 )
 
 

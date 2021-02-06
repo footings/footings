@@ -1,20 +1,18 @@
+import sys
 from enum import Enum, auto
 from functools import partial
-import sys
 from traceback import extract_tb, format_list
 from typing import Any, List, Optional
 
-from attr import attrs, attrib, make_class, evolve, NOTHING
-from attr.setters import NO_OP
-from attr._make import _CountingAttr
-from attr.setters import frozen
 import numpydoc.docscrape as numpydoc
+from attr import NOTHING, attrib, attrs, evolve, make_class
+from attr._make import _CountingAttr
+from attr.setters import NO_OP, frozen
 
 from .audit import run_model_audit
 from .doc_tools.docscrape import FootingsDoc
 from .exceptions import ModelCreationError, ModelRunError
 from .visualize import visualize_model
-
 
 __all__ = [
     "Model",

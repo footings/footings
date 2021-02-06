@@ -1,7 +1,7 @@
 import os
+
 from footings.io import load_footings_file
 from footings.io.from_json import flatten_dict, load_footings_json_file
-
 
 test_dict = {"outer": {"inner": {"endpoint1": 1, "endpoint2": 2}}, "endpoint3": 3}
 expected_dict = {

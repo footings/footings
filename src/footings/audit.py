@@ -1,13 +1,12 @@
-from copy import deepcopy
 import pathlib
+from copy import deepcopy
 from inspect import getfullargspec, signature
 
-from attr import attrs, attrib, asdict
+from attr import asdict, attrib, attrs
 from attr.validators import instance_of, optional
 
+from .io import create_footings_json_file, create_footings_xlsx_file
 from .utils import dispatch_function
-from .io import create_footings_xlsx_file
-from .io import create_footings_json_file
 
 
 def _make_signature(model):

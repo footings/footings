@@ -1,8 +1,8 @@
 import pytest
 
 from footings.utils import (
-    dispatch_function,
     DispatchMissingArgumentError,
+    dispatch_function,
     loaded_function,
 )
 

@@ -9,12 +9,12 @@
 __all__ = ["DocModel"]
 
 from footings.model import (
+    def_meta,
+    def_parameter,
+    def_return,
+    def_sensitivity,
     model,
     step,
-    def_parameter,
-    def_meta,
-    def_sensitivity,
-    def_return,
 )
 
 

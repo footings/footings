@@ -1,12 +1,12 @@
-import os
 import datetime
+import os
 
-from attr import attrs, attrib, evolve
 import pandas as pd
+from attr import attrib, attrs, evolve
 
-from footings.model import model, step, def_parameter, def_return
-from footings.jigs import WrappedModel
 from footings.io.to_xlsx import FootingsXlsxWb
+from footings.jigs import WrappedModel
+from footings.model import def_parameter, def_return, model, step
 from footings.testing import assert_footings_files_equal
 
 

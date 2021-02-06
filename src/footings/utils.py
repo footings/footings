@@ -1,10 +1,9 @@
 import inspect
 import types
-from itertools import product
-from functools import partial, update_wrapper, wraps
 from collections.abc import Iterable
+from functools import partial, update_wrapper, wraps
+from itertools import product
 from typing import Callable, Tuple
-
 
 __all__ = ["dispatch_function", "once"]
 

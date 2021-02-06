@@ -1,17 +1,18 @@
 import inspect
+import os
 import pydoc
 from collections.abc import Callable
-import os
 
 from jinja2 import FileSystemLoader
 from jinja2.sandbox import SandboxedEnvironment
-from sphinx.jinja2glue import BuiltinTemplateLoader
 from numpydoc.docscrape_sphinx import (
-    SphinxDocString,
     SphinxClassDoc,
+    SphinxDocString,
     SphinxFunctionDoc,
     SphinxObjDoc,
 )
+from sphinx.jinja2glue import BuiltinTemplateLoader
+
 from .docscrape import FootingsDoc
 
 

@@ -1,7 +1,6 @@
-import pytest
-
-from attr import Attribute, NOTHING
 import pandas as pd
+import pytest
+from attr import NOTHING, Attribute
 
 from footings import validators as validator_module
 from footings.data_dictionary import data_dictionary, def_column

@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Dict, Tuple
+from typing import Callable, Dict, Optional, Tuple
 
 # import ray
 #

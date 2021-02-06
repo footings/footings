@@ -2,18 +2,17 @@ from enum import Enum
 from functools import partial
 from typing import List, Mapping, Optional, Union
 
-from attr import attrs, attrib, make_class, evolve
-from attr.validators import instance_of, optional
 import numpy as np
 import pandas as pd
+from attr import attrib, attrs, evolve, make_class
+from attr.validators import instance_of, optional
 
-from .model import def_parameter
 from .exceptions import (
-    DataDictionaryValidatorsConversionError,
     DataDictionaryPandasDtypeConversionError,
     DataDictionaryValidateError,
+    DataDictionaryValidatorsConversionError,
 )
-
+from .model import def_parameter
 
 __all__ = ["PandasDtype", "data_dictionary", "def_column"]
 

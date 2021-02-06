@@ -1,24 +1,24 @@
-from functools import partial
 import re
+from functools import partial
 
-from attr import asdict
 import pandas as pd
 import pytest
+from attr import asdict
 
-from footings.model import model
 from footings.data_dictionary import (
-    PandasDtype,
     Column,
-    def_column,
     DataDictionary,
+    PandasDtype,
     data_dictionary,
+    def_column,
 )
-from footings.validators import equal_to
 from footings.exceptions import (
-    DataDictionaryValidatorsConversionError,
     DataDictionaryPandasDtypeConversionError,
     DataDictionaryValidateError,
+    DataDictionaryValidatorsConversionError,
 )
+from footings.model import model
+from footings.validators import equal_to
 
 
 def clean_str(x):

@@ -1,6 +1,6 @@
+import pathlib
 from fnmatch import fnmatch
 from functools import singledispatch
-import pathlib
 from typing import Optional
 
 import pandas as pd

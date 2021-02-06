@@ -1,11 +1,11 @@
 """
 Implementing `python -m numpydoc` functionality.
 """
-import sys
 import argparse
 import ast
+import sys
 
-from numpydoc.validate import validate, Docstring
+from numpydoc.validate import Docstring, validate
 
 from .docscrape_sphinx import get_doc_object
 

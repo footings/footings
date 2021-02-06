@@ -1,8 +1,8 @@
-from inspect import signature, Signature, Parameter
-from typing import Optional, Callable, Tuple, Dict, Iterable, Union
 import sys
+from inspect import Parameter, Signature, signature
+from typing import Callable, Dict, Iterable, Optional, Tuple, Union
 
-from attr import attrs, attrib
+from attr import attrib, attrs
 from attr.validators import instance_of, is_callable, optional
 
 from .exceptions import Error

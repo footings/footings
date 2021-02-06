@@ -1,7 +1,7 @@
-from distutils.version import LooseVersion
-from html.parser import HTMLParser
 import os.path as op
 import shutil
+from distutils.version import LooseVersion
+from html.parser import HTMLParser
 
 import pytest
 import sphinx

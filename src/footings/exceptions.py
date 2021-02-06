@@ -1,7 +1,7 @@
-from traceback import extract_tb, format_list
 import sys
+from traceback import extract_tb, format_list
 
-from attr import attrs, attrib, asdict
+from attr import asdict, attrib, attrs
 from attr.validators import instance_of
 
 

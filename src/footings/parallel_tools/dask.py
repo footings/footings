@@ -1,8 +1,8 @@
-from typing import Optional, Callable, Dict, Tuple
+from typing import Callable, Dict, Optional, Tuple
 
-from dask import delayed, compute
+from dask import compute, delayed
 
-from ..jigs import WrappedModel, MappedModel, ForeachJig
+from ..jigs import ForeachJig, MappedModel, WrappedModel
 
 __all__ = ["create_dask_foreach_jig"]
 

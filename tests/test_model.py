@@ -1,22 +1,22 @@
 import inspect
-import pytest
 
-from attr import attrs, attrib
-from attr.setters import frozen, FrozenAttributeError
+import pytest
+from attr import attrib, attrs
+from attr.setters import FrozenAttributeError, frozen
 from numpydoc.docscrape import Parameter
 
 from footings.model import (
-    model,
-    step,
-    def_return,
-    def_intermediate,
-    def_meta,
-    def_sensitivity,
-    def_parameter,
-    ModelAttributeType,
     FootingsDoc,
+    ModelAttributeType,
     ModelCreationError,
     ModelRunError,
+    def_intermediate,
+    def_meta,
+    def_parameter,
+    def_return,
+    def_sensitivity,
+    model,
+    step,
 )
 
 

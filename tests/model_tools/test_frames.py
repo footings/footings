@@ -1,18 +1,18 @@
 import os
 
-import pytest
 import pandas as pd
+import pytest
 from pandas.testing import assert_frame_equal
 
 from footings.model_tools.frames import (
-    freq_dispatcher,
-    kwarg_dispatcher,
     create_frame,
     create_frame_from_record,
     expand_frame_per_record,
     frame_add_exposure,
     frame_add_weights,
     frame_filter,
+    freq_dispatcher,
+    kwarg_dispatcher,
 )
 
 FILE = os.path.join("tests", "model_tools", "data", "frame-examples.xlsx")

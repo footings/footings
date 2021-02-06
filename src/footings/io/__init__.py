@@ -1,10 +1,10 @@
 import pathlib
 
+from ..utils import dispatch_function
 from .from_json import load_footings_json_file
 from .from_xlsx import load_footings_xlsx_file
 from .to_json import create_footings_json_file
 from .to_xlsx import create_footings_xlsx_file
-from ..utils import dispatch_function
 
 
 def load_footings_file(file: str):

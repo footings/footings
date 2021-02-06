@@ -1,9 +1,4 @@
-from footings.model import (
-    model,
-    step,
-    def_parameter,
-    def_return,
-)
+from footings.model import def_parameter, def_return, model, step
 from footings.parallel_tools.dask import create_dask_foreach_jig
 
 

@@ -1,19 +1,13 @@
 from inspect import getfullargspec, signature
 
-from footings.model import (
-    model,
-    step,
-    def_parameter,
-    def_return,
-)
-
 from footings.jigs import (
     Error,
-    WrappedModel,
-    MappedModel,
     ForeachJig,
+    MappedModel,
+    WrappedModel,
     create_foreach_jig,
 )
+from footings.model import def_parameter, def_return, model, step
 
 
 @model(steps=["_add_a_b"])

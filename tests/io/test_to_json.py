@@ -1,13 +1,13 @@
-import os
 import datetime
 import json
+import os
 
-from attr import attrs, attrib, evolve
 import pandas as pd
+from attr import attrib, attrs, evolve
 
-from footings.model import model, step, def_parameter, def_return
 from footings.io.to_json import create_footings_json_file
 from footings.jigs import WrappedModel
+from footings.model import def_parameter, def_return, model, step
 
 
 def test_footings_json(tmp_path):

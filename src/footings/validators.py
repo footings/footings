@@ -1,4 +1,5 @@
-from attr import attrs, attrib
+from attr import attrib, attrs
+
 from .data_dictionary import DataDictionary
 
 # from attr.validators import (
