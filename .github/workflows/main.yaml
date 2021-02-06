@@ -30,19 +30,15 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.7", "3.8"]
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest] # macOS-latest,
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: "${{ matrix.python-version }}"
-      - name: Print OS "$RUNNER_OS"
-        run: |
-          echo $RUNNER_OS
       - name: Install pipx
         run: |
-
           if [ "$RUNNER_OS" == "Windows" ]; then
                python -m pip install pipx
           else
@@ -54,7 +50,6 @@ jobs:
           pipx install nox
       - name: Install footings
         run: |
-          poetry config experimental.new-installer false
           poetry install
       - name: Poetry show libraries
         run: |
