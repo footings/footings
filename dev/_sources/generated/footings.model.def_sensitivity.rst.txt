@@ -1,0 +1,6 @@
+﻿footings.model.def\_sensitivity
+===============================
+
+.. currentmodule:: footings.model
+
+.. autofunction:: def_sensitivity

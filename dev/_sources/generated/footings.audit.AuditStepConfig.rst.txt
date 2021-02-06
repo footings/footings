@@ -1,0 +1,27 @@
+﻿footings.audit.AuditStepConfig
+==============================
+
+.. currentmodule:: footings.audit
+
+.. autoclass:: AuditStepConfig
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AuditStepConfig.show_docstring
+      ~AuditStepConfig.show_impacts
+      ~AuditStepConfig.show_metadata
+      ~AuditStepConfig.show_method_name
+      ~AuditStepConfig.show_output
+      ~AuditStepConfig.show_uses
+   
+   

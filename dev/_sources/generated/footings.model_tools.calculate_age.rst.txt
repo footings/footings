@@ -1,0 +1,6 @@
+﻿footings.model\_tools.calculate\_age
+====================================
+
+.. currentmodule:: footings.model_tools
+
+.. autofunction:: calculate_age

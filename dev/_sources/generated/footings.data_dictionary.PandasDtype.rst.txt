@@ -1,0 +1,42 @@
+﻿footings.data\_dictionary.PandasDtype
+=====================================
+
+.. currentmodule:: footings.data_dictionary
+
+.. autoclass:: PandasDtype
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PandasDtype.Bool
+      ~PandasDtype.Category
+      ~PandasDtype.Complex
+      ~PandasDtype.Complex256
+      ~PandasDtype.Complex64
+      ~PandasDtype.DateTime
+      ~PandasDtype.Float
+      ~PandasDtype.Float16
+      ~PandasDtype.Float32
+      ~PandasDtype.Int
+      ~PandasDtype.Int16
+      ~PandasDtype.Int32
+      ~PandasDtype.Int64
+      ~PandasDtype.Int8
+      ~PandasDtype.Object
+      ~PandasDtype.String
+      ~PandasDtype.Timedelta
+      ~PandasDtype.UInt16
+      ~PandasDtype.UInt32
+      ~PandasDtype.UInt64
+      ~PandasDtype.UInt8
+   
+   

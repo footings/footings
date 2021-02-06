@@ -1,0 +1,6 @@
+﻿footings.parallel\_tools.ray.create\_ray\_foreach\_jig
+======================================================
+
+.. currentmodule:: footings.parallel_tools.ray
+
+.. autofunction:: create_ray_foreach_jig

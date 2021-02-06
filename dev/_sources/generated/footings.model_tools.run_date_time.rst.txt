@@ -1,0 +1,6 @@
+﻿footings.model\_tools.run\_date\_time
+=====================================
+
+.. currentmodule:: footings.model_tools
+
+.. autodata:: run_date_time

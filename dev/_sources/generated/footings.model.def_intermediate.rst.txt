@@ -1,0 +1,6 @@
+﻿footings.model.def\_intermediate
+================================
+
+.. currentmodule:: footings.model
+
+.. autofunction:: def_intermediate

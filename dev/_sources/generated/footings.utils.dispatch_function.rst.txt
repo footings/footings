@@ -1,0 +1,6 @@
+﻿footings.utils.dispatch\_function
+=================================
+
+.. currentmodule:: footings.utils
+
+.. autofunction:: dispatch_function

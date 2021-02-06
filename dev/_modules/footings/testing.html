@@ -1,0 +1,519 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>footings.testing &#8212; Footings 0.10.0rc0 documentation</title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Footings</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../installation.html">Installation</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../principles.html">Principles</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../tutorials/index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../api.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../license.html">License</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../changelog.html">Changelog</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this site..." aria-label="Search this site..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/footings/footings" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for footings.testing</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">from</span> <span class="nn">fnmatch</span> <span class="kn">import</span> <span class="n">fnmatch</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">footings.utils</span> <span class="kn">import</span> <span class="n">dispatch_function</span>
+
+<span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="n">load_footings_json_file</span><span class="p">,</span> <span class="n">load_footings_xlsx_file</span>
+<span class="kn">from</span> <span class="nn">.io.to_xlsx</span> <span class="kn">import</span> <span class="n">FootingsXlsxEntry</span>
+
+<span class="c1">#########################################################################################</span>
+<span class="c1"># comparison functions</span>
+<span class="c1">#########################################################################################</span>
+
+<span class="n">MAX_STR_LEN_TO_SHOW</span> <span class="o">=</span> <span class="mi">100</span>
+
+
+<span class="nd">@singledispatch</span>
+<span class="k">def</span> <span class="nf">compare_values</span><span class="p">(</span><span class="n">result_value</span><span class="p">,</span> <span class="n">expected_value</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A dispatch function to compare two values.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">compare_values</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">result_value</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">expected_value</span><span class="p">))</span>
+
+
+<span class="nd">@compare_values</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">result_value</span><span class="p">,</span> <span class="n">expected_value</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result_value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">expected_value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">compare_values</span><span class="p">(</span><span class="n">result_value</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">expected_value</span><span class="p">),</span> <span class="n">tolerance</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">result_value</span> <span class="o">==</span> <span class="n">expected_value</span>
+    <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">result_value</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">MAX_STR_LEN_TO_SHOW</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">expected_value</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">MAX_STR_LEN_TO_SHOW</span>
+        <span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The result value [</span><span class="si">{</span><span class="n">result_value</span><span class="si">}</span><span class="s2">] is not equal to the expected value [</span><span class="si">{</span><span class="n">expected_value</span><span class="si">}</span><span class="s2">].&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The result and expected strings are not equal and they are to long to display.&quot;</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">msg</span>
+
+
+<span class="nd">@compare_values</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+<span class="nd">@compare_values</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="nd">@compare_values</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">result_value</span><span class="p">,</span> <span class="n">expected_value</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result_value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">expected_value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">compare_values</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">result_value</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">expected_value</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">result_value</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">expected_value</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">compare_values</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">result_value</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">expected_value</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">tolerance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result_value</span> <span class="o">==</span> <span class="n">expected_value</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">result_value</span> <span class="o">-</span> <span class="n">expected_value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tolerance</span>
+    <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The result value [</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">result_value</span><span class="p">)</span><span class="si">}</span><span class="s2">] is not equal to the expected value [</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">expected_value</span><span class="p">)</span><span class="si">}</span><span class="s2">].&quot;</span>
+        <span class="k">if</span> <span class="n">tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; using a tolerance of </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">tolerance</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">msg</span>
+
+
+<span class="nd">@compare_values</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">result_value</span><span class="p">,</span> <span class="n">expected_value</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="n">compare_values</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">result_value</span><span class="p">,</span> <span class="n">expected_value</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The result list values are different from the expected list values.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;The result list values are - </span><span class="se">\n\n</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">result_value</span><span class="p">)</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;The expected list values are - </span><span class="se">\n\n</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">expected_value</span><span class="p">)</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">msg</span>
+
+
+<span class="nd">@compare_values</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">result_value</span><span class="p">,</span> <span class="n">expected_value</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="n">compare_values</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">result_value</span><span class="p">,</span> <span class="n">expected_value</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">result_value</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The result pd.Series is different from the expected pd.Series.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The result pd.Series for column [</span><span class="si">{</span><span class="n">result_value</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">] is different&quot;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot; from the expected pd.Series.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;The result pd.Series is - </span><span class="se">\n\n</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">result_value</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;The expected pd.Series is - </span><span class="se">\n\n</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">expected_value</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">msg</span>
+
+
+<span class="nd">@compare_values</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">result_value</span><span class="p">,</span> <span class="n">expected_value</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">series_compare</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">compare_values</span><span class="p">(</span><span class="n">result_value</span><span class="p">[</span><span class="n">r</span><span class="p">],</span> <span class="n">expected_value</span><span class="p">[</span><span class="n">e</span><span class="p">],</span> <span class="n">tolerance</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">result_value</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">expected_value</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">series_compare</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The result pd.DataFrame is different from the expected pd.DataFrame.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">series_compare</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">msg</span>
+
+
+<span class="k">def</span> <span class="nf">make_key_checker</span><span class="p">(</span><span class="n">exclude_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">callable</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">exclude_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">lambda</span> <span class="n">key</span><span class="p">:</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">key_checker</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">FootingsXlsxEntry</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">mapping</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">exclude_keys</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">key_checker</span>
+
+
+<span class="k">def</span> <span class="nf">compare_file_dicts</span><span class="p">(</span>
+    <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">expected</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">exclude_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">],</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">key_exclude</span> <span class="o">=</span> <span class="n">make_key_checker</span><span class="p">(</span><span class="n">exclude_keys</span><span class="p">)</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">expected</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">key_exclude</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">res_val</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;The result file is missing this key, but it exists in the expected file.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">exp_val</span> <span class="o">=</span> <span class="n">expected</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;The expected file is missing this key, but it exists in the result file.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">temp</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">res_val</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">exp_val</span><span class="p">):</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The value types are different.&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">temp</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">compare_values</span><span class="p">(</span><span class="n">res_val</span><span class="p">,</span> <span class="n">exp_val</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">temp</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">test</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="n">temp</span><span class="p">,</span> <span class="s2">&quot;msg&quot;</span><span class="p">:</span> <span class="n">msg</span><span class="p">}})</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> : </span><span class="si">{</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">log</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;result&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">test</span><span class="p">,</span> <span class="n">message</span>
+
+
+<span class="k">def</span> <span class="nf">check_extensions_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="n">result_ext</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
+    <span class="n">expected_ext</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
+    <span class="k">if</span> <span class="n">result_ext</span> <span class="o">!=</span> <span class="n">expected_ext</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The file extensions for result [</span><span class="si">{</span><span class="n">result_ext</span><span class="si">}</span><span class="s2">] and expected [</span><span class="si">{</span><span class="n">expected_ext</span><span class="si">}</span><span class="s2">] do not match.&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<div class="viewcode-block" id="assert_footings_json_files_equal"><a class="viewcode-back" href="../../generated/footings.testing.assert_footings_json_files_equal.html#footings.testing.assert_footings_json_files_equal">[docs]</a><span class="k">def</span> <span class="nf">assert_footings_json_files_equal</span><span class="p">(</span>
+    <span class="n">result</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">expected</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Assert whether two footing json files are equal.  This function is</span>
+<span class="sd">    useful for unit testing models to ensure models stay true over time.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    result : str</span>
+<span class="sd">        The path to the result file.</span>
+<span class="sd">    expected : str</span>
+<span class="sd">        The path to the expected file.</span>
+<span class="sd">    tolerance : float, optional</span>
+<span class="sd">        The tolerance to test on numeric values.</span>
+<span class="sd">    exclude_keys : list, optional</span>
+<span class="sd">        Keys to exclude from testing.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True or false on whether files are equal given parameters.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the result and expected files share different extension types.</span>
+<span class="sd">    AssertionError</span>
+<span class="sd">        If any records between the result and expected files are different.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_extensions_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">load_footings_json_file</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="n">load_footings_json_file</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+    <span class="n">test</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="n">compare_file_dicts</span><span class="p">(</span>
+        <span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">expected</span><span class="o">=</span><span class="n">expected</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span> <span class="n">exclude_keys</span><span class="o">=</span><span class="n">exclude_keys</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">test</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">message</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="assert_footings_xlsx_files_equal"><a class="viewcode-back" href="../../generated/footings.testing.assert_footings_xlsx_files_equal.html#footings.testing.assert_footings_xlsx_files_equal">[docs]</a><span class="k">def</span> <span class="nf">assert_footings_xlsx_files_equal</span><span class="p">(</span>
+    <span class="n">result</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">expected</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Assert whether two footing xlsx files are equal. This function is</span>
+<span class="sd">    useful for unit testing models to ensure models stay true over time.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    result : str</span>
+<span class="sd">        The path to the result file.</span>
+<span class="sd">    expected : str</span>
+<span class="sd">        The path to the expected file.</span>
+<span class="sd">    tolerance : float, optional</span>
+<span class="sd">        The tolerance to test on numeric values.</span>
+<span class="sd">    exclude_keys : list, optional</span>
+<span class="sd">        Keys to exclude from testing.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True or false on whether files are equal given parameters.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the result and expected files share different extension types.</span>
+<span class="sd">    AssertionError</span>
+<span class="sd">        If any records between the result and expected files are different.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_extensions_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">expected</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">load_footings_xlsx_file</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="n">expected</span> <span class="o">=</span> <span class="n">load_footings_xlsx_file</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+    <span class="n">test</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="n">compare_file_dicts</span><span class="p">(</span>
+        <span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">expected</span><span class="o">=</span><span class="n">expected</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span> <span class="n">exclude_keys</span><span class="o">=</span><span class="n">exclude_keys</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">test</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<span class="nd">@dispatch_function</span><span class="p">(</span><span class="n">key_parameters</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;file_ext&quot;</span><span class="p">,))</span>
+<span class="k">def</span> <span class="nf">_assert_footings_files_equal</span><span class="p">(</span><span class="n">file_ext</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;test run_model audit&quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No registered function based on passed paramters and no default function.&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+
+<span class="nd">@_assert_footings_files_equal</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">file_ext</span><span class="o">=</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">expected</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">assert_footings_json_files_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="nd">@_assert_footings_files_equal</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">file_ext</span><span class="o">=</span><span class="s2">&quot;.xlsx&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">expected</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">assert_footings_xlsx_files_equal</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="assert_footings_files_equal"><a class="viewcode-back" href="../../generated/footings.testing.assert_footings_files_equal.html#footings.testing.assert_footings_files_equal">[docs]</a><span class="k">def</span> <span class="nf">assert_footings_files_equal</span><span class="p">(</span>
+    <span class="n">result</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">expected</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A generic function to assert whether two footing files are equal. This function is</span>
+<span class="sd">    useful for unit testing models to ensure models stay true over time.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    result : str</span>
+<span class="sd">        The path to the result file.</span>
+<span class="sd">    expected : str</span>
+<span class="sd">        The path to the expected file.</span>
+<span class="sd">    tolerance : float, optional</span>
+<span class="sd">        The tolerance to test on numeric values.</span>
+<span class="sd">    exclude_keys : list, optional</span>
+<span class="sd">        Keys to exclude from testing.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True or false on whether files are equal given parameters.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the result and expected files share different extension types.</span>
+<span class="sd">    AssertionError</span>
+<span class="sd">        If any records between the result and expected files are different.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    assert_footings_json_files_equal</span>
+<span class="sd">    assert_footings_xlsx_files_equal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file_ext</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
+    <span class="n">_assert_footings_files_equal</span><span class="p">(</span>
+        <span class="n">file_ext</span><span class="o">=</span><span class="n">file_ext</span><span class="p">,</span>
+        <span class="n">result</span><span class="o">=</span><span class="n">result</span><span class="p">,</span>
+        <span class="n">expected</span><span class="o">=</span><span class="n">expected</span><span class="p">,</span>
+        <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span>
+        <span class="n">exclude_keys</span><span class="o">=</span><span class="n">exclude_keys</span><span class="p">,</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2020, Dustin Tindall.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

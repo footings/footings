@@ -1,0 +1,554 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Documenting Models &#8212; Footings 0.10.0rc0 documentation</title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Running Models" href="4-running-models.html" />
+    <link rel="prev" title="Attributes and Instantiation" href="2-attributes-and-instantiation.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Footings</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../installation.html">Installation</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../principles.html">Principles</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../api.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../license.html">License</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../changelog.html">Changelog</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this site..." aria-label="Search this site..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/footings/footings" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+          
+            
+  
+                <li class="active">
+                    <a href="index.html">Intro Series</a>
+                    <ul>
+                    
+                        <li class="">
+                            <a href="1-building-a-model.html">Building a Model</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="2-attributes-and-instantiation.html">Attributes and Instantiation</a>
+                        </li>
+                    
+                        <li class="active">
+                            <a href="">Documenting Models</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="4-running-models.html">Running Models</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="5-auditing-models.html">Auditing Models</a>
+                        </li>
+                    
+                    </ul>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../pattern-series/index.html">Pattern Series</a>
+                </li>
+            
+          
+        
+        
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#introduction" class="nav-link">Introduction</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#documented-model" class="nav-link">Documented Model</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#viewing-the-documentation" class="nav-link">Viewing the Documentation</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#closing" class="nav-link">Closing</a>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="documenting-models">
+<h1>Documenting Models<a class="headerlink" href="#documenting-models" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This is the third tutorial in the <a class="reference internal" href="index.html"><span class="doc std std-doc">Intro Series</span></a> where we do a deeper dive into the topic of documenting models. One of the underlying <a class="reference internal" href="../../principles.html"><span class="doc std std-doc">principles</span></a> of the <code class="docutils literal notranslate"><span class="pre">Footings</span> <span class="pre">framework</span></code> is <em>models should be self documenting</em>.</p>
+<p>To start, it is important to note that the <code class="docutils literal notranslate"><span class="pre">Footings</span> <span class="pre">framework</span></code> supports numpy style docstrings and internally builds off <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/">numpydoc</a> to generate docstrings and the associated objects for generating documentation in sphinx.</p>
+</div>
+<div class="section" id="documented-model">
+<h2>Documented Model<a class="headerlink" href="#documented-model" title="Permalink to this headline">¶</a></h2>
+<p>Below is the code for <code class="docutils literal notranslate"><span class="pre">AddABC</span></code> from the prior two tutorials with documentations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">footings.model</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">step</span><span class="p">,</span>
+    <span class="n">def_parameter</span><span class="p">,</span>
+    <span class="n">def_intermediate</span><span class="p">,</span>
+    <span class="n">def_return</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nd">@model</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_add_a_b&quot;</span><span class="p">,</span> <span class="s2">&quot;_add_ab_c&quot;</span><span class="p">])</span>
+<span class="k">class</span> <span class="nc">AddABC</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This model takes 3 parameters - a, b, and c and adds them together in two steps.&quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">def_parameter</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;This is parameter a.&quot;</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">def_parameter</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;This is parameter b.&quot;</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">def_parameter</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;This is parameter c.&quot;</span><span class="p">)</span>
+    <span class="n">ab</span> <span class="o">=</span> <span class="n">def_intermediate</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;This holds a + b.&quot;</span><span class="p">)</span>
+    <span class="n">abc</span> <span class="o">=</span> <span class="n">def_return</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The sum of ab and c.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@step</span><span class="p">(</span><span class="n">uses</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">],</span> <span class="n">impacts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ab&quot;</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">_add_a_b</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a and b together and assign to ab.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+
+    <span class="nd">@step</span><span class="p">(</span><span class="n">uses</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ab&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">],</span> <span class="n">impacts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;abc&quot;</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">_add_ab_c</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add ab and c together for final return.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">abc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ab</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>As the above code shows -</p>
+<ul class="simple">
+<li><p>Documentation about the model is added as a standard python docstring directly underneath the class.</p></li>
+<li><p>Documentation for attributes, including the data types, should be set within the <code class="docutils literal notranslate"><span class="pre">def_*</span></code> function.</p></li>
+<li><p>Information on each step can be added as a docstring underneath the method defining that step.</p></li>
+</ul>
+<p>Do note the attributes could be documented in the associated docstring. However, it is recommended to put the attribute documentation within the <code class="docutils literal notranslate"><span class="pre">def_*</span></code> function. Lastly, being able to pass documentation (i.e., dtype and description) into functions as code allows us to move the source of the documentation to be elsewhere.</p>
+<p>The below code demonstrates this. Assume the model developer wants to have a data dictionary file that is the true source of information underlying the parameters.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="n">data_dictionary_file</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">a:</span>
+<span class="s2">  dtype: int</span>
+<span class="s2">  description: This is parameter a.</span>
+<span class="s2">b:</span>
+<span class="s2">  dtype: int</span>
+<span class="s2">  description: This is parameter b.</span>
+<span class="s2">c:</span>
+<span class="s2">  dtype: int</span>
+<span class="s2">  description: This is parameter c.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">data_dictionary</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">data_dictionary_file</span><span class="p">)</span>
+
+<span class="n">data_dictionary</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;a&#39;: {&#39;dtype&#39;: &#39;int&#39;, &#39;description&#39;: &#39;This is parameter a.&#39;},
+ &#39;b&#39;: {&#39;dtype&#39;: &#39;int&#39;, &#39;description&#39;: &#39;This is parameter b.&#39;},
+ &#39;c&#39;: {&#39;dtype&#39;: &#39;int&#39;, &#39;description&#39;: &#39;This is parameter c.&#39;}}
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can then pass the information from the data dictionary file into the associated parameters.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nd">@model</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_add_a_b&quot;</span><span class="p">,</span> <span class="s2">&quot;_add_ab_c&quot;</span><span class="p">])</span>
+<span class="k">class</span> <span class="nc">AddABC</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This model takes 3 parameters - a, b, and c and adds them together in two steps.&quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">def_parameter</span><span class="p">(</span><span class="o">**</span><span class="n">data_dictionary</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">def_parameter</span><span class="p">(</span><span class="o">**</span><span class="n">data_dictionary</span><span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">])</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">def_parameter</span><span class="p">(</span><span class="o">**</span><span class="n">data_dictionary</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">])</span>
+    <span class="n">ab</span> <span class="o">=</span> <span class="n">def_intermediate</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;This holds a + b.&quot;</span><span class="p">)</span>
+    <span class="n">abc</span> <span class="o">=</span> <span class="n">def_return</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The sum of ab and c.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@step</span><span class="p">(</span><span class="n">uses</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">],</span> <span class="n">impacts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ab&quot;</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">_add_a_b</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a and b together and assign to ab.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+
+    <span class="nd">@step</span><span class="p">(</span><span class="n">uses</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ab&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">],</span> <span class="n">impacts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;abc&quot;</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">_add_ab_c</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add ab and c together for final return.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">abc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ab</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="viewing-the-documentation">
+<h2>Viewing the Documentation<a class="headerlink" href="#viewing-the-documentation" title="Permalink to this headline">¶</a></h2>
+<p>To see what the documentation looks like to a user call <code class="docutils literal notranslate"><span class="pre">help</span></code> on the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="n">AddABC</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on class AddABC in module footings.model:
+
+class AddABC(__main__.AddABC, Model)
+ |  AddABC(*, a: &#39;int&#39;, b: &#39;int&#39;, c: &#39;int&#39;) -&gt; None
+ |  
+ |  This model takes 3 parameters - a, b, and c and adds them together in two steps.
+ |  
+ |  Parameters
+ |  ----------
+ |  a : int
+ |      This is parameter a.
+ |  b : int
+ |      This is parameter b.
+ |  c : int
+ |      This is parameter c.
+ |  
+ |  Intermediates
+ |  -------------
+ |  ab : int
+ |      This holds a + b.
+ |  
+ |  Returns
+ |  -------
+ |  abc : int
+ |      The sum of ab and c.
+ |  
+ |  Steps
+ |  -----
+ |  1) _add_a_b - Add a and b together and assign to ab.
+ |  2) _add_ab_c - Add ab and c together for final return.
+ |  
+ |  Method resolution order:
+ |      AddABC
+ |      __main__.AddABC
+ |      Model
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __eq__(self, other)
+ |      Method generated by attrs for class AddABC.
+ |  
+ |  __ge__(self, other)
+ |      Method generated by attrs for class AddABC.
+ |  
+ |  __getstate__ = slots_getstate(self)
+ |      Automatically created by attrs.
+ |  
+ |  __gt__(self, other)
+ |      Method generated by attrs for class AddABC.
+ |  
+ |  __init__(self, *, a: &#39;int&#39;, b: &#39;int&#39;, c: &#39;int&#39;) -&gt; None
+ |      Method generated by attrs for class AddABC.
+ |  
+ |  __le__(self, other)
+ |      Method generated by attrs for class AddABC.
+ |  
+ |  __lt__(self, other)
+ |      Method generated by attrs for class AddABC.
+ |  
+ |  __ne__(self, other)
+ |      Method generated by attrs for class AddABC.
+ |  
+ |  __setattr__(self, name, val)
+ |      Method generated by attrs for class AddABC.
+ |  
+ |  __setstate__ = slots_setstate(self, state)
+ |      Automatically created by attrs.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  a
+ |      Intermediate representation of attributes that uses a counter to preserve
+ |      the order in which the attributes have been defined.
+ |      
+ |      *Internal* data structure of the attrs library.  Running into is most
+ |      likely the result of a bug like a forgotten `@attr.s` decorator.
+ |  
+ |  ab
+ |      Intermediate representation of attributes that uses a counter to preserve
+ |      the order in which the attributes have been defined.
+ |      
+ |      *Internal* data structure of the attrs library.  Running into is most
+ |      likely the result of a bug like a forgotten `@attr.s` decorator.
+ |  
+ |  abc
+ |      Intermediate representation of attributes that uses a counter to preserve
+ |      the order in which the attributes have been defined.
+ |      
+ |      *Internal* data structure of the attrs library.  Running into is most
+ |      likely the result of a bug like a forgotten `@attr.s` decorator.
+ |  
+ |  b
+ |      Intermediate representation of attributes that uses a counter to preserve
+ |      the order in which the attributes have been defined.
+ |      
+ |      *Internal* data structure of the attrs library.  Running into is most
+ |      likely the result of a bug like a forgotten `@attr.s` decorator.
+ |  
+ |  c
+ |      Intermediate representation of attributes that uses a counter to preserve
+ |      the order in which the attributes have been defined.
+ |      
+ |      *Internal* data structure of the attrs library.  Running into is most
+ |      likely the result of a bug like a forgotten `@attr.s` decorator.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes defined here:
+ |  
+ |  __attrs_attrs__ = (Attribute(name=&#39;__model_steps__&#39;, default=NOTHI...e...
+ |  
+ |  __attrs_own_setattr__ = True
+ |  
+ |  __hash__ = None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from __main__.AddABC:
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes inherited from __main__.AddABC:
+ |  
+ |  __model_attribute_map__ = {&#39;a&#39;: &#39;parameter.a&#39;, &#39;ab&#39;: &#39;intermediate.ab&#39;...
+ |  
+ |  __model_intermediates__ = (&#39;ab&#39;,)
+ |  
+ |  __model_meta__ = ()
+ |  
+ |  __model_parameters__ = (&#39;a&#39;, &#39;b&#39;, &#39;c&#39;)
+ |  
+ |  __model_returns__ = (&#39;abc&#39;,)
+ |  
+ |  __model_sensitivities__ = ()
+ |  
+ |  __model_steps__ = (&#39;_add_a_b&#39;, &#39;_add_ab_c&#39;)
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from Model:
+ |  
+ |  audit(self, file: str = None, **kwargs)
+ |      Audit the model which returns copies of the object as it is modified across each step.
+ |      
+ |      Parameters
+ |      ----------
+ |      file : str, optional
+ |          The name of the audit output file.
+ |      kwargs
+ |          Additional key words passed to audit.
+ |      
+ |      Returns
+ |      -------
+ |      None
+ |          An audit file in specfified format (e.g., .xlsx).
+ |  
+ |  run(self, to_step=None)
+ |      Runs the model and returns any returns defined.
+ |      
+ |      Parameters
+ |      ----------
+ |      to_step : str, optional
+ |          The name of the step to run model to.
+ |  
+ |  visualize(self)
+ |      Visualize the model to get an understanding of what model attributes are used and when.
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes inherited from Model:
+ |  
+ |  __annotations__ = {&#39;__model_attribute_map__&#39;: &lt;class &#39;dict&#39;&gt;, &#39;__model...
+</pre></div>
+</div>
+</div>
+</div>
+<p>When viewing the output, you will see the attributes are split into sections based on the <code class="docutils literal notranslate"><span class="pre">def_*</span></code> function called. In addition, directly below the return detail is a section titled <code class="docutils literal notranslate"><span class="pre">Steps</span></code> with the method name of the step and the description of the step.</p>
+<p>This layout of the  documentation will flow through if using <a class="reference external" href="https://www.sphinx-doc.org/en/master/">sphinx</a>. Be sure to include <code class="docutils literal notranslate"><span class="pre">footings.doc_tools</span></code> as an extension in your <code class="docutils literal notranslate"><span class="pre">conf.py</span></code> file. For an example of this see the <code class="docutils literal notranslate"><span class="pre">footings-idi-model</span></code> <a class="reference external" href="https://github.com/footings/footings-idi-model">repository</a> and <a class="reference external" href="https://footings-idi-model.readthedocs.io/en/master/">documentation</a>.</p>
+</div>
+<div class="section" id="closing">
+<h2>Closing<a class="headerlink" href="#closing" title="Permalink to this headline">¶</a></h2>
+<p>When building a model using the <code class="docutils literal notranslate"><span class="pre">Footings</span> <span class="pre">framework</span></code>, the developer needs to document the different components of the model and the <code class="docutils literal notranslate"><span class="pre">footings</span></code> library will organize those components into consumable documentation. Model documentation is paired best with sphinx and a CI/CD pipeline producing versioned documentation along side your model code.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="2-attributes-and-instantiation.html" title="previous page">Attributes and Instantiation</a>
+    <a class='right-next' id="next-link" href="4-running-models.html" title="next page">Running Models</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2020, Dustin Tindall.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

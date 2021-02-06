@@ -1,0 +1,6 @@
+﻿footings.testing.assert\_footings\_files\_equal
+===============================================
+
+.. currentmodule:: footings.testing
+
+.. autofunction:: assert_footings_files_equal

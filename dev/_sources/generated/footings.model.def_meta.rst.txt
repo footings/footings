@@ -1,0 +1,6 @@
+﻿footings.model.def\_meta
+========================
+
+.. currentmodule:: footings.model
+
+.. autofunction:: def_meta

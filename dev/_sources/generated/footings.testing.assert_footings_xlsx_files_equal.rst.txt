@@ -1,0 +1,6 @@
+﻿footings.testing.assert\_footings\_xlsx\_files\_equal
+=====================================================
+
+.. currentmodule:: footings.testing
+
+.. autofunction:: assert_footings_xlsx_files_equal

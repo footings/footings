@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Principles &#8212; Footings 0.10.0rc0 documentation</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorials" href="tutorials/index.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="index.html">
+    
+      <p class="title">Footings</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="installation.html">Installation</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="">Principles</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="tutorials/index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="api.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="license.html">License</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="changelog.html">Changelog</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this site..." aria-label="Search this site..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/footings/footings" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+          
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#models-are-a-sequence-of-linked-steps" class="nav-link">Models are a sequence of linked steps</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#models-need-to-be-easy-to-understand" class="nav-link">Models need to be easy to understand</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#models-need-to-have-validation-built-in" class="nav-link">Models need to have validation built in</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#models-need-to-be-easy-to-audit" class="nav-link">Models need to be easy to audit</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#models-need-to-be-self-documenting" class="nav-link">Models need to be self documenting</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#models-need-to-be-able-to-scale-up" class="nav-link">Models need to be able to scale up</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#models-need-to-be-able-to-build-off-other-models" class="nav-link">Models need to be able to build off other models</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#model-environments-should-not-be-monolithic" class="nav-link">Model environments should not be monolithic</a>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="principles">
+<h1>Principles<a class="headerlink" href="#principles" title="Permalink to this headline">¶</a></h1>
+<p>The principles upon which the <code class="docutils literal notranslate"><span class="pre">footings</span></code> library was built are listed below with commentary on why they are a principle. Do note the <code class="docutils literal notranslate"><span class="pre">footings</span></code> library was designed with the intention of making it easier to develop long duration life and health actuarial models. Thus, the principles are heavily inspired by these types of models.</p>
+<div class="section" id="models-are-a-sequence-of-linked-steps">
+<h2>Models are a sequence of linked steps<a class="headerlink" href="#models-are-a-sequence-of-linked-steps" title="Permalink to this headline">¶</a></h2>
+<p>Actuarial models usually require many calculations and data processing steps to transform inputs into the needed output. Examples of calculations and data processing steps typical in actuarial models include -</p>
+<ul class="simple">
+<li><p>calculating dates or ages of policy holders,</p></li>
+<li><p>loading assumption values from disk (e.g., csv file),</p></li>
+<li><p>adding, subtracting, multiplying, dividing vectors,</p></li>
+<li><p>summing values of groups, and</p></li>
+<li><p>data wrangling to get needed format.</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">footings</span> <span class="pre">framework</span></code> needs to embrace this thought and make it easy to do siloed calculations and data processing steps that are linked together to form the final output.</p>
+</div>
+<div class="section" id="models-need-to-be-easy-to-understand">
+<h2>Models need to be easy to understand<a class="headerlink" href="#models-need-to-be-easy-to-understand" title="Permalink to this headline">¶</a></h2>
+<p>For programmers, it is often said that code is read more often then it is written. Actuarial models have a similar situation after initial development, where models will more often be reviewed by those who did not do the initial development then modified in any meaningful way. Thus, the <code class="docutils literal notranslate"><span class="pre">footings</span> <span class="pre">framework</span></code> needs to embrace this. Objects used to build models need to have meaningful names and they need to come together in a way that makes sense. The closer we get it to pseudocode the better. Simply using python as the underlying language helps considerably given its readability.</p>
+</div>
+<div class="section" id="models-need-to-have-validation-built-in">
+<h2>Models need to have validation built in<a class="headerlink" href="#models-need-to-have-validation-built-in" title="Permalink to this headline">¶</a></h2>
+<p>Actuarial models tend to have lots of inputs covering all data types - strings, ints, floats, dates, etc. Some of these have specifications such as a min value or max value, only a list of values, etc. Being able to specify data types and rules around those data types will aid in finding errors early that may impact downstream steps within a model.</p>
+</div>
+<div class="section" id="models-need-to-be-easy-to-audit">
+<h2>Models need to be easy to audit<a class="headerlink" href="#models-need-to-be-easy-to-audit" title="Permalink to this headline">¶</a></h2>
+<p>Actuarial models are used to produce values that flow through to financial statements, price insurance, and inform regulators of solvency. It is vital that those using the models understand what is going on and be able to explain how the ending numbers were derived. Often times, actuaries that use PAMS are forced to maintain separate emulators in MS Excel that replicate the results of the model. These emulators are used for serving internal and external audit needs as well as informing those who are not familiar with the system how the  model works. Creating these emulator can be very time consuming given some PAMS are closed systems where you cannot see the underlying code. Given the importance of the emulators in a different environment, the <code class="docutils literal notranslate"><span class="pre">footings</span> <span class="pre">framework</span></code> makes it easy to produce an audit file that shows the steps on how the numbers were derived.</p>
+</div>
+<div class="section" id="models-need-to-be-self-documenting">
+<h2>Models need to be self documenting<a class="headerlink" href="#models-need-to-be-self-documenting" title="Permalink to this headline">¶</a></h2>
+<p>All to often documentation supporting actuarial models exist as a MS word document, which is a less than ideal tool and delivery format for the task. There are a couples reasons for this including that documentation is not usually treated as important as code. It is often completed last when building a model and the effort towards it is skimped. In addition, documentation typically is not versioned like code is in git/github workflow.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">footings</span> <span class="pre">framework</span></code> wants to make it easy for model developers to provide professional, end user level documentation. This can be accomplished by building off the Sphinx documentation pipeline and customizing how model objects are displayed  in Sphinx. This pushes documentation down to the model developer and versions the documentation as well.</p>
+</div>
+<div class="section" id="models-need-to-be-able-to-scale-up">
+<h2>Models need to be able to scale up<a class="headerlink" href="#models-need-to-be-able-to-scale-up" title="Permalink to this headline">¶</a></h2>
+<p>Actuarial models for long duration products are compute intensive as calculations need to be performed like a matrix across many policy holders and scenarios. In order for the <code class="docutils literal notranslate"><span class="pre">footings</span> <span class="pre">framework</span></code> to be a realistic solution for actuarial modeling, it will need to scale-up to use additional compute resources. Good news there exist well supported python frameworks to do high performance computing such as <a class="reference external" href="https://dask.org/">dask</a> and <a class="reference external" href="https://ray.io/">ray</a> which can be utilized with the <code class="docutils literal notranslate"><span class="pre">footings</span> <span class="pre">framework</span></code>.</p>
+</div>
+<div class="section" id="models-need-to-be-able-to-build-off-other-models">
+<h2>Models need to be able to build off other models<a class="headerlink" href="#models-need-to-be-able-to-build-off-other-models" title="Permalink to this headline">¶</a></h2>
+<p>Insurance products can have many features and the number of features can grow considerably when there are many insurance riders. Many of these features require slight variations in calculations or extra inputs when modeling. In order to model all these features in a concise way, models needs to be able to be combined. Given the <code class="docutils literal notranslate"><span class="pre">footings</span> <span class="pre">framework</span></code> is written in python, it allows inheritance just like standard python classes. In addition, the <code class="docutils literal notranslate"><span class="pre">footings</span> <span class="pre">framework</span></code> provides key objects that allow policy models (i.e., models for a single policy) to be combined to form population models (i.e., models for many policies).</p>
+</div>
+<div class="section" id="model-environments-should-not-be-monolithic">
+<h2>Model environments should not be monolithic<a class="headerlink" href="#model-environments-should-not-be-monolithic" title="Permalink to this headline">¶</a></h2>
+<p>Long duration actuarial models usually are built with PAMS. PAMS are monolithic systems. That is, they are designed to be the one tool solution with an exception for connectivity to databases for i/o. This is their biggest downfall. It is hard to combine PAMS with other software including all the DevOps tooling that has been created over the years. Features have to come through the vendor of the PAMS. Thus, innovation is slow and lags significantly behind what software developers have come to expect. The <code class="docutils literal notranslate"><span class="pre">footings</span> <span class="pre">framework</span></code> was designed with this mind and is the reason why the project is open-source and exist as pure python. This allows the most flexibility to combine a mix of software to create a best in class modeling environment.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="installation.html" title="previous page">Installation</a>
+    <a class='right-next' id="next-link" href="tutorials/index.html" title="next page">Tutorials</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2020, Dustin Tindall.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
