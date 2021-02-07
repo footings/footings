@@ -224,7 +224,7 @@ def df_all_dtypes():
             "Complex": pd.Series([], dtype="complex"),  #: ``"complex"`` numpy dtype
             "Complex64": pd.Series([], dtype="complex64"),  #: ``"complex"`` numpy dtype
             "Complex128": pd.Series([], dtype="complex128"),  #: ``"complex"`` numpy dtype
-            "Complex256": pd.Series([], dtype="complex256"),  #: ``"complex"`` numpy dtype
+            # "Complex256": pd.Series([], dtype="complex256"),  #: ``"complex"`` numpy dtype
             "String": pd.Series([], dtype="string"),  #: ``"str"`` numpy dtype
         }
     )
@@ -264,7 +264,7 @@ def dd_all_dtypes():
         Complex = def_column(dtype="Complex")
         Complex64 = def_column(dtype="Complex64")
         Complex128 = def_column(dtype="Complex128")
-        Complex256 = def_column(dtype="Complex256")
+        # Complex256 = def_column(dtype="Complex256")
         String = def_column(dtype="String")
 
     return TestAllDtypes
