@@ -1,3 +1,4 @@
+import platform
 from enum import Enum
 from functools import partial
 from typing import List, Mapping, Optional, Union
@@ -31,7 +32,7 @@ class PandasDtype(Enum):
     Float16 = "float16"
     Float32 = "float32"
     Float64 = "float64"
-    Int = "int64"
+    Int = "int32" if platform.system() == "Windows" else "int64"
     Int8 = "int8"
     Int16 = "int16"
     Int32 = "int32"
@@ -65,7 +66,7 @@ PANDAS_DTYPE_STR_ALIAS = {
     "float16": PandasDtype.Float16,
     "float32": PandasDtype.Float32,
     "float64": PandasDtype.Float64,
-    "int": PandasDtype.Int,
+    "int": PandasDtype.Int32 if platform.system() == "Windows" else PandasDtype.Int64,
     "int8": PandasDtype.Int8,
     "int16": PandasDtype.Int16,
     "int32": PandasDtype.Int32,
@@ -101,7 +102,7 @@ PANDAS_DTYPE_CONVERSION = {
     PandasDtype.Float16: float,
     PandasDtype.Float32: float,
     PandasDtype.Float64: float,
-    PandasDtype.Int: np.int64,
+    PandasDtype.Int: np.int32 if platform.system() == "Windows" else np.int64,
     PandasDtype.Int8: np.int8,
     PandasDtype.Int16: np.int16,
     PandasDtype.Int32: np.int32,
