@@ -3,7 +3,7 @@ name = "footings"
 packages = [
     { include = "footings", from = "src" }
 ]
-version = "v0.10.0rc0"
+version = "0.10.0-rc.1"
 description = "A model building library"
 authors = ["Dustin Tindall <dustin.tindall@gmail.com>"]
 license = "BSD 3-Clause License"
