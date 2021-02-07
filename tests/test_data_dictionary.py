@@ -26,36 +26,6 @@ def clean_str(x):
     return re.sub(r"\s+", "", x, flags=re.UNICODE)
 
 
-def create_df():
-
-    df = pd.DataFrame()
-    df["bool"] = pd.Series([True, False], dtype="bool")
-    df["datetime64[ns]"] = pd.Series([0, 1], dtype="datetime64[ns]")
-    df["timedelta64[ns]"] = pd.Series([0, 1], dtype="timedelta64[ns]")
-    df["category"] = pd.Series(["a", "b"], dtype="category")
-    df["float"] = pd.Series([1.1, 1.2], dtype="float")
-    df["float16"] = pd.Series([1.1, 1.2], dtype="float16")
-    df["float32"] = pd.Series([1.1, 1.2], dtype="float32")
-    df["float64"] = pd.Series([1.1, 1.2], dtype="float64")
-    df["int"] = pd.Series([1, 2], dtype="int")
-    df["int8"] = pd.Series([1, 2], dtype="Int8")
-    df["int16"] = pd.Series([1, 2], dtype="Int16")
-    df["int32"] = pd.Series([1, 2], dtype="Int32")
-    df["int64"] = pd.Series([1, 2], dtype="int")
-    df["uint8"] = pd.Series([1, 2], dtype="UInt8")
-    df["uint16"] = pd.Series([1, 2], dtype="UInt16")
-    df["uint32"] = pd.Series([1, 2], dtype="UInt32")
-    df["uint64"] = pd.Series([1, 2], dtype="UInt64")
-    df["object"] = pd.Series(["a", "b"], dtype="object")
-    df["complex"] = pd.Series([complex(1), complex(2)], dtype="complex")
-    df["complex64"] = pd.Series([complex(1), complex(2)], dtype="complex64")
-    df["complex128"] = pd.Series([complex(1), complex(2)], dtype="complex128")
-    df["complex256"] = pd.Series([complex(1), complex(2)], dtype="complex256")
-    df["string"] = pd.Series(["str1", "str2"], dtype="string")
-
-    return df
-
-
 class TestColumn:
     """Test Column class"""
 
@@ -129,7 +99,7 @@ def dd_success():
     @data_dictionary
     class TestDD:
         COL1 = def_column(
-            dtype="int", description="This is column 1.", validator=equal_to(1)
+            dtype="int64", description="This is column 1.", validator=equal_to(1)
         )
         COL2 = def_column(dtype="str", description="This is column 2.")
 
@@ -140,7 +110,7 @@ def dd_success():
 def df_correct():
     df = pd.DataFrame(
         {
-            "COL1": pd.Series([1, 1, 1], dtype="int"),
+            "COL1": pd.Series([1, 1, 1], dtype="int64"),
             "COL2": pd.Series(["a", "b", "c"], dtype="string"),
         }
     )
@@ -149,7 +119,7 @@ def df_correct():
 
 @pytest.fixture(scope="session")
 def df_missing_column():
-    df = pd.DataFrame({"COL1": pd.Series([1, 1, 1], dtype="int")})
+    df = pd.DataFrame({"COL1": pd.Series([1, 1, 1], dtype="int64")})
     return df
 
 
@@ -157,9 +127,9 @@ def df_missing_column():
 def df_extra_column():
     df = pd.DataFrame(
         {
-            "COL1": pd.Series([1, 1, 1], dtype="int"),
+            "COL1": pd.Series([1, 1, 1], dtype="int64"),
             "COL2": pd.Series(["a", "b", "c"], dtype="string"),
-            "COL3": pd.Series([1, 1, 1], dtype="int"),
+            "COL3": pd.Series([1, 1, 1], dtype="int64"),
         }
     )
     return df
@@ -169,8 +139,8 @@ def df_extra_column():
 def df_wrong_type():
     df = pd.DataFrame(
         {
-            "COL1": pd.Series([1, 1, 1], dtype="int"),
-            "COL2": pd.Series([1, 1, 1], dtype="int"),
+            "COL1": pd.Series([1, 1, 1], dtype="int64"),
+            "COL2": pd.Series([1, 1, 1], dtype="int64"),
         }
     )
     return df
@@ -180,7 +150,7 @@ def df_wrong_type():
 def df_fail_validator():
     df = pd.DataFrame(
         {
-            "COL1": pd.Series([1, 1, 2], dtype="int"),
+            "COL1": pd.Series([1, 1, 2], dtype="int64"),
             "COL2": pd.Series(["a", "b", "c"], dtype="string"),
         }
     )
@@ -191,9 +161,9 @@ def df_fail_validator():
 def df_wrong_multiple():
     df = pd.DataFrame(
         {
-            "COL1": pd.Series([1, 1, 2], dtype="int"),
-            "COL2": pd.Series([1, 1, 1], dtype="int"),
-            "COL3": pd.Series([1, 1, 1], dtype="int"),
+            "COL1": pd.Series([1, 1, 2], dtype="int64"),
+            "COL2": pd.Series([1, 1, 1], dtype="int64"),
+            "COL3": pd.Series([1, 1, 1], dtype="int64"),
         }
     )
     return df
