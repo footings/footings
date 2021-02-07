@@ -1,0 +1,6 @@
+﻿footings.model.model
+====================
+
+.. currentmodule:: footings.model
+
+.. autofunction:: model

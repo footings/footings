@@ -1,0 +1,6 @@
+﻿footings.model.def\_return
+==========================
+
+.. currentmodule:: footings.model
+
+.. autofunction:: def_return

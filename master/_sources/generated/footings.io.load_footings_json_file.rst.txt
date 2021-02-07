@@ -1,0 +1,6 @@
+﻿footings.io.load\_footings\_json\_file
+======================================
+
+.. currentmodule:: footings.io
+
+.. autofunction:: load_footings_json_file

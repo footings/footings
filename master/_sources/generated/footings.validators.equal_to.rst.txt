@@ -1,0 +1,6 @@
+﻿footings.validators.equal\_to
+=============================
+
+.. currentmodule:: footings.validators
+
+.. autofunction:: equal_to

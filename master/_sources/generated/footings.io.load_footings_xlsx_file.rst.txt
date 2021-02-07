@@ -1,0 +1,6 @@
+﻿footings.io.load\_footings\_xlsx\_file
+======================================
+
+.. currentmodule:: footings.io
+
+.. autofunction:: load_footings_xlsx_file

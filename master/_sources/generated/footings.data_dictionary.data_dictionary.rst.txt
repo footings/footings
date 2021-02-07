@@ -1,0 +1,6 @@
+﻿footings.data\_dictionary.data\_dictionary
+==========================================
+
+.. currentmodule:: footings.data_dictionary
+
+.. autofunction:: data_dictionary

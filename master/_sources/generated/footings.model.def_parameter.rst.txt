@@ -1,0 +1,6 @@
+﻿footings.model.def\_parameter
+=============================
+
+.. currentmodule:: footings.model
+
+.. autofunction:: def_parameter

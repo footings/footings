@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>footings.model_tools.calculate_age &#8212; Footings 0.10.0rc1 documentation</title>
+    
+  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="footings.model_tools.run_date_time" href="footings.model_tools.run_date_time.html" />
+    <link rel="prev" title="footings.model_tools.frame_filter" href="footings.model_tools.frame_filter.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../index.html">
+    
+      <p class="title">Footings</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../installation.html">Installation</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../principles.html">Principles</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../api.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../license.html">License</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../changelog.html">Changelog</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this site..." aria-label="Search this site..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/footings/footings" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+        
+        
+          
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="footings-model-tools-calculate-age">
+<h1>footings.model_tools.calculate_age<a class="headerlink" href="#footings-model-tools-calculate-age" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="footings.model_tools.calculate_age">
+<code class="sig-name descname">calculate_age</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">birth_dt</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>datetime.date<span class="p">, </span>pandas._libs.tslibs.timestamps.Timestamp<span class="p">, </span>pandas.core.series.Series<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">as_of_dt</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>datetime.date<span class="p">, </span>pandas._libs.tslibs.timestamps.Timestamp<span class="p">, </span>pandas.core.series.Series<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">method</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>int<span class="p">, </span>pandas.core.series.Series<span class="p">]</span><a class="reference internal" href="../_modules/footings/model_tools/age.html#calculate_age"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#footings.model_tools.calculate_age" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate age given a birth date and an as of date.</p>
+<p>The calculate age accepts many different types for both the birth_dt and as_of_dt. Thus, this
+formula can be used to calculate the age difference between a single date as well as a pandas
+series of dates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>birth_dt</strong><span class="classifier">date or pd.Timestamp or pd.Series</span></dt><dd><p>The birth date.</p>
+</dd>
+<dt><strong>as_of_dt</strong><span class="classifier">date or pd.Timestamp or pd.Series</span></dt><dd><p>The as of date to calculate age.</p>
+</dd>
+<dt><strong>method</strong><span class="classifier">str</span></dt><dd><p>Options are -</p>
+<ul class="simple">
+<li><p>ALB = Age last birthday</p></li>
+<li><p>ACB = Age closest birthday</p></li>
+<li><p>ANB = Age next birthday</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>int or pd.Series</dt><dd><p>Returns int if both birth_dt and as_of_dt are not pd.Series. Returns a pd.Series if any
+parameter is a pd.Series.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">birth_dt</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">1990</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">as_of_dt</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts_birth_dt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;1990-05-30&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts_as_of_dt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-04-06&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pd_birth_dt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">date</span><span class="p">(</span><span class="mi">1990</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">30</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;datetime64[ns]&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pd_as_of_dt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;datetime64[ns]&quot;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_age</span><span class="p">(</span><span class="n">pd_birth_dt</span><span class="p">,</span> <span class="n">pd_as_of_dt</span><span class="p">,</span> <span class="s2">&quot;ALB&quot;</span><span class="p">)</span> <span class="c1"># pd.Series([29])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_age</span><span class="p">(</span><span class="n">pd_birth_dt</span><span class="p">,</span> <span class="n">as_of_dt</span><span class="p">,</span> <span class="s2">&quot;ANB&quot;</span><span class="p">)</span> <span class="c1"># pd.Series([30])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_age</span><span class="p">(</span><span class="n">pd_birth_dt</span><span class="p">,</span> <span class="n">ts_as_of_dt</span><span class="p">,</span> <span class="s2">&quot;ACB&quot;</span><span class="p">)</span> <span class="c1"># pd.Series([30])</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_age</span><span class="p">(</span><span class="n">birth_dt</span><span class="p">,</span> <span class="n">as_of_dt</span><span class="p">,</span> <span class="s2">&quot;ALB&quot;</span><span class="p">)</span> <span class="c1"># 29</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_age</span><span class="p">(</span><span class="n">birth_dt</span><span class="p">,</span> <span class="n">pd_as_of_dt</span><span class="p">,</span> <span class="s2">&quot;ANB&quot;</span><span class="p">)</span> <span class="c1"># pd.Series([30])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_age</span><span class="p">(</span><span class="n">birth_dt</span><span class="p">,</span> <span class="n">ts_as_of_dt</span><span class="p">,</span> <span class="s2">&quot;ACB&quot;</span><span class="p">)</span> <span class="c1"># 30</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_age</span><span class="p">(</span><span class="n">ts_birth_dt</span><span class="p">,</span> <span class="n">ts_as_of_dt</span><span class="p">,</span> <span class="s2">&quot;ALB&quot;</span><span class="p">)</span> <span class="c1"># 29</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_age</span><span class="p">(</span><span class="n">ts_birth_dt</span><span class="p">,</span> <span class="n">pd_as_of_dt</span><span class="p">,</span> <span class="s2">&quot;ANB&quot;</span><span class="p">)</span> <span class="c1"># pd.Series([30])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_age</span><span class="p">(</span><span class="n">ts_birth_dt</span><span class="p">,</span> <span class="n">as_of_dt</span><span class="p">,</span> <span class="s2">&quot;ACB&quot;</span><span class="p">)</span> <span class="c1"># 30</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="footings.model_tools.frame_filter.html" title="previous page">footings.model_tools.frame_filter</a>
+    <a class='right-next' id="next-link" href="footings.model_tools.run_date_time.html" title="next page">footings.model_tools.run_date_time</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2020, Dustin Tindall.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

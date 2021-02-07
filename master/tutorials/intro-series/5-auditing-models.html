@@ -1,0 +1,349 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auditing Models &#8212; Footings 0.10.0rc1 documentation</title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Pattern Series" href="../pattern-series/index.html" />
+    <link rel="prev" title="Running Models" href="4-running-models.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Footings</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../installation.html">Installation</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../principles.html">Principles</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../api.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../license.html">License</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../changelog.html">Changelog</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this site..." aria-label="Search this site..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/footings/footings" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+          
+            
+  
+                <li class="active">
+                    <a href="index.html">Intro Series</a>
+                    <ul>
+                    
+                        <li class="">
+                            <a href="1-building-a-model.html">Building a Model</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="2-attributes-and-instantiation.html">Attributes and Instantiation</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="3-documenting-models.html">Documenting Models</a>
+                        </li>
+                    
+                        <li class="">
+                            <a href="4-running-models.html">Running Models</a>
+                        </li>
+                    
+                        <li class="active">
+                            <a href="">Auditing Models</a>
+                        </li>
+                    
+                    </ul>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../pattern-series/index.html">Pattern Series</a>
+                </li>
+            
+          
+        
+        
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#introduction" class="nav-link">Introduction</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#id1" class="nav-link">Auditing Models</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#closing" class="nav-link">Closing</a>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="auditing-models">
+<h1>Auditing Models<a class="headerlink" href="#auditing-models" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This is the fifth and last tutorial in the <a class="reference internal" href="index.html"><span class="doc std std-doc">Intro Series</span></a> where we do a deeper dive into auditing models built using the <code class="docutils literal notranslate"><span class="pre">Footings</span> <span class="pre">framework</span></code>. Recall, one of the <a class="reference internal" href="../../principles.html"><span class="doc std std-doc">principles</span></a> of the <code class="docutils literal notranslate"><span class="pre">Footings</span> <span class="pre">framework</span></code> is - <code class="docutils literal notranslate"><span class="pre">models</span> <span class="pre">need</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">audited</span> <span class="pre">using</span> <span class="pre">a</span> <span class="pre">second</span> <span class="pre">source</span> <span class="pre">such</span> <span class="pre">as</span> <span class="pre">excel</span></code>. This is important in the actuarial world where models are contrived of many calculations which are used to value and price insurance. Actuaries need to be able to demonstrate how the calculations work to satisfy requirements whether they be internal, external, regulatory, audit, etc.</p>
+</div>
+<div class="section" id="id1">
+<h2>Auditing Models<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>We will continue to use the AddABC model with documentation for the prior tutorial.</p>
+<p>We will start with the code from the <a class="reference internal" href="3-documenting-models.html"><span class="doc std std-doc">prior tutorial</span></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">footings.model</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">step</span><span class="p">,</span>
+    <span class="n">def_parameter</span><span class="p">,</span>
+    <span class="n">def_intermediate</span><span class="p">,</span>
+    <span class="n">def_return</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nd">@model</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_add_a_b&quot;</span><span class="p">,</span> <span class="s2">&quot;_add_ab_c&quot;</span><span class="p">])</span>
+<span class="k">class</span> <span class="nc">AddABC</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This model takes 3 parameters - a, b, and c and adds them together in two steps.&quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">def_parameter</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;This is parameter a.&quot;</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">def_parameter</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;This is parameter b.&quot;</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">def_parameter</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;This is parameter c.&quot;</span><span class="p">)</span>
+    <span class="n">ab</span> <span class="o">=</span> <span class="n">def_intermediate</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;This holds a + b.&quot;</span><span class="p">)</span>
+    <span class="n">abc</span> <span class="o">=</span> <span class="n">def_return</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The sum of ab and c.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@step</span><span class="p">(</span><span class="n">uses</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">],</span> <span class="n">impacts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ab&quot;</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">_add_a_b</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a and b together and assign to ab.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+
+    <span class="nd">@step</span><span class="p">(</span><span class="n">uses</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ab&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">],</span> <span class="n">impacts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;abc&quot;</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">_add_ab_c</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add ab and c together for final return.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">abc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ab</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>To audit a model, one needs to instantiate it and call the <code class="docutils literal notranslate"><span class="pre">audit</span></code> method as shown below. We will first return the audit results as a native python object and in later sections, we will show how it can be exported to different file types.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">AddABC</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">audit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AuditContainer(name=&#39;AddABC&#39;, instantiation={&#39;parameter.a&#39;: 1, &#39;parameter.b&#39;: 2, &#39;parameter.c&#39;: 3}, output={&#39;abc&#39;: 6}, docstring=&#39;\nThis model takes 3 parameters - a, b, and c and adds them together in two steps.\n\nParameters\n----------\na : int\n    This is parameter a.\nb : int\n    This is parameter b.\nc : int\n    This is parameter c.\n\nIntermediates\n-------------\nab : int\n    This holds a + b.\n\nReturns\n-------\nabc : int\n    The sum of ab and c.\n\nSteps\n-----\n1) _add_a_b - Add a and b together and assign to ab.\n2) _add_ab_c - Add ab and c together for final return.\n&#39;, signature=&#39;AddABC(*, a: int, b: int, c: int)&#39;, steps={&#39;_add_a_b&#39;: AuditStepContainer(name=&#39;_add_a_b&#39;, method_name=&#39;_add_a_b&#39;, docstring=&#39;Add a and b together and assign to ab.&#39;, uses=(&#39;parameter.a&#39;, &#39;parameter.b&#39;), impacts=(&#39;intermediate.ab&#39;,), output={&#39;intermediate.ab&#39;: 3}, metadata={}, config=AuditStepConfig(show_method_name=True, show_docstring=True, show_uses=True, show_impacts=True, show_output=True, show_metadata=True)), &#39;_add_ab_c&#39;: AuditStepContainer(name=&#39;_add_ab_c&#39;, method_name=&#39;_add_ab_c&#39;, docstring=&#39;Add ab and c together for final return.&#39;, uses=(&#39;intermediate.ab&#39;, &#39;parameter.c&#39;), impacts=(&#39;return.abc&#39;,), output={&#39;return.abc&#39;: 6}, metadata={}, config=AuditStepConfig(show_method_name=True, show_docstring=True, show_uses=True, show_impacts=True, show_output=True, show_metadata=True))}, metadata=None, config=AuditConfig(show_signature=True, show_docstring=True, show_steps=True, step_config=AuditStepConfig(show_method_name=True, show_docstring=True, show_uses=True, show_impacts=True, show_output=True, show_metadata=True)))
+</pre></div>
+</div>
+</div>
+</div>
+<p>As the output shows, a dictionary is returned with information about the model including arguments passed on initialization, the steps, and the output. Do notice that each step shows output for each attribute that is impacted including the intermediate attributes in the model.</p>
+<p>The goal of an audit is to provide the user with sufficient documentation describing what the model does. Using native python code might not be the best delivery format if someone is not a python user. Thus, the <code class="docutils literal notranslate"><span class="pre">Footings</span> <span class="pre">framework</span></code> provides the ability to output to a file format. As of right now, two file types are supported - <code class="docutils literal notranslate"><span class="pre">.xlsx</span></code> and <code class="docutils literal notranslate"><span class="pre">.json</span></code>.</p>
+<p>The below code shows how to generate an audit file in excel.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">AddABC</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">audit</span><span class="p">(</span><span class="s2">&quot;Audit-AddABC.xlsx&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This produces an <code class="docutils literal notranslate"><span class="pre">.xlsx</span></code> file with five tabs. Below are screenshots of the the tabs. The file can also be downloaded <a class="reference download internal" download="" href="../../_downloads/4c05fd59b496f9a767e272ac80c7dab4/Audit-AddABC.xlsx"><code class="xref download docutils literal notranslate"><span class="pre">here.</span></code></a></p>
+<div class="figure align-default" id="id2">
+<img alt="../../_images/main.png" src="../../_images/main.png" />
+<p class="caption"><span class="caption-text">Sheet: Main</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="id3">
+<img alt="../../_images/instantiation.png" src="../../_images/instantiation.png" />
+<p class="caption"><span class="caption-text">Sheet: Instantiation</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="id4">
+<img alt="../../_images/_add_a_b.png" src="../../_images/_add_a_b.png" />
+<p class="caption"><span class="caption-text">Sheet: _add_a_b</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="id5">
+<img alt="../../_images/_add_ab_c.png" src="../../_images/_add_ab_c.png" />
+<p class="caption"><span class="caption-text">Sheet: _add_ab_c</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-default" id="id6">
+<img alt="../../_images/output.png" src="../../_images/output.png" />
+<p class="caption"><span class="caption-text">Sheet: Output</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</div>
+<p>The below code shows how to generate an audit file in excel. The audit file can be downloaded <a class="reference download internal" download="" href="../../_downloads/9aebe487587e69c46a092091f2e29bf5/Audit-AddABC.json"><code class="xref download docutils literal notranslate"><span class="pre">here.</span></code></a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">AddABC</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">audit</span><span class="p">(</span><span class="s2">&quot;Audit-AddABC.json&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>There are options to configure audit output a certain way. To see this review the audit <a class="reference external" href="../../generated/footings.audit.html#module-footings.audit">api</a>.</p>
+</div>
+<div class="section" id="closing">
+<h2>Closing<a class="headerlink" href="#closing" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial concludes the <a class="reference internal" href="index.html"><span class="doc std std-doc">Intro Series</span></a> of tutorials. With this tutorial we dug deeper into auditing models which is probably the  most important feature of the <code class="docutils literal notranslate"><span class="pre">Footings</span> <span class="pre">framework</span></code>. The long-term goal is to continue to build out this feature so it will be able to generate an audit document sufficient to satisfy the needs of any auditor or regulator who needs an understanding of the model.</p>
+<p>Note a more advanced topic of testing with the <code class="docutils literal notranslate"><span class="pre">Footings</span> <span class="pre">framework</span></code> builds off of the audit capabilities. At some point there will be a tutorial demonstrating this.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="4-running-models.html" title="previous page">Running Models</a>
+    <a class='right-next' id="next-link" href="../pattern-series/index.html" title="next page">Pattern Series</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2020, Dustin Tindall.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

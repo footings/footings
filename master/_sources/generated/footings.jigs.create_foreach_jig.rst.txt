@@ -1,0 +1,6 @@
+﻿footings.jigs.create\_foreach\_jig
+==================================
+
+.. currentmodule:: footings.jigs
+
+.. autofunction:: create_foreach_jig
