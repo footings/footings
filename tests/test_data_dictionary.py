@@ -359,7 +359,9 @@ class TestDataDictionary:
         @model
         class TestDD:
             col1 = DD.def_parameter("COL1")
-            col1_mapping = DD.def_parameter("COL1", dtype_mapping={PandasDtype.Int64: str})
+            col1_mapping = DD.def_parameter(
+                "COL1", dtype_mapping={PandasDtype.Int64: str}
+            )
             col2 = DD.def_parameter("COL2")
             col2_validator = DD.def_parameter("COL2", add_dtype_validator=True)
 
@@ -370,7 +372,7 @@ class TestDataDictionary:
         assert isinstance(
             TestDD(col1=1, col1_mapping=1, col2=1, col2_validator="x"), TestDD
         )
-        with pytest.raises(TypeError):  # fails due col2_validator should be 
+        with pytest.raises(TypeError):  # fails due col2_validator should be
             TestDD(col1=1, col1_mapping=1, col2=1, col2_validator=1)
         with pytest.raises(ValueError):  # fails because col1 is 2
             TestDD(col1=2, col1_mapping=1, col2="x", col2_validator="x")
