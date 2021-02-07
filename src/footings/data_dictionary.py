@@ -66,7 +66,7 @@ PANDAS_DTYPE_STR_ALIAS = {
     "float16": PandasDtype.Float16,
     "float32": PandasDtype.Float32,
     "float64": PandasDtype.Float64,
-    "int": PandasDtype.Int32 if platform.system() == "Windows" else PandasDtype.Int64,
+    "int": PandasDtype.Int,
     "int8": PandasDtype.Int8,
     "int16": PandasDtype.Int16,
     "int32": PandasDtype.Int32,
