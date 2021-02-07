@@ -1,6 +1,7 @@
 import re
 from functools import partial
 
+import numpy as np
 import pandas as pd
 import pytest
 from attr import asdict
@@ -139,7 +140,7 @@ def dd_success():
 def df_correct():
     df = pd.DataFrame(
         {
-            "COL1": pd.Series([1, 1, 1], dtype="Int64"),
+            "COL1": pd.Series([1, 1, 1], dtype="int"),
             "COL2": pd.Series(["a", "b", "c"], dtype="string"),
         }
     )
@@ -148,7 +149,7 @@ def df_correct():
 
 @pytest.fixture(scope="session")
 def df_missing_column():
-    df = pd.DataFrame({"COL1": pd.Series([1, 1, 1], dtype="Int64"),})
+    df = pd.DataFrame({"COL1": pd.Series([1, 1, 1], dtype="int")})
     return df
 
 
@@ -156,9 +157,9 @@ def df_missing_column():
 def df_extra_column():
     df = pd.DataFrame(
         {
-            "COL1": pd.Series([1, 1, 1], dtype="Int64"),
+            "COL1": pd.Series([1, 1, 1], dtype="int"),
             "COL2": pd.Series(["a", "b", "c"], dtype="string"),
-            "COL3": pd.Series([1, 1, 1], dtype="Int64"),
+            "COL3": pd.Series([1, 1, 1], dtype="int"),
         }
     )
     return df
@@ -168,8 +169,8 @@ def df_extra_column():
 def df_wrong_type():
     df = pd.DataFrame(
         {
-            "COL1": pd.Series([1, 1, 1], dtype="Int64"),
-            "COL2": pd.Series([1, 1, 1], dtype="Int64"),
+            "COL1": pd.Series([1, 1, 1], dtype="int"),
+            "COL2": pd.Series([1, 1, 1], dtype="int"),
         }
     )
     return df
@@ -179,7 +180,7 @@ def df_wrong_type():
 def df_fail_validator():
     df = pd.DataFrame(
         {
-            "COL1": pd.Series([1, 1, 2], dtype="Int64"),
+            "COL1": pd.Series([1, 1, 2], dtype="int"),
             "COL2": pd.Series(["a", "b", "c"], dtype="string"),
         }
     )
@@ -190,12 +191,113 @@ def df_fail_validator():
 def df_wrong_multiple():
     df = pd.DataFrame(
         {
-            "COL1": pd.Series([1, 1, 2], dtype="Int64"),
-            "COL2": pd.Series([1, 1, 1], dtype="Int64"),
-            "COL3": pd.Series([1, 1, 1], dtype="Int64"),
+            "COL1": pd.Series([1, 1, 2], dtype="int"),
+            "COL2": pd.Series([1, 1, 1], dtype="int"),
+            "COL3": pd.Series([1, 1, 1], dtype="int"),
         }
     )
     return df
+
+
+@pytest.fixture(scope="session")
+def df_all_dtypes():
+    df = pd.DataFrame(
+        {
+            "Bool": pd.Series([], dtype="bool"),  #: ``"bool"`` numpy dtype
+            "DateTime": pd.Series(
+                [], dtype="datetime64[ns]"
+            ),  #: ``"datetime64[ns]"`` numpy dtype
+            "Timedelta": pd.Series(
+                [], dtype="timedelta64[ns]"
+            ),  #: ``"timedelta64[ns]"`` numpy dtype
+            "Category": pd.Series(
+                [], dtype="category"
+            ),  #: pandas ``"categorical"`` datatype
+            "Float": pd.Series([], dtype="float"),  #: ``"float"`` numpy dtype
+            "Float16": pd.Series([], dtype="float16"),  #: ``"float16"`` numpy dtype
+            "Float32": pd.Series([], dtype="float32"),  #: ``"float32"`` numpy dtype
+            "Float64": pd.Series([], dtype="float64"),  #: ``"float64"`` numpy dtype
+            "Int": pd.Series([], dtype="int"),  #: ``"int"`` numpy dtype
+            "Int8": pd.Series([], dtype="int8"),  #: ``"int8"`` numpy dtype
+            "Int16": pd.Series([], dtype="int16"),  #: ``"int16"`` numpy dtype
+            "Int32": pd.Series([], dtype="int32"),  #: ``"int32"`` numpy dtype
+            "Int64": pd.Series([], dtype="int64"),  #: ``"int64"`` numpy dtype
+            "UInt8": pd.Series([], dtype="uint8"),  #: ``"uint8"`` numpy dtype
+            "UInt16": pd.Series([], dtype="uint16"),  #: ``"uint16"`` numpy dtype
+            "UInt32": pd.Series([], dtype="uint32"),  #: ``"uint32"`` numpy dtype
+            "UInt64": pd.Series([], dtype="uint64"),  #: ``"uint64"`` numpy dtype
+            "INT8": pd.Series(
+                [], dtype="Int8"
+            ),  #: ``"Int8"`` pandas dtype:: pandas 0.24.0+
+            "INT16": pd.Series(
+                [], dtype="Int16"
+            ),  #: ``"Int16"`` pandas dtype: pandas 0.24.0+
+            "INT32": pd.Series(
+                [], dtype="Int32"
+            ),  #: ``"Int32"`` pandas dtype: pandas 0.24.0+
+            "INT64": pd.Series(
+                [], dtype="Int64"
+            ),  #: ``"Int64"`` pandas dtype: pandas 0.24.0+
+            "UINT8": pd.Series(
+                [], dtype="UInt8"
+            ),  #: ``"UInt8"`` pandas dtype: pandas 0.24.0+
+            "UINT16": pd.Series(
+                [], dtype="UInt16"
+            ),  #: ``"UInt16"`` pandas dtype: pandas 0.24.0+
+            "UINT32": pd.Series(
+                [], dtype="UInt32"
+            ),  #: ``"UInt32"`` pandas dtype: pandas 0.24.0+
+            "UINT64": pd.Series(
+                [], dtype="UInt64"
+            ),  #: ``"UInt64"`` pandas dtype: pandas 0.24.0+
+            "Object": pd.Series([], dtype="object"),  #: ``"object"`` numpy dtype
+            "Complex": pd.Series([], dtype="complex"),  #: ``"complex"`` numpy dtype
+            "Complex64": pd.Series([], dtype="complex64"),  #: ``"complex"`` numpy dtype
+            "Complex128": pd.Series([], dtype="complex128"),  #: ``"complex"`` numpy dtype
+            "Complex256": pd.Series([], dtype="complex256"),  #: ``"complex"`` numpy dtype
+            "String": pd.Series([], dtype="string"),  #: ``"str"`` numpy dtype
+        }
+    )
+    return df
+
+
+@pytest.fixture(scope="session")
+def dd_all_dtypes():
+    @data_dictionary
+    class TestAllDtypes:
+        Bool = def_column(dtype="Bool")
+        DateTime = def_column(dtype="DateTime")
+        Timedelta = def_column(dtype="Timedelta")
+        Category = def_column(dtype="Category")
+        Float = def_column(dtype="Float")
+        Float16 = def_column(dtype="Float16")
+        Float32 = def_column(dtype="Float32")
+        Float64 = def_column(dtype="Float64")
+        Int = def_column(dtype="Int")
+        Int8 = def_column(dtype="Int8")
+        Int16 = def_column(dtype="Int16")
+        Int32 = def_column(dtype="Int32")
+        Int64 = def_column(dtype="Int64")
+        UInt8 = def_column(dtype="UInt8")
+        UInt16 = def_column(dtype="UInt16")
+        UInt32 = def_column(dtype="UInt32")
+        UInt64 = def_column(dtype="UInt64")
+        INT8 = def_column(dtype="INT8")
+        INT16 = def_column(dtype="INT16")
+        INT32 = def_column(dtype="INT32")
+        INT64 = def_column(dtype="INT64")
+        UINT8 = def_column(dtype="UINT8")
+        UINT16 = def_column(dtype="UINT16")
+        UINT32 = def_column(dtype="UINT32")
+        UINT64 = def_column(dtype="UINT64")
+        Object = def_column(dtype="Object")
+        Complex = def_column(dtype="Complex")
+        Complex64 = def_column(dtype="Complex64")
+        Complex128 = def_column(dtype="Complex128")
+        Complex256 = def_column(dtype="Complex256")
+        String = def_column(dtype="String")
+
+    return TestAllDtypes
 
 
 def compare_attributes(result, expected):
@@ -252,6 +354,9 @@ class TestDataDictionary:
             ],
         )
 
+    def test_all_dtypes(self, df_all_dtypes, dd_all_dtypes):
+        assert dd_all_dtypes.validate(df_all_dtypes)
+
     def test_validators_valid(self, DD, df_correct, df_fail_validator):
         assert DD._validators_valid(df_correct) == ([True], [],)
         assert DD._validators_valid(df_fail_validator) == (
@@ -288,7 +393,7 @@ class TestDataDictionary:
             col2 = DD.def_parameter("COL2")
             col2_validator = DD.def_parameter("COL2", add_dtype_validator=True)
 
-        assert TestDD.__attrs_attrs__.col1.type == int
+        assert TestDD.__attrs_attrs__.col1.type == np.int64
         assert TestDD.__attrs_attrs__.col1_mapping.type == str
         assert TestDD.__attrs_attrs__.col2.type == str
         assert TestDD.__attrs_attrs__.col2_validator.type == str

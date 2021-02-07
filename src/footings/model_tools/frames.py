@@ -253,8 +253,7 @@ def create_frame(
     col_date_nm: str,
     **kwargs,
 ) -> pd.DataFrame:
-    """
-    Create a frame with a date colum ranging from the start_dt to the end_dt.
+    """Create a frame with a date colum ranging from the start_dt to the end_dt.
 
     Additional columns can be created by passing kwargs (see list below) where the value is the
     assigned name. As an example, to add a column for duration month to be called DURATION_MONTH,
@@ -302,20 +301,20 @@ def create_frame(
     >>> import pandas as pd
     >>> from footings.model_tools import create_frame
     >>> frame = create_frame(
-    >>>     start_dt = pd.Timestamp("2020-01-10"),
-    >>>     end_dt = pd.Timestamp("2020-05-30"),
-    >>>     frequency = "M",
-    >>>     col_date_nm = "DATE",
-    >>>     duration_month = "DURATION_MONTH"
-    >>> )
+    ...     start_dt = pd.Timestamp("2020-01-10"),
+    ...     end_dt = pd.Timestamp("2020-05-30"),
+    ...     frequency = "M",
+    ...     col_date_nm = "DATE",
+    ...     duration_month = "DURATION_MONTH"
+    ... )
     >>> frame
-    >>> #       DATE	        DURATION_MONTH
-    >>> # 0	2020-01-10	1
-    >>> # 1	2020-02-10	2
-    >>> # 2	2020-03-10	3
-    >>> # 3	2020-04-10	4
-    >>> # 4	2020-05-10	5
-    >>> # 5	2020-06-10	6
+              DATE  DURATION_MONTH
+    0   2020-01-10               1
+    1   2020-02-10               2
+    2   2020-03-10               3
+    3   2020-04-10               4
+    4   2020-05-10               5
+    5   2020-06-10               6
     """
     end_duration = kwargs.pop("end_duration", None)
     tbl = freq_dispatcher(

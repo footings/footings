@@ -32,14 +32,22 @@ class PandasDtype(Enum):
     Float32 = "float32"
     Float64 = "float64"
     Int = "int64"
-    Int8 = "Int8"
-    Int16 = "Int16"
-    Int32 = "Int32"
-    Int64 = "Int64"
-    UInt8 = "UInt8"
-    UInt16 = "UInt16"
-    UInt32 = "UInt32"
-    UInt64 = "UInt64"
+    Int8 = "int8"
+    Int16 = "int16"
+    Int32 = "int32"
+    Int64 = "int64"
+    UInt8 = "uint8"
+    UInt16 = "uint16"
+    UInt32 = "uint32"
+    UInt64 = "uint64"
+    INT8 = "Int8"
+    INT16 = "Int16"
+    INT32 = "Int32"
+    INT64 = "Int64"
+    UINT8 = "UInt8"
+    UINT16 = "UInt16"
+    UINT32 = "UInt32"
+    UINT64 = "UInt64"
     Object = "object"
     Complex = "complex128"
     Complex64 = "complex64"
@@ -66,6 +74,14 @@ PANDAS_DTYPE_STR_ALIAS = {
     "uint16": PandasDtype.UInt16,
     "uint32": PandasDtype.UInt32,
     "uint64": PandasDtype.UInt64,
+    "Int8": PandasDtype.INT8,
+    "Int16": PandasDtype.INT16,
+    "Int32": PandasDtype.INT32,
+    "Int64": PandasDtype.INT64,
+    "UInt8": PandasDtype.UINT8,
+    "UInt16": PandasDtype.UINT16,
+    "UInt32": PandasDtype.UINT32,
+    "UInt64": PandasDtype.UINT64,
     "object": PandasDtype.Object,
     "complex": PandasDtype.Complex,
     "complex64": PandasDtype.Complex64,
@@ -85,7 +101,7 @@ PANDAS_DTYPE_CONVERSION = {
     PandasDtype.Float16: float,
     PandasDtype.Float32: float,
     PandasDtype.Float64: float,
-    PandasDtype.Int: int,
+    PandasDtype.Int: np.int64,
     PandasDtype.Int8: np.int8,
     PandasDtype.Int16: np.int16,
     PandasDtype.Int32: np.int32,
@@ -94,6 +110,14 @@ PANDAS_DTYPE_CONVERSION = {
     PandasDtype.UInt16: np.uint16,
     PandasDtype.UInt32: np.uint32,
     PandasDtype.UInt64: np.uint64,
+    PandasDtype.INT8: pd.Int8Dtype,
+    PandasDtype.INT16: pd.Int16Dtype,
+    PandasDtype.INT32: pd.Int32Dtype,
+    PandasDtype.INT64: pd.Int64Dtype,
+    PandasDtype.UINT8: pd.UInt8Dtype,
+    PandasDtype.UINT16: pd.UInt16Dtype,
+    PandasDtype.UINT32: pd.UInt32Dtype,
+    PandasDtype.UINT64: pd.UInt64Dtype,
     PandasDtype.Object: str,
     PandasDtype.Complex: complex,
     PandasDtype.Complex64: complex,
