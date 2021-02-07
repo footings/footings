@@ -26,14 +26,21 @@
       ~PandasDtype.Float
       ~PandasDtype.Float16
       ~PandasDtype.Float32
+      ~PandasDtype.INT16
+      ~PandasDtype.INT32
+      ~PandasDtype.INT64
+      ~PandasDtype.INT8
       ~PandasDtype.Int
       ~PandasDtype.Int16
       ~PandasDtype.Int32
-      ~PandasDtype.Int64
       ~PandasDtype.Int8
       ~PandasDtype.Object
       ~PandasDtype.String
       ~PandasDtype.Timedelta
+      ~PandasDtype.UINT16
+      ~PandasDtype.UINT32
+      ~PandasDtype.UINT64
+      ~PandasDtype.UINT8
       ~PandasDtype.UInt16
       ~PandasDtype.UInt32
       ~PandasDtype.UInt64

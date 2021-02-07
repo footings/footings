@@ -414,8 +414,7 @@
     <span class="n">col_date_nm</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create a frame with a date colum ranging from the start_dt to the end_dt.</span>
+    <span class="sd">&quot;&quot;&quot;Create a frame with a date colum ranging from the start_dt to the end_dt.</span>
 
 <span class="sd">    Additional columns can be created by passing kwargs (see list below) where the value is the</span>
 <span class="sd">    assigned name. As an example, to add a column for duration month to be called DURATION_MONTH,</span>
@@ -463,20 +462,20 @@
 <span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
 <span class="sd">    &gt;&gt;&gt; from footings.model_tools import create_frame</span>
 <span class="sd">    &gt;&gt;&gt; frame = create_frame(</span>
-<span class="sd">    &gt;&gt;&gt;     start_dt = pd.Timestamp(&quot;2020-01-10&quot;),</span>
-<span class="sd">    &gt;&gt;&gt;     end_dt = pd.Timestamp(&quot;2020-05-30&quot;),</span>
-<span class="sd">    &gt;&gt;&gt;     frequency = &quot;M&quot;,</span>
-<span class="sd">    &gt;&gt;&gt;     col_date_nm = &quot;DATE&quot;,</span>
-<span class="sd">    &gt;&gt;&gt;     duration_month = &quot;DURATION_MONTH&quot;</span>
-<span class="sd">    &gt;&gt;&gt; )</span>
+<span class="sd">    ...     start_dt = pd.Timestamp(&quot;2020-01-10&quot;),</span>
+<span class="sd">    ...     end_dt = pd.Timestamp(&quot;2020-05-30&quot;),</span>
+<span class="sd">    ...     frequency = &quot;M&quot;,</span>
+<span class="sd">    ...     col_date_nm = &quot;DATE&quot;,</span>
+<span class="sd">    ...     duration_month = &quot;DURATION_MONTH&quot;</span>
+<span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; frame</span>
-<span class="sd">    &gt;&gt;&gt; #       DATE	        DURATION_MONTH</span>
-<span class="sd">    &gt;&gt;&gt; # 0	2020-01-10	1</span>
-<span class="sd">    &gt;&gt;&gt; # 1	2020-02-10	2</span>
-<span class="sd">    &gt;&gt;&gt; # 2	2020-03-10	3</span>
-<span class="sd">    &gt;&gt;&gt; # 3	2020-04-10	4</span>
-<span class="sd">    &gt;&gt;&gt; # 4	2020-05-10	5</span>
-<span class="sd">    &gt;&gt;&gt; # 5	2020-06-10	6</span>
+<span class="sd">              DATE  DURATION_MONTH</span>
+<span class="sd">    0   2020-01-10               1</span>
+<span class="sd">    1   2020-02-10               2</span>
+<span class="sd">    2   2020-03-10               3</span>
+<span class="sd">    3   2020-04-10               4</span>
+<span class="sd">    4   2020-05-10               5</span>
+<span class="sd">    5   2020-06-10               6</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">end_duration</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;end_duration&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">tbl</span> <span class="o">=</span> <span class="n">freq_dispatcher</span><span class="p">(</span>

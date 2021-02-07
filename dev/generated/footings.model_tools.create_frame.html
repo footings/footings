@@ -218,20 +218,20 @@ passing the kwarg “duration_month”: “DURATION_MONTH”.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">footings.model_tools</span> <span class="kn">import</span> <span class="n">create_frame</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="n">create_frame</span><span class="p">(</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">start_dt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-01-10&quot;</span><span class="p">),</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">end_dt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-05-30&quot;</span><span class="p">),</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">frequency</span> <span class="o">=</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">col_date_nm</span> <span class="o">=</span> <span class="s2">&quot;DATE&quot;</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">duration_month</span> <span class="o">=</span> <span class="s2">&quot;DURATION_MONTH&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">start_dt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-01-10&quot;</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">end_dt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-05-30&quot;</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">frequency</span> <span class="o">=</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">col_date_nm</span> <span class="o">=</span> <span class="s2">&quot;DATE&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">duration_month</span> <span class="o">=</span> <span class="s2">&quot;DURATION_MONTH&quot;</span>
+<span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1">#       DATE            DURATION_MONTH</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 0     2020-01-10      1</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 1     2020-02-10      2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 2     2020-03-10      3</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 3     2020-04-10      4</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 4     2020-05-10      5</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 5     2020-06-10      6</span>
+<span class="go">          DATE  DURATION_MONTH</span>
+<span class="go">0   2020-01-10               1</span>
+<span class="go">1   2020-02-10               2</span>
+<span class="go">2   2020-03-10               3</span>
+<span class="go">3   2020-04-10               4</span>
+<span class="go">4   2020-05-10               5</span>
+<span class="go">5   2020-06-10               6</span>
 </pre></div>
 </div>
 </dd></dl>
