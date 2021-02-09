@@ -8,9 +8,9 @@ description = "A model building library"
 authors = ["Dustin Tindall <dustin.tindall@gmail.com>"]
 license = "BSD 3-Clause License"
 readme = 'README.md'
-homepage = "https://footings.readthedocs.io/en/master/"
+homepage = "https://github.com/footings/footings"
 repository = "https://github.com/footings/footings"
-documentation = "https://footings.readthedocs.io/en/master/"
+documentation = "https://footings.github.io/footings/"
 classifiers = [
     "License :: OSI Approved :: BSD License",
     "Programming Language :: Python :: 3.7",
