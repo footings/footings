@@ -27,6 +27,7 @@ jobs:
           pipx install nox
       - name: Install footings
         run: |
+          poetry config virtualenvs.in-project true
           poetry install
       - name: Poetry show libraries
         run: |
@@ -34,6 +35,9 @@ jobs:
       - name: Pip show footings
         run: |
           poetry run pip show footings
+      - name: Setup ipykernel
+        run: |
+          poetry run python -m ipykernel install --user --name footings --display-name "Footings"
       - name: Run sphinx
         run:  nox -s create_docs
       - name: Deploy docs to github pages - master
