@@ -2,10 +2,11 @@ import functools
 import operator
 from typing import Optional, Union
 
+import numpy as np
 import pandas as pd
 
 
-def calculate_continuance(
+def calc_continuance(
     *decrements: pd.Series, starting_duration: Optional[pd.Series] = None,
 ) -> pd.Series:
     """Apply a set of decrements together to form a continuance table.
@@ -25,7 +26,7 @@ def calculate_continuance(
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.actuarial_tools import calculate_continuance
+    >>> from footings.actuarial_tools import calc_continuance
     >>> mortality_rate = pd.Series([0.01, 0.015, 0.02])
     >>> lapse_rate = pd.Series([0.2, 0.1, 0.05])
 
@@ -34,7 +35,7 @@ def calculate_continuance(
     - lapse occurs only at end of duration
 
     Calculate continuance at the end of a duration.
-    >>> lives_ed = calculate_continuance(mortality_rate, lapse_rate)
+    >>> lives_ed = calc_continuance(mortality_rate, lapse_rate)
     >>> lives_ed
     0   0.792000
     1   0.702108
@@ -48,7 +49,7 @@ def calculate_continuance(
     2   0.702108
 
     To get the value for the mid-point of the duration set a starting_duration value.
-    >>> lives_md = calculate_continuance(mortality_rate / 2, starting_duration=lives_bd)
+    >>> lives_md = calc_continuance(mortality_rate / 2, starting_duration=lives_bd)
     >>> lives_md
     0   0.995000
     1   0.786060
@@ -59,8 +60,8 @@ def calculate_continuance(
     return starting_duration * functools.reduce(operator.mul, [1 - d for d in decrements])
 
 
-def calculate_discount_factor(
-    interest_rate: pd.Series, *, period_adjustment: Optional[Union[int, float]] = None
+def calc_discount(
+    interest_rate: pd.Series, *, adjustment: Optional[Union[int, float]] = None
 ) -> pd.Series:
     """Calculate the discount factor over a series.
 
@@ -68,7 +69,7 @@ def calculate_discount_factor(
     ----------
     interest_rate : pd.Series
         A series of interest rate values
-    period_adjustment : Union[int, float], optional
+    adjustment : Union[int, float], optional
         An optinal adjustment to consider timing. As an example, use 0.5 for a midpoint.
 
     Returns
@@ -79,44 +80,92 @@ def calculate_discount_factor(
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.actuarial_tools import calculate_discount_factor
+    >>> from footings.actuarial_tools import calc_discount
     >>> interest_rate = pd.Series([0.03, 0.04, 0.05])
-    >>> v_ed = calculate_discount_factor(interest_rate)
+    >>> v_ed = calc_discount(interest_rate)
     >>> v_ed
     0    0.970874
     1    0.933532
     2    0.889079
 
-    >>> v_md = calculate_discount_factor(interest_rate, period_adjustment=0.5)
+    >>> v_md = calc_discount(interest_rate, adjustment=0.5)
     >>> v_md
     0    0.985329
     1    0.952020
     2    0.911034
 
-    >>> v_bd = calculate_discount_factor(interest_rate, period_adjustment=0)
+    >>> v_bd = calc_discount(interest_rate, adjustment=0)
     >>> v_bd
     0    1.000000
     1    0.970874
     2    0.933532
     """
     cum = (1 + interest_rate).cumprod()
-    if period_adjustment is not None:
-        cum = cum.shift(1, fill_value=1) * (1 + interest_rate) ** period_adjustment
+    if adjustment is not None:
+        cum = cum.shift(1, fill_value=1) * (1 + interest_rate) ** adjustment
     return 1 / cum
 
 
-# def calculate_interpolation(
-#     start: pd.Series,
-#     end: pd.Series,
-#     start_wt: Optional[pd.Series] = None,
-#     end_wt: Optional[pd.Series] = None,
-#     method: str = "linear",
-# ):
-#     """ """
-#     return
+def calc_interpolation(
+    val_0: pd.Series,
+    val_1: pd.Series,
+    wt_0: pd.Series,
+    wt_1: Optional[pd.Series] = None,
+    method: str = "linear",
+) -> pd.Series:
+    """Calculate interpolation between two values.
+
+    Parameters
+    ----------
+    val_0 : pd.Series
+        zzz
+    val_1 : pd.Sereis
+        zzz
+    wt_0 : pd.Series
+        zzz
+    wt_1 : pd.Series, optional
+        zzz
+    method : str
+        zzz
+
+    Returns
+    -------
+    pd.Series
+        The interpolated values.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from footings.actuarial_tools import calc_interpolation
+    >>> val_0 = pd.Series([1, 2, 3])
+    >>> val_1 = pd.Series([2, 3, 4])
+    >>> wt_0 = pd.Series([0.5, 0.5, 0.5])
+    >>> linear = calc_interpolation(val_0, val_1, wt_0, method="linear")
+    >>> linear
+    0    1.5
+    1    2.5
+    2    3.5
+    >>> log = calc_interpolation(val_0, val_1, wt_0, method="log")
+    >>> log
+    0    1.414214
+    1    2.449490
+    2    3.464102
+    """
+    if wt_1 is None:
+        wt_1 = 1 - wt_0
+
+    if method == "linear":
+        ret = val_0 * wt_0 + val_1 * wt_1
+    elif method == "log":
+        ret = np.exp(np.log(val_1) * wt_1 + np.log(val_0) * wt_0)
+    else:
+        msg = f"The value passed to method [{str(method)}] is not recognized."
+        msg += " Please use one of 'linear' or 'log'."
+        raise ValueError(msg)
+    return ret
 
 
-def calculate_pv(series: pd.Series):
+def calc_pv(series: pd.Series) -> pd.Series:
     """Calculate the present value of a series for each row.
 
     Parameters
@@ -132,8 +181,8 @@ def calculate_pv(series: pd.Series):
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.actuarial_tools import calculate_pv
-    >>> x = calculate_pv(pd.Series([3, 2, 1]))
+    >>> from footings.actuarial_tools import calc_pv
+    >>> x = calc_pv(pd.Series([3, 2, 1]))
     0    6
     1    3
     2    1
@@ -141,7 +190,7 @@ def calculate_pv(series: pd.Series):
     return series[::-1].cumsum()[::-1]
 
 
-def calculate_pvfnb(pvfb: pd.Series, pvfp: pd.Series, net_benefit_method: str):
+def calc_pvfnb(pvfb: pd.Series, pvfp: pd.Series, net_benefit_method: str) -> pd.Series:
     """Calculate present value of future net benefits.
 
     Parameters
@@ -164,10 +213,10 @@ def calculate_pvfnb(pvfb: pd.Series, pvfp: pd.Series, net_benefit_method: str):
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.actuarial_tools import calculate_pvfnb
+    >>> from footings.actuarial_tools import calc_pvfnb
     >>> pvfb = pd.Series([6, 5, 3])
     >>> pvfp = pd.Series([9, 6, 3])
-    >>> pvfnb = calculate_pvfnb(pvfb=pvfb, pvfp=pvfp, net_benefit_method="NLP")
+    >>> pvfnb = calc_pvfnb(pvfb=pvfb, pvfp=pvfp, net_benefit_method="NLP")
     >>> pvfnb
     0    6.0
     1    4.0
@@ -192,9 +241,9 @@ def calculate_pvfnb(pvfb: pd.Series, pvfp: pd.Series, net_benefit_method: str):
     return pvfnb
 
 
-def calculate_benefit_reserve(
+def calc_benefit_reserve(
     pvfb: pd.Series, pvfnb: pd.Series, lives: pd.Series, discount: pd.Series
-):
+) -> pd.Series:
     """Calculate benefit reserve.
 
     Parameters
@@ -216,13 +265,13 @@ def calculate_benefit_reserve(
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.actuarial_tools import calculate_pvfnb, calculate_benefit_reserve
+    >>> from footings.actuarial_tools import calc_pvfnb, calc_benefit_reserve
     >>> pvfb = pd.Series([6, 5, 3])
     >>> pvfp = pd.Series([9, 6, 3])
-    >>> pvfnb = calculate_pvfnb(pvfb=pvfb, pvfp=pvfp, net_benefit_method="NLP")
+    >>> pvfnb = calc_pvfnb(pvfb=pvfb, pvfp=pvfp, net_benefit_method="NLP")
     >>> lives = pd.Series([0.95, 0.9, 0.8])
     >>> discount = pd.Series([0.95, 0.9, 0.85])
-    >>> calculate_benefit_reserve(
+    >>> calc_benefit_reserve(
     ...     pvfb=pvfb,
     ...     pvfnb=pvfnb,
     ...     lives=lives,
@@ -235,7 +284,7 @@ def calculate_benefit_reserve(
     return (pvfb - pvfnb).shift(-1, fill_value=0) / lives / discount
 
 
-# def calculate_change_in_reserve(
+# def calc_change_in_reserve(
 #     reserve: pd.Series, lives: pd.Series, discount: pd.Series
 # ):
 #     """Calculate change in reserve."""
@@ -245,7 +294,7 @@ def calculate_benefit_reserve(
 #     return current_period - prior_period
 
 
-# def calculate_policy_year_benefit_reserve(
+# def calc_policy_year_benefit_reserve(
 #     gross_premiums: pd.Series,
 #     benefits: pd.Series,
 #     lives: pd.Series,
@@ -275,8 +324,8 @@ def calculate_benefit_reserve(
 #     pd.Series
 #         A series with the benefit reserves.
 #     """
-#     pvfb = calculate_pv(benefits * lives * discount)
-#     pvp = calculate_pv(gross_premiums * lives * discount)
-#     pvfnb = calculate_pvfnb(pvfb, pvp, net_benefit_method)
+#     pvfb = calc_pv(benefits * lives * discount)
+#     pvp = calc_pv(gross_premiums * lives * discount)
+#     pvfnb = calc_pvfnb(pvfb, pvp, net_benefit_method)
 #     benefit_reserve = (pvfb - pvfnb) / discount
 #     return benefit_reserve
