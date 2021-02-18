@@ -3,8 +3,8 @@
 
 *A Model Building Library*
 
-![build](https://github.com/dustindall/footings-core/workflows/CI/badge.svg)
-[![docs](https://readthedocs.org/projects/footings/badge/?version=master)](https://footings.readthedocs.io/en/master/?badge=latest)
+![tests](https://github.com/footings/footings/workflows/tests/badge.svg)
+[![gh-pages](https://github.com/footings/footings/workflows/gh-pages/badge.svg)](https://footings.github.io/footings/master/)
 [![license](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![codecov](https://codecov.io/gh/dustindall/footings/branch/master/graph/badge.svg?token=SC5BHMYBSN)](https://codecov.io/gh/dustindall/footings)
 ![version](https://img.shields.io/pypi/pyversions/footings.svg)

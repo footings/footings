@@ -1,0 +1,6 @@
+﻿footings.actuarial\_tools.calc\_pv
+==================================
+
+.. currentmodule:: footings.actuarial_tools
+
+.. autofunction:: calc_pv
