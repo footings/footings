@@ -1,0 +1,6 @@
+﻿footings.actuarial\_tools.calc\_continuance
+===========================================
+
+.. currentmodule:: footings.actuarial_tools
+
+.. autofunction:: calc_continuance

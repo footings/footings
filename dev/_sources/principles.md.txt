@@ -42,4 +42,4 @@ Insurance products can have many features and the number of features can grow co
 
 ## Model environments should not be monolithic
 
-Long duration actuarial models usually are built with PAMS. PAMS are monolithic systems. That is, they are designed to be the one tool solution with an exception for connectivity to databases for i/o. This is their biggest downfall. It is hard to combine PAMS with other software including all the DevOps tooling that has been created over the years. Features have to come through the vendor of the PAMS. Thus, innovation is slow and lags significantly behind what software developers have come to expect. The `footings framework` was designed with this mind and is the reason why the project is open-source and exist as pure python. This allows the most flexibility to combine a mix of software to create a best in class modeling environment.
+There exist many tools that can be added to a model environment to make it more functional and automated. Many of these tools fall within the DevOps space. Use these tools to create a best in class modeling environment.

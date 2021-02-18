@@ -3,6 +3,25 @@ API
 ===
 
 
+footings.actuarial_tools
+------------------------
+
+.. automodule:: footings.actuarial_tools
+   :exclude-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated
+
+    calc_benefit_reserve
+    calc_continuance
+    calc_discount
+    calc_interpolation
+    calc_pv
+    calc_pvfnb
+|
+
+
 footings.audit
 --------------
 

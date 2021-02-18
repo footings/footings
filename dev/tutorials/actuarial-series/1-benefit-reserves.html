@@ -1,0 +1,1587 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Benefit Reserves &#8212; Footings 0.10.0rc2 documentation</title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="API" href="../../api.html" />
+    <link rel="prev" title="Actuarial Series" href="index.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+<div class="container-xl">
+
+    <a class="navbar-brand" href="../../index.html">
+    
+      <p class="title">Footings</p>
+    
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
+      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+        
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../installation.html">Installation</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../principles.html">Principles</a>
+        </li>
+        
+        <li class="nav-item active">
+            <a class="nav-link" href="../index.html">Tutorials</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../api.html">API</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../license.html">License</a>
+        </li>
+        
+        <li class="nav-item ">
+            <a class="nav-link" href="../../changelog.html">Changelog</a>
+        </li>
+        
+        
+      </ul>
+
+
+      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this site..." aria-label="Search this site..." autocomplete="off" >
+</form>
+      
+
+      <ul class="navbar-nav">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/footings/footings" target="_blank" rel="noopener">
+              <span><i class="fab fa-github-square"></i></span>
+            </a>
+          </li>
+        
+        
+      </ul>
+    </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+    <div class="bd-toc-item active">
+    
+  
+    <ul class="nav bd-sidenav">
+        
+        
+        
+        
+        
+        
+          
+            
+                <li class="">
+                    <a href="../intro-series/index.html">Intro Series</a>
+                </li>
+            
+          
+            
+                <li class="">
+                    <a href="../pattern-series/index.html">Pattern Series</a>
+                </li>
+            
+          
+            
+  
+                <li class="active">
+                    <a href="index.html">Actuarial Series</a>
+                    <ul>
+                    
+                        <li class="active">
+                            <a href="">Benefit Reserves</a>
+                        </li>
+                    
+                    </ul>
+                </li>
+            
+          
+        
+        
+        
+        
+        
+        
+        
+        
+      </ul>
+  
+  </nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#introduction" class="nav-link">Introduction</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#starting-data" class="nav-link">Starting Data</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#calculating-a-benefit-reserve" class="nav-link">Calculating a Benefit Reserve</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#closing" class="nav-link">Closing</a>
+        </li>
+    
+    </ul>
+</nav>
+
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="benefit-reserves">
+<h1>Benefit Reserves<a class="headerlink" href="#benefit-reserves" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This is a the first tutorial in the <a class="reference internal" href="index.html"><span class="doc std std-doc">Actuarial Series</span></a> describing how to use the <a class="reference external" href="https://www.github.com/footings/footings">Footings framework</a> to perform common actuarial functions.  This tutorial will demonstrate how to calculate a benefit reserve.</p>
+<p>A benefit reserve is necessary whenever the expected benefit stream differs porportionally over time relative to the expected premium stream. That is, if premiums are constant for a policy holder and their expected cost go up overtime, part of the premiums paid early in the life of the policy must be set aside to pay for higher expected claims later in the life of the policy.</p>
+</div>
+<div class="section" id="starting-data">
+<h2>Starting Data<a class="headerlink" href="#starting-data" title="Permalink to this headline">¶</a></h2>
+<p>For this example, we will assume we are starting with the following data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;benefit-reserve-example.csv&quot;</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>policy_duration</th>
+      <th>gross_premium</th>
+      <th>benefits</th>
+      <th>mortality_rate</th>
+      <th>lapse_rate</th>
+      <th>interest_rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>500</td>
+      <td>97.29</td>
+      <td>0.0031</td>
+      <td>0.30</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>500</td>
+      <td>179.99</td>
+      <td>0.0034</td>
+      <td>0.20</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>500</td>
+      <td>285.38</td>
+      <td>0.0036</td>
+      <td>0.20</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>500</td>
+      <td>332.08</td>
+      <td>0.0039</td>
+      <td>0.20</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>500</td>
+      <td>377.48</td>
+      <td>0.0042</td>
+      <td>0.15</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>500</td>
+      <td>422.89</td>
+      <td>0.0045</td>
+      <td>0.15</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>7</td>
+      <td>500</td>
+      <td>477.37</td>
+      <td>0.0049</td>
+      <td>0.15</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>8</td>
+      <td>500</td>
+      <td>533.15</td>
+      <td>0.0054</td>
+      <td>0.15</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>9</td>
+      <td>500</td>
+      <td>587.63</td>
+      <td>0.0059</td>
+      <td>0.15</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>10</td>
+      <td>500</td>
+      <td>643.41</td>
+      <td>0.0065</td>
+      <td>0.15</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>11</td>
+      <td>500</td>
+      <td>697.89</td>
+      <td>0.0070</td>
+      <td>0.15</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>12</td>
+      <td>500</td>
+      <td>729.03</td>
+      <td>0.0076</td>
+      <td>0.15</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>13</td>
+      <td>500</td>
+      <td>761.46</td>
+      <td>0.0082</td>
+      <td>0.15</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>14</td>
+      <td>500</td>
+      <td>792.59</td>
+      <td>0.0090</td>
+      <td>0.15</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>15</td>
+      <td>500</td>
+      <td>825.02</td>
+      <td>0.0099</td>
+      <td>0.15</td>
+      <td>0.05</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Do note that each row in the table above represents a year. Thus, the timing of cashflows and when decrements are applied can vary even within a row. For this example, assume -</p>
+<ul class="simple">
+<li><p>premium is earned at the begining of each duration,</p></li>
+<li><p>benefits are paid in the middle of each duration,</p></li>
+<li><p>mortality is spread uniformly through each duration, and</p></li>
+<li><p>lapses happen at the end of each duration.</p></li>
+</ul>
+</div>
+<div class="section" id="calculating-a-benefit-reserve">
+<h2>Calculating a Benefit Reserve<a class="headerlink" href="#calculating-a-benefit-reserve" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned in the intro, a benefit reserve is needed any time there is mismatch in the level of expected premiums relative to the expected benefits to be paid. When calculating a benefit reserve, the following items need to be present -</p>
+<ul class="simple">
+<li><p>expected premiums (given in table),</p></li>
+<li><p>expected benefits (given in table),</p></li>
+<li><p>probability of the policy holder reaching each policy duration, and</p></li>
+<li><p>the time value-of-money.</p></li>
+</ul>
+<p>The Footings framework has a function <code class="docutils literal notranslate"><span class="pre">calc_continuance</span></code> that can be used to calculate the probability of the policy holder each each policy duration. The code of this is shown below alongside the provided table.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">footings.actuarial_tools</span> <span class="kn">import</span> <span class="n">calc_continuance</span>
+
+<span class="n">lives_ed</span> <span class="o">=</span> <span class="n">calc_continuance</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;mortality_rate&quot;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lapse_rate&quot;</span><span class="p">])</span>
+<span class="n">lives_bd</span> <span class="o">=</span> <span class="n">lives_ed</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">lives_md</span> <span class="o">=</span> <span class="n">calc_continuance</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;mortality_rate&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">starting_duration</span><span class="o">=</span><span class="n">lives_bd</span><span class="p">)</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;l_bd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lives_bd</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;l_md&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lives_md</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;l_ed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lives_ed</span>
+
+<span class="n">df</span><span class="p">[[</span><span class="s2">&quot;policy_duration&quot;</span><span class="p">,</span> <span class="s2">&quot;mortality_rate&quot;</span><span class="p">,</span> <span class="s2">&quot;lapse_rate&quot;</span><span class="p">,</span> <span class="s2">&quot;l_bd&quot;</span><span class="p">,</span> <span class="s2">&quot;l_md&quot;</span><span class="p">,</span> <span class="s2">&quot;l_ed&quot;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>policy_duration</th>
+      <th>mortality_rate</th>
+      <th>lapse_rate</th>
+      <th>l_bd</th>
+      <th>l_md</th>
+      <th>l_ed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0.0031</td>
+      <td>0.30</td>
+      <td>1.000000</td>
+      <td>0.998450</td>
+      <td>0.697830</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>0.0034</td>
+      <td>0.20</td>
+      <td>0.697830</td>
+      <td>0.696644</td>
+      <td>0.556366</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>0.0036</td>
+      <td>0.20</td>
+      <td>0.556366</td>
+      <td>0.555364</td>
+      <td>0.443490</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>0.0039</td>
+      <td>0.20</td>
+      <td>0.443490</td>
+      <td>0.442626</td>
+      <td>0.353409</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>0.0042</td>
+      <td>0.15</td>
+      <td>0.353409</td>
+      <td>0.352666</td>
+      <td>0.299136</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>0.0045</td>
+      <td>0.15</td>
+      <td>0.299136</td>
+      <td>0.298463</td>
+      <td>0.253121</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>7</td>
+      <td>0.0049</td>
+      <td>0.15</td>
+      <td>0.253121</td>
+      <td>0.252501</td>
+      <td>0.214099</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>8</td>
+      <td>0.0054</td>
+      <td>0.15</td>
+      <td>0.214099</td>
+      <td>0.213521</td>
+      <td>0.181001</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>9</td>
+      <td>0.0059</td>
+      <td>0.15</td>
+      <td>0.181001</td>
+      <td>0.180467</td>
+      <td>0.152943</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>10</td>
+      <td>0.0065</td>
+      <td>0.15</td>
+      <td>0.152943</td>
+      <td>0.152446</td>
+      <td>0.129157</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>11</td>
+      <td>0.0070</td>
+      <td>0.15</td>
+      <td>0.129157</td>
+      <td>0.128705</td>
+      <td>0.109015</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>12</td>
+      <td>0.0076</td>
+      <td>0.15</td>
+      <td>0.109015</td>
+      <td>0.108601</td>
+      <td>0.091958</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>13</td>
+      <td>0.0082</td>
+      <td>0.15</td>
+      <td>0.091958</td>
+      <td>0.091581</td>
+      <td>0.077524</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>14</td>
+      <td>0.0090</td>
+      <td>0.15</td>
+      <td>0.077524</td>
+      <td>0.077175</td>
+      <td>0.065302</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>15</td>
+      <td>0.0099</td>
+      <td>0.15</td>
+      <td>0.065302</td>
+      <td>0.064979</td>
+      <td>0.054957</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>A few items to note -</p>
+<ul class="simple">
+<li><p>the lives at the end of the duration is the cumulative product of (1 - mortality_rate) x (1 - lapse_rate),</p></li>
+<li><p>the lives at the beginning of each duration is equal to the lives at the end of each duration for the next policy year (year 1 beginning duration is set to 1), and</p></li>
+<li><p>the lives in the middle of each duration is equal to lives_bd x (1 - mortality_rate / 2).</p></li>
+</ul>
+<p>Next, the discount factors are calculated to consider the time value-of-money. The code for this is below.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">footings.actuarial_tools</span> <span class="kn">import</span> <span class="n">calc_discount</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;v_bd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_discount</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;interest_rate&quot;</span><span class="p">],</span> <span class="n">adjustment</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;v_md&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_discount</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;interest_rate&quot;</span><span class="p">],</span> <span class="n">adjustment</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;v_ed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_discount</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;interest_rate&quot;</span><span class="p">])</span>
+
+<span class="n">df</span><span class="p">[[</span><span class="s2">&quot;policy_duration&quot;</span><span class="p">,</span> <span class="s2">&quot;interest_rate&quot;</span><span class="p">,</span> <span class="s2">&quot;v_bd&quot;</span><span class="p">,</span> <span class="s2">&quot;v_md&quot;</span><span class="p">,</span> <span class="s2">&quot;v_ed&quot;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>policy_duration</th>
+      <th>interest_rate</th>
+      <th>v_bd</th>
+      <th>v_md</th>
+      <th>v_ed</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0.05</td>
+      <td>1.000000</td>
+      <td>0.975900</td>
+      <td>0.952381</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>0.05</td>
+      <td>0.952381</td>
+      <td>0.929429</td>
+      <td>0.907029</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>0.05</td>
+      <td>0.907029</td>
+      <td>0.885170</td>
+      <td>0.863838</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>0.05</td>
+      <td>0.863838</td>
+      <td>0.843019</td>
+      <td>0.822702</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>0.05</td>
+      <td>0.822702</td>
+      <td>0.802875</td>
+      <td>0.783526</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>0.05</td>
+      <td>0.783526</td>
+      <td>0.764643</td>
+      <td>0.746215</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>7</td>
+      <td>0.05</td>
+      <td>0.746215</td>
+      <td>0.728232</td>
+      <td>0.710681</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>8</td>
+      <td>0.05</td>
+      <td>0.710681</td>
+      <td>0.693554</td>
+      <td>0.676839</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>9</td>
+      <td>0.05</td>
+      <td>0.676839</td>
+      <td>0.660528</td>
+      <td>0.644609</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>10</td>
+      <td>0.05</td>
+      <td>0.644609</td>
+      <td>0.629074</td>
+      <td>0.613913</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>11</td>
+      <td>0.05</td>
+      <td>0.613913</td>
+      <td>0.599118</td>
+      <td>0.584679</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>12</td>
+      <td>0.05</td>
+      <td>0.584679</td>
+      <td>0.570589</td>
+      <td>0.556837</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>13</td>
+      <td>0.05</td>
+      <td>0.556837</td>
+      <td>0.543418</td>
+      <td>0.530321</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>14</td>
+      <td>0.05</td>
+      <td>0.530321</td>
+      <td>0.517541</td>
+      <td>0.505068</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>15</td>
+      <td>0.05</td>
+      <td>0.505068</td>
+      <td>0.492896</td>
+      <td>0.481017</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>To calculate a benefit reserve, the present value of future benefits and future gross premiums need to be known. The code for this is below. As the code shows, both benefits and premiums are multiplied by the probability of a life receiving/paying the benefit/premium times the respective discount factor.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">footings.actuarial_tools</span> <span class="kn">import</span> <span class="n">calc_pv</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;pvfb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_pv</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;benefits&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;l_md&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;v_md&quot;</span><span class="p">])</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;pvgp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_pv</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;gross_premium&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;l_bd&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;v_bd&quot;</span><span class="p">])</span>
+
+<span class="n">df</span><span class="p">[[</span><span class="s2">&quot;policy_duration&quot;</span><span class="p">,</span> <span class="s2">&quot;benefits&quot;</span><span class="p">,</span> <span class="s2">&quot;l_md&quot;</span><span class="p">,</span> <span class="s2">&quot;v_md&quot;</span><span class="p">,</span> <span class="s2">&quot;pvfb&quot;</span><span class="p">,</span> <span class="s2">&quot;gross_premium&quot;</span><span class="p">,</span> <span class="s2">&quot;l_bd&quot;</span><span class="p">,</span> <span class="s2">&quot;v_bd&quot;</span><span class="p">,</span> <span class="s2">&quot;pvgp&quot;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>policy_duration</th>
+      <th>benefits</th>
+      <th>l_md</th>
+      <th>v_md</th>
+      <th>pvfb</th>
+      <th>gross_premium</th>
+      <th>l_bd</th>
+      <th>v_bd</th>
+      <th>pvgp</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>97.29</td>
+      <td>0.998450</td>
+      <td>0.975900</td>
+      <td>1172.382101</td>
+      <td>500</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1953.970418</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>179.99</td>
+      <td>0.696644</td>
+      <td>0.929429</td>
+      <td>1077.583948</td>
+      <td>500</td>
+      <td>0.697830</td>
+      <td>0.952381</td>
+      <td>1453.970418</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>285.38</td>
+      <td>0.555364</td>
+      <td>0.885170</td>
+      <td>961.043915</td>
+      <td>500</td>
+      <td>0.556366</td>
+      <td>0.907029</td>
+      <td>1121.670418</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>332.08</td>
+      <td>0.442626</td>
+      <td>0.843019</td>
+      <td>820.753385</td>
+      <td>500</td>
+      <td>0.443490</td>
+      <td>0.863838</td>
+      <td>869.350281</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>377.48</td>
+      <td>0.352666</td>
+      <td>0.802875</td>
+      <td>696.840438</td>
+      <td>500</td>
+      <td>0.353409</td>
+      <td>0.822702</td>
+      <td>677.798445</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>422.89</td>
+      <td>0.298463</td>
+      <td>0.764643</td>
+      <td>589.958022</td>
+      <td>500</td>
+      <td>0.299136</td>
+      <td>0.783526</td>
+      <td>532.423371</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>7</td>
+      <td>477.37</td>
+      <td>0.252501</td>
+      <td>0.728232</td>
+      <td>493.447160</td>
+      <td>500</td>
+      <td>0.253121</td>
+      <td>0.746215</td>
+      <td>415.233063</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>8</td>
+      <td>533.15</td>
+      <td>0.213521</td>
+      <td>0.693554</td>
+      <td>405.668747</td>
+      <td>500</td>
+      <td>0.214099</td>
+      <td>0.710681</td>
+      <td>320.791626</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>9</td>
+      <td>587.63</td>
+      <td>0.180467</td>
+      <td>0.660528</td>
+      <td>326.715587</td>
+      <td>500</td>
+      <td>0.181001</td>
+      <td>0.676839</td>
+      <td>244.713652</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>10</td>
+      <td>643.41</td>
+      <td>0.152446</td>
+      <td>0.629074</td>
+      <td>256.667986</td>
+      <td>500</td>
+      <td>0.152943</td>
+      <td>0.644609</td>
+      <td>183.459290</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>11</td>
+      <td>697.89</td>
+      <td>0.128705</td>
+      <td>0.599118</td>
+      <td>194.965009</td>
+      <td>500</td>
+      <td>0.129157</td>
+      <td>0.613913</td>
+      <td>134.164988</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>12</td>
+      <td>729.03</td>
+      <td>0.108601</td>
+      <td>0.570589</td>
+      <td>141.151186</td>
+      <td>500</td>
+      <td>0.109015</td>
+      <td>0.584679</td>
+      <td>94.519459</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>13</td>
+      <td>761.46</td>
+      <td>0.091581</td>
+      <td>0.543418</td>
+      <td>95.975955</td>
+      <td>500</td>
+      <td>0.091958</td>
+      <td>0.556837</td>
+      <td>62.650117</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>14</td>
+      <td>792.59</td>
+      <td>0.077175</td>
+      <td>0.517541</td>
+      <td>58.080455</td>
+      <td>500</td>
+      <td>0.077524</td>
+      <td>0.530321</td>
+      <td>37.047199</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>15</td>
+      <td>825.02</td>
+      <td>0.064979</td>
+      <td>0.492896</td>
+      <td>26.423553</td>
+      <td>500</td>
+      <td>0.065302</td>
+      <td>0.505068</td>
+      <td>16.490981</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>With the known present value of both benefits and premiums, the present value of future net benefits can be calculated. This function calculates the net level premium (NLP) which is the time 0 present value of benefits ($1,172.38) divided by the present value of gross premiums ($1,953.97). The NLP is then multiplied by the present value of premium. This column represent the time 0 value of future premium that needs to be available to pay future benefits.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">footings.actuarial_tools</span> <span class="kn">import</span> <span class="n">calc_pvfnb</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;pvfnb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_pvfnb</span><span class="p">(</span>
+    <span class="n">pvfb</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;pvfb&quot;</span><span class="p">],</span>
+    <span class="n">pvfp</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;pvgp&quot;</span><span class="p">],</span>
+    <span class="n">net_benefit_method</span><span class="o">=</span><span class="s2">&quot;NLP&quot;</span>
+<span class="p">)</span>
+
+<span class="n">df</span><span class="p">[[</span><span class="s2">&quot;policy_duration&quot;</span><span class="p">,</span> <span class="s2">&quot;pvfb&quot;</span><span class="p">,</span> <span class="s2">&quot;pvgp&quot;</span><span class="p">,</span> <span class="s2">&quot;pvfnb&quot;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>policy_duration</th>
+      <th>pvfb</th>
+      <th>pvgp</th>
+      <th>pvfnb</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>1172.382101</td>
+      <td>1953.970418</td>
+      <td>1172.382101</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>1077.583948</td>
+      <td>1453.970418</td>
+      <td>872.382139</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>961.043915</td>
+      <td>1121.670418</td>
+      <td>673.002165</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>820.753385</td>
+      <td>869.350281</td>
+      <td>521.610102</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>696.840438</td>
+      <td>677.798445</td>
+      <td>406.679015</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>589.958022</td>
+      <td>532.423371</td>
+      <td>319.453982</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>7</td>
+      <td>493.447160</td>
+      <td>415.233063</td>
+      <td>249.139806</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>8</td>
+      <td>405.668747</td>
+      <td>320.791626</td>
+      <td>192.474951</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>9</td>
+      <td>326.715587</td>
+      <td>244.713652</td>
+      <td>146.828173</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>10</td>
+      <td>256.667986</td>
+      <td>183.459290</td>
+      <td>110.075560</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>11</td>
+      <td>194.965009</td>
+      <td>134.164988</td>
+      <td>80.498983</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>12</td>
+      <td>141.151186</td>
+      <td>94.519459</td>
+      <td>56.711668</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>13</td>
+      <td>95.975955</td>
+      <td>62.650117</td>
+      <td>37.590066</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>14</td>
+      <td>58.080455</td>
+      <td>37.047199</td>
+      <td>22.228316</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>15</td>
+      <td>26.423553</td>
+      <td>16.490981</td>
+      <td>9.894587</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>With both the present value of future benefits and the present value of future net benefits known, the benefit reserve is calculated using the formula <code class="docutils literal notranslate"><span class="pre">calc_benefit_reserve</span></code>. This formula is equal to pvfb minus the pvfnb shifted one row. Given both pvfb and pvfnb are time 0 values (i.e., both multipled by lives and the discount factor), to get the appropriate ending duration value it is divided by both the lives and discount factor.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">footings.actuarial_tools</span> <span class="kn">import</span> <span class="n">calc_benefit_reserve</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s2">&quot;benefit_reserve&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_benefit_reserve</span><span class="p">(</span>
+    <span class="n">pvfb</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;pvfb&quot;</span><span class="p">],</span>
+    <span class="n">pvfnb</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;pvfnb&quot;</span><span class="p">],</span>
+    <span class="n">lives</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;l_ed&quot;</span><span class="p">],</span>
+    <span class="n">discount</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;v_ed&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">df</span><span class="p">[[</span><span class="s2">&quot;policy_duration&quot;</span><span class="p">,</span> <span class="s2">&quot;gross_premium&quot;</span><span class="p">,</span> <span class="s2">&quot;benefits&quot;</span><span class="p">,</span> <span class="s2">&quot;l_ed&quot;</span><span class="p">,</span> <span class="s2">&quot;v_ed&quot;</span><span class="p">,</span> <span class="s2">&quot;pvfb&quot;</span><span class="p">,</span> <span class="s2">&quot;pvfnb&quot;</span><span class="p">,</span> <span class="s2">&quot;benefit_reserve&quot;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>policy_duration</th>
+      <th>gross_premium</th>
+      <th>benefits</th>
+      <th>l_ed</th>
+      <th>v_ed</th>
+      <th>pvfb</th>
+      <th>pvfnb</th>
+      <th>benefit_reserve</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>500</td>
+      <td>97.29</td>
+      <td>0.697830</td>
+      <td>0.952381</td>
+      <td>1172.382101</td>
+      <td>1172.382101</td>
+      <td>308.759869</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>500</td>
+      <td>179.99</td>
+      <td>0.556366</td>
+      <td>0.907029</td>
+      <td>1077.583948</td>
+      <td>872.382139</td>
+      <td>570.786291</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>500</td>
+      <td>285.38</td>
+      <td>0.443490</td>
+      <td>0.863838</td>
+      <td>961.043915</td>
+      <td>673.002165</td>
+      <td>780.841597</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>500</td>
+      <td>332.08</td>
+      <td>0.353409</td>
+      <td>0.822702</td>
+      <td>820.753385</td>
+      <td>521.610102</td>
+      <td>997.975157</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>500</td>
+      <td>377.48</td>
+      <td>0.299136</td>
+      <td>0.783526</td>
+      <td>696.840438</td>
+      <td>406.679015</td>
+      <td>1154.122918</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>500</td>
+      <td>422.89</td>
+      <td>0.253121</td>
+      <td>0.746215</td>
+      <td>589.958022</td>
+      <td>319.453982</td>
+      <td>1293.433064</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>7</td>
+      <td>500</td>
+      <td>477.37</td>
+      <td>0.214099</td>
+      <td>0.710681</td>
+      <td>493.447160</td>
+      <td>249.139806</td>
+      <td>1401.153211</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>8</td>
+      <td>500</td>
+      <td>533.15</td>
+      <td>0.181001</td>
+      <td>0.676839</td>
+      <td>405.668747</td>
+      <td>192.474951</td>
+      <td>1468.364114</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>9</td>
+      <td>500</td>
+      <td>587.63</td>
+      <td>0.152943</td>
+      <td>0.644609</td>
+      <td>326.715587</td>
+      <td>146.828173</td>
+      <td>1486.910453</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>10</td>
+      <td>500</td>
+      <td>643.41</td>
+      <td>0.129157</td>
+      <td>0.613913</td>
+      <td>256.667986</td>
+      <td>110.075560</td>
+      <td>1443.618340</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>11</td>
+      <td>500</td>
+      <td>697.89</td>
+      <td>0.109015</td>
+      <td>0.584679</td>
+      <td>194.965009</td>
+      <td>80.498983</td>
+      <td>1324.776619</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>12</td>
+      <td>500</td>
+      <td>729.03</td>
+      <td>0.091958</td>
+      <td>0.556837</td>
+      <td>141.151186</td>
+      <td>56.711668</td>
+      <td>1140.219415</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>13</td>
+      <td>500</td>
+      <td>761.46</td>
+      <td>0.077524</td>
+      <td>0.530321</td>
+      <td>95.975955</td>
+      <td>37.590066</td>
+      <td>872.050954</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>14</td>
+      <td>500</td>
+      <td>792.59</td>
+      <td>0.065302</td>
+      <td>0.505068</td>
+      <td>58.080455</td>
+      <td>22.228316</td>
+      <td>501.151688</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>15</td>
+      <td>500</td>
+      <td>825.02</td>
+      <td>0.054957</td>
+      <td>0.481017</td>
+      <td>26.423553</td>
+      <td>9.894587</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>To verify the formula works correctly, it can be viewed from a financial perspective. The code for this is below. The values for each duration are at the beginning of the duration.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">change_in_reserve</span><span class="p">(</span><span class="n">reserve</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">lives</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">discount</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate change in reserve.&quot;&quot;&quot;</span>
+    <span class="n">discount_shift</span> <span class="o">=</span> <span class="n">discount</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">current_period</span> <span class="o">=</span> <span class="n">reserve</span> <span class="o">*</span> <span class="n">lives</span> <span class="o">/</span> <span class="p">(</span><span class="n">discount_shift</span> <span class="o">/</span> <span class="n">discount</span><span class="p">)</span>
+    <span class="n">prior_period</span> <span class="o">=</span> <span class="n">reserve</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">lives</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">current_period</span> <span class="o">-</span> <span class="n">prior_period</span>
+
+<span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">df2</span><span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;gross_premium&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;l_bd&quot;</span><span class="p">]</span>
+<span class="n">df2</span><span class="p">[</span><span class="s2">&quot;benefits&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;benefits&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;l_md&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;v_md&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;v_bd&quot;</span><span class="p">])</span>
+<span class="n">df2</span><span class="p">[</span><span class="s2">&quot;benefit_reserve&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;benefit_reserve&quot;</span><span class="p">]</span>
+<span class="n">df2</span><span class="p">[</span><span class="s2">&quot;change_in_reserve&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">change_in_reserve</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;benefit_reserve&quot;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;l_ed&quot;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;v_ed&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">df2</span><span class="p">[</span><span class="s2">&quot;net_income&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df2</span><span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df2</span><span class="p">[</span><span class="s2">&quot;benefits&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df2</span><span class="p">[</span><span class="s2">&quot;change_in_reserve&quot;</span><span class="p">]</span>
+<span class="n">df2</span><span class="p">[</span><span class="s2">&quot;ratio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df2</span><span class="p">[</span><span class="s2">&quot;net_income&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df2</span><span class="p">[</span><span class="s2">&quot;income&quot;</span><span class="p">]</span>
+
+<span class="n">df2</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>income</th>
+      <th>benefits</th>
+      <th>benefit_reserve</th>
+      <th>change_in_reserve</th>
+      <th>net_income</th>
+      <th>ratio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>500.000000</td>
+      <td>94.798153</td>
+      <td>308.759869</td>
+      <td>205.201809</td>
+      <td>200.000038</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>348.915000</td>
+      <td>122.367034</td>
+      <td>570.786291</td>
+      <td>86.981939</td>
+      <td>139.566027</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>278.182951</td>
+      <td>154.670310</td>
+      <td>780.841597</td>
+      <td>12.239440</td>
+      <td>111.273202</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>221.745194</td>
+      <td>143.444725</td>
+      <td>997.975157</td>
+      <td>-10.397625</td>
+      <td>88.698095</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>176.704310</td>
+      <td>129.916245</td>
+      <td>1154.122918</td>
+      <td>-23.893672</td>
+      <td>70.681738</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>149.567829</td>
+      <td>123.175033</td>
+      <td>1293.433064</td>
+      <td>-33.434347</td>
+      <td>59.827143</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>126.560558</td>
+      <td>117.631470</td>
+      <td>1401.153211</td>
+      <td>-41.695144</td>
+      <td>50.624233</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>107.049350</td>
+      <td>111.095025</td>
+      <td>1468.364114</td>
+      <td>-46.865424</td>
+      <td>42.819748</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>90.500591</td>
+      <td>103.492209</td>
+      <td>1486.910453</td>
+      <td>-49.191862</td>
+      <td>36.200243</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>76.471642</td>
+      <td>95.721569</td>
+      <td>1443.618340</td>
+      <td>-49.838590</td>
+      <td>30.588662</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>64.578390</td>
+      <td>87.657047</td>
+      <td>1324.776619</td>
+      <td>-48.910018</td>
+      <td>25.831361</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>54.507390</td>
+      <td>77.264975</td>
+      <td>1140.219415</td>
+      <td>-44.560545</td>
+      <td>21.802960</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>45.979163</td>
+      <td>68.054875</td>
+      <td>872.050954</td>
+      <td>-40.467380</td>
+      <td>18.391669</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>38.761814</td>
+      <td>59.693809</td>
+      <td>501.151688</td>
+      <td>-36.436724</td>
+      <td>15.504729</td>
+      <td>0.4</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>32.651014</td>
+      <td>52.316828</td>
+      <td>0.000000</td>
+      <td>-32.726222</td>
+      <td>13.060408</td>
+      <td>0.4</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</div>
+<div class="section" id="closing">
+<h2>Closing<a class="headerlink" href="#closing" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial walked through how a benefit reserve can be calculated using available formulas in the <code class="docutils literal notranslate"><span class="pre">footings</span></code> framework. Do note, that many of the formulas can be combined within a function to show only the final benefit reserve value.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="index.html" title="previous page">Actuarial Series</a>
+    <a class='right-next' id="next-link" href="../../api.html" title="next page">API</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    <p>
+          &copy; Copyright 2020, Dustin Tindall.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
