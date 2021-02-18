@@ -114,3 +114,5 @@ mydask.png
 # myst_nb
 docs/jupyter_execute/
 docs/generated/
+docs/tutorials/**/**/*.json
+docs/tutorials/**/**/*.xlsx
