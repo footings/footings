@@ -9,7 +9,7 @@ import pandas as pd
 def calc_continuance(
     *decrements: pd.Series, starting_duration: Optional[pd.Series] = None,
 ) -> pd.Series:
-    """Apply a set of decrements together to form a continuance table.
+    """Calculate continuance given a set of decrements.
 
     Parameters
     ----------
@@ -166,7 +166,7 @@ def calc_interpolation(
 
 
 def calc_pv(series: pd.Series) -> pd.Series:
-    """Calculate the present value of a series for each row.
+    """Calculate the present value of a series.
 
     Parameters
     ----------
@@ -191,7 +191,7 @@ def calc_pv(series: pd.Series) -> pd.Series:
 
 
 def calc_pvfnb(pvfb: pd.Series, pvfp: pd.Series, net_benefit_method: str) -> pd.Series:
-    """Calculate present value of future net benefits.
+    """Calculate the present value of net future benefits.
 
     Parameters
     ----------

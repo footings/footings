@@ -48,14 +48,14 @@ As mentioned in the intro, a benefit reserve is needed any time there is mismatc
 - probability of the policy holder reaching each policy duration, and
 - the time value-of-money.
 
-The Footings framework has a function `calculate_continuance` that can be used to calculate the probability of the policy holder each each policy duration. The code of this is shown below alongside the provided table.
+The Footings framework has a function `calc_continuance` that can be used to calculate the probability of the policy holder each each policy duration. The code of this is shown below alongside the provided table.
 
 ```{code-cell} ipython3
-from footings.actuarial_tools import calculate_continuance
+from footings.actuarial_tools import calc_continuance
 
-lives_ed = calculate_continuance(df["mortality_rate"], df["lapse_rate"])
+lives_ed = calc_continuance(df["mortality_rate"], df["lapse_rate"])
 lives_bd = lives_ed.shift(1, fill_value=1)
-lives_md = calculate_continuance(df["mortality_rate"] / 2, starting_duration=lives_bd)
+lives_md = calc_continuance(df["mortality_rate"] / 2, starting_duration=lives_bd)
 
 df["l_bd"] = lives_bd
 df["l_md"] = lives_md
@@ -73,11 +73,11 @@ A few items to note -
 Next, the discount factors are calculated to consider the time value-of-money. The code for this is below.
 
 ```{code-cell} ipython3
-from footings.actuarial_tools import calculate_discount
+from footings.actuarial_tools import calc_discount
 
-df["v_bd"] = calculate_discount(df["interest_rate"], adjustment = 0)
-df["v_md"] = calculate_discount(df["interest_rate"], adjustment = 0.5)
-df["v_ed"] = calculate_discount(df["interest_rate"])
+df["v_bd"] = calc_discount(df["interest_rate"], adjustment = 0)
+df["v_md"] = calc_discount(df["interest_rate"], adjustment = 0.5)
+df["v_ed"] = calc_discount(df["interest_rate"])
 
 df[["policy_duration", "interest_rate", "v_bd", "v_md", "v_ed"]]
 ```
@@ -85,10 +85,10 @@ df[["policy_duration", "interest_rate", "v_bd", "v_md", "v_ed"]]
 To calculate a benefit reserve, the present value of future benefits and future gross premiums need to be known. The code for this is below. As the code shows, both benefits and premiums are multiplied by the probability of a life receiving/paying the benefit/premium times the respective discount factor.
 
 ```{code-cell} ipython3
-from footings.actuarial_tools import calculate_pv
+from footings.actuarial_tools import calc_pv
 
-df["pvfb"] = calculate_pv(df["benefits"] * df["l_md"] * df["v_md"])
-df["pvgp"] = calculate_pv(df["gross_premium"] * df["l_bd"] * df["v_bd"])
+df["pvfb"] = calc_pv(df["benefits"] * df["l_md"] * df["v_md"])
+df["pvgp"] = calc_pv(df["gross_premium"] * df["l_bd"] * df["v_bd"])
 
 df[["policy_duration", "benefits", "l_md", "v_md", "pvfb", "gross_premium", "l_bd", "v_bd", "pvgp"]]
 ```
@@ -96,9 +96,9 @@ df[["policy_duration", "benefits", "l_md", "v_md", "pvfb", "gross_premium", "l_b
 With the known present value of both benefits and premiums, the present value of future net benefits can be calculated. This function calculates the net level premium (NLP) which is the time 0 present value of benefits ($1,172.38) divided by the present value of gross premiums (\$1,953.97). The NLP is then multiplied by the present value of premium. This column represent the time 0 value of future premium that needs to be available to pay future benefits.
 
 ```{code-cell} ipython3
-from footings.actuarial_tools import calculate_pvfnb
+from footings.actuarial_tools import calc_pvfnb
 
-df["pvfnb"] = calculate_pvfnb(
+df["pvfnb"] = calc_pvfnb(
     pvfb=df["pvfb"],
     pvfp=df["pvgp"],
     net_benefit_method="NLP"
@@ -107,12 +107,12 @@ df["pvfnb"] = calculate_pvfnb(
 df[["policy_duration", "pvfb", "pvgp", "pvfnb"]]
 ```
 
-With both the present value of future benefits and the present value of future net benefits known, the benefit reserve is calculated using the formula `calculate_benefit_reserve`. This formula is equal to pvfb minus the pvfnb shifted one row. Given both pvfb and pvfnb are time 0 values (i.e., both multipled by lives and the discount factor), to get the appropriate ending duration value it is divided by both the lives and discount factor.
+With both the present value of future benefits and the present value of future net benefits known, the benefit reserve is calculated using the formula `calc_benefit_reserve`. This formula is equal to pvfb minus the pvfnb shifted one row. Given both pvfb and pvfnb are time 0 values (i.e., both multipled by lives and the discount factor), to get the appropriate ending duration value it is divided by both the lives and discount factor.
 
 ```{code-cell} ipython3
-from footings.actuarial_tools import calculate_benefit_reserve
+from footings.actuarial_tools import calc_benefit_reserve
 
-df["benefit_reserve"] = calculate_benefit_reserve(
+df["benefit_reserve"] = calc_benefit_reserve(
     pvfb=df["pvfb"],
     pvfnb=df["pvfnb"],
     lives=df["l_ed"],
