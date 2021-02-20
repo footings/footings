@@ -292,27 +292,27 @@ def _format_signature(sig):
     return sig
 
 
-def _format_sheets(wb, sheet, format_beyond_c=False):
+def _format_widths(wksht, start_column):
+    for col in list(wksht.columns)[start_column:]:
+        max_length = 0
+        for cell in col:
+            if len(str(cell.value)) > max_length:
+                max_length = len(str(cell.value))
+        if max_length <= 3:
+            adj_width = (max_length + 1) * 1.2
+        else:
+            adj_width = max_length + 3
+        wksht.column_dimensions[col[0].column_letter].width = adj_width
+
+
+def _format_sheets(wb, sheet, format_beyond_d=False):
     wksht = wb.worksheets[sheet].obj
     wksht.sheet_view.showGridLines = False
     wksht.column_dimensions["A"].width = 2.14
     wksht.column_dimensions["B"].width = 14
-    # wksht.column_dimensions["C"].width = 1
-
-    if format_beyond_c:
-        for col in list(wksht.columns)[2:]:
-            max_length = 0
-            for cell in col:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(str(cell.value))
-                except:
-                    pass
-            if max_length <= 3:
-                adj_width = (max_length + 1) * 1.2
-            else:
-                adj_width = max_length + 3
-            wksht.column_dimensions[col[0].column_letter].width = adj_width
+    wksht.column_dimensions["C"].width = 14
+    if format_beyond_d:
+        _format_widths(wksht, start_column=3)
 
 
 def _write_sheet(wb, sheet, step):
@@ -382,7 +382,7 @@ def create_footings_xlsx_file(audit_dict, file, **kwargs):
             "DOCSTRING",
         )
 
-    _format_sheets(wb, "Main", format_beyond_c=False)
+    _format_sheets(wb, "Main", format_beyond_d=False)
 
     # write instantiation
     wb.create_sheet("Instantiation", start_row=2, start_col=2)
@@ -393,7 +393,7 @@ def create_footings_xlsx_file(audit_dict, file, **kwargs):
         audit_dict["instantiation"],
         "INSTANTIATION",
     )
-    _format_sheets(wb, "Instantiation", format_beyond_c=True)
+    _format_sheets(wb, "Instantiation", format_beyond_d=True)
 
     # write steps
     if "steps" in audit_dict:
@@ -401,14 +401,14 @@ def create_footings_xlsx_file(audit_dict, file, **kwargs):
             name = v.get("name", None)
             wb.create_sheet(name, start_row=2, start_col=2)
             _write_sheet(wb, name, v)
-            _format_sheets(wb, name, format_beyond_c=True)
+            _format_sheets(wb, name, format_beyond_d=True)
 
     # write output
     wb.create_sheet("Output", start_row=2, start_col=2)
     _add_section(
         wb, "Output", "Output:", audit_dict["output"], "OUTPUT",
     )
-    _format_sheets(wb, "Output", format_beyond_c=True)
+    _format_sheets(wb, "Output", format_beyond_d=True)
 
     # save file
     wb.save(file)
