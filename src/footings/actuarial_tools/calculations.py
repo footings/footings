@@ -61,7 +61,7 @@ def calc_continuance(
 
 
 def calc_discount(
-    interest_rate: pd.Series, *, adjustment: Optional[Union[int, float]] = None
+    interest_rate: pd.Series, *, t_adj: Optional[Union[int, float]] = None
 ) -> pd.Series:
     """Calculate the discount factor over a series.
 
@@ -69,8 +69,8 @@ def calc_discount(
     ----------
     interest_rate : pd.Series
         A series of interest rate values
-    adjustment : Union[int, float], optional
-        An optinal adjustment to consider timing. As an example, use 0.5 for a midpoint.
+    t_adj : Union[int, float], optional
+        An optinal adjustment to the timing for the current duration. As an example, use 0.5 for a midpoint.
 
     Returns
     -------
@@ -88,21 +88,21 @@ def calc_discount(
     1    0.933532
     2    0.889079
 
-    >>> v_md = calc_discount(interest_rate, adjustment=0.5)
+    >>> v_md = calc_discount(interest_rate, t_adj=0.5)
     >>> v_md
     0    0.985329
     1    0.952020
     2    0.911034
 
-    >>> v_bd = calc_discount(interest_rate, adjustment=0)
+    >>> v_bd = calc_discount(interest_rate, t_adj=0)
     >>> v_bd
     0    1.000000
     1    0.970874
     2    0.933532
     """
     cum = (1 + interest_rate).cumprod()
-    if adjustment is not None:
-        cum = cum.shift(1, fill_value=1) * (1 + interest_rate) ** adjustment
+    if t_adj is not None:
+        cum = cum.shift(1, fill_value=1) * (1 + interest_rate) ** t_adj
     return 1 / cum
 
 
@@ -226,11 +226,11 @@ def calc_pvfnb(pvfb: pd.Series, pvfp: pd.Series, net_benefit_method: str) -> pd.
         nlp = pvfb.iat[0] / pvfp.iat[0]
         pvfnb = pvfp * nlp
     elif net_benefit_method == "PT1":
-        nlp = pvfb.iat[1] / pvfb.iat[1]
+        nlp = pvfb.iat[1] / pvfp.iat[1]
         pvfnb = pvfp * nlp
         pvfnb.iat[0] = pvfb.iat[0]
     elif net_benefit_method == "PT2":
-        nlp = pvfb.iat[2] = pvfb.iat[2]
+        nlp = pvfb.iat[2] / pvfp.iat[2]
         pvfnb = pvfp * nlp
         pvfnb.iat[0] = pvfb.iat[0]
         pvfnb.iat[1] = pvfb.iat[1]
@@ -242,7 +242,7 @@ def calc_pvfnb(pvfb: pd.Series, pvfp: pd.Series, net_benefit_method: str) -> pd.
 
 
 def calc_benefit_reserve(
-    pvfb: pd.Series, pvfnb: pd.Series, lives: pd.Series, discount: pd.Series
+    pvfb: pd.Series, pvfnb: pd.Series, lives: pd.Series, discount: pd.Series,
 ) -> pd.Series:
     """Calculate benefit reserve.
 
