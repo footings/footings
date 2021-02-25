@@ -166,14 +166,14 @@
 <h1>footings.actuarial_tools.calc_discount<a class="headerlink" href="#footings-actuarial-tools-calc-discount" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="footings.actuarial_tools.calc_discount">
-<code class="sig-name descname"><span class="pre">calc_discount</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interest_rate</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.series.Series</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjustment</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pandas.core.series.Series</span><a class="reference internal" href="../_modules/footings/actuarial_tools/calculations.html#calc_discount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.actuarial_tools.calc_discount" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">calc_discount</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interest_rate</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.series.Series</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_adj</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pandas.core.series.Series</span><a class="reference internal" href="../_modules/footings/actuarial_tools/calculations.html#calc_discount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.actuarial_tools.calc_discount" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the discount factor over a series.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>interest_rate</strong><span class="classifier">pd.Series</span></dt><dd><p>A series of interest rate values</p>
 </dd>
-<dt><strong>adjustment</strong><span class="classifier">Union[int, float], optional</span></dt><dd><p>An optinal adjustment to consider timing. As an example, use 0.5 for a midpoint.</p>
+<dt><strong>t_adj</strong><span class="classifier">Union[int, float], optional</span></dt><dd><p>An optinal adjustment to the timing for the current duration. As an example, use 0.5 for a midpoint.</p>
 </dd>
 </dl>
 </dd>
@@ -195,14 +195,14 @@
 <span class="go">2    0.889079</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v_md</span> <span class="o">=</span> <span class="n">calc_discount</span><span class="p">(</span><span class="n">interest_rate</span><span class="p">,</span> <span class="n">adjustment</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v_md</span> <span class="o">=</span> <span class="n">calc_discount</span><span class="p">(</span><span class="n">interest_rate</span><span class="p">,</span> <span class="n">t_adj</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">v_md</span>
 <span class="go">0    0.985329</span>
 <span class="go">1    0.952020</span>
 <span class="go">2    0.911034</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v_bd</span> <span class="o">=</span> <span class="n">calc_discount</span><span class="p">(</span><span class="n">interest_rate</span><span class="p">,</span> <span class="n">adjustment</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v_bd</span> <span class="o">=</span> <span class="n">calc_discount</span><span class="p">(</span><span class="n">interest_rate</span><span class="p">,</span> <span class="n">t_adj</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">v_bd</span>
 <span class="go">0    1.000000</span>
 <span class="go">1    0.970874</span>

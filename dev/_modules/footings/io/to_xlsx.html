@@ -453,27 +453,27 @@
     <span class="k">return</span> <span class="n">sig</span>
 
 
-<span class="k">def</span> <span class="nf">_format_sheets</span><span class="p">(</span><span class="n">wb</span><span class="p">,</span> <span class="n">sheet</span><span class="p">,</span> <span class="n">format_beyond_c</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_format_widths</span><span class="p">(</span><span class="n">wksht</span><span class="p">,</span> <span class="n">start_column</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">wksht</span><span class="o">.</span><span class="n">columns</span><span class="p">)[</span><span class="n">start_column</span><span class="p">:]:</span>
+        <span class="n">max_length</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">col</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">value</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">max_length</span><span class="p">:</span>
+                <span class="n">max_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">max_length</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">adj_width</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">adj_width</span> <span class="o">=</span> <span class="n">max_length</span> <span class="o">+</span> <span class="mi">3</span>
+        <span class="n">wksht</span><span class="o">.</span><span class="n">column_dimensions</span><span class="p">[</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_letter</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">adj_width</span>
+
+
+<span class="k">def</span> <span class="nf">_format_sheets</span><span class="p">(</span><span class="n">wb</span><span class="p">,</span> <span class="n">sheet</span><span class="p">,</span> <span class="n">format_beyond_d</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">wksht</span> <span class="o">=</span> <span class="n">wb</span><span class="o">.</span><span class="n">worksheets</span><span class="p">[</span><span class="n">sheet</span><span class="p">]</span><span class="o">.</span><span class="n">obj</span>
     <span class="n">wksht</span><span class="o">.</span><span class="n">sheet_view</span><span class="o">.</span><span class="n">showGridLines</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">wksht</span><span class="o">.</span><span class="n">column_dimensions</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mf">2.14</span>
     <span class="n">wksht</span><span class="o">.</span><span class="n">column_dimensions</span><span class="p">[</span><span class="s2">&quot;B&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mi">14</span>
-    <span class="c1"># wksht.column_dimensions[&quot;C&quot;].width = 1</span>
-
-    <span class="k">if</span> <span class="n">format_beyond_c</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">wksht</span><span class="o">.</span><span class="n">columns</span><span class="p">)[</span><span class="mi">2</span><span class="p">:]:</span>
-            <span class="n">max_length</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">col</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">value</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">max_length</span><span class="p">:</span>
-                        <span class="n">max_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
-                <span class="k">except</span><span class="p">:</span>
-                    <span class="k">pass</span>
-            <span class="k">if</span> <span class="n">max_length</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="n">adj_width</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.2</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">adj_width</span> <span class="o">=</span> <span class="n">max_length</span> <span class="o">+</span> <span class="mi">3</span>
-            <span class="n">wksht</span><span class="o">.</span><span class="n">column_dimensions</span><span class="p">[</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column_letter</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">adj_width</span>
+    <span class="n">wksht</span><span class="o">.</span><span class="n">column_dimensions</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mi">14</span>
+    <span class="k">if</span> <span class="n">format_beyond_d</span><span class="p">:</span>
+        <span class="n">_format_widths</span><span class="p">(</span><span class="n">wksht</span><span class="p">,</span> <span class="n">start_column</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_write_sheet</span><span class="p">(</span><span class="n">wb</span><span class="p">,</span> <span class="n">sheet</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
@@ -543,7 +543,7 @@
             <span class="s2">&quot;DOCSTRING&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="n">_format_sheets</span><span class="p">(</span><span class="n">wb</span><span class="p">,</span> <span class="s2">&quot;Main&quot;</span><span class="p">,</span> <span class="n">format_beyond_c</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">_format_sheets</span><span class="p">(</span><span class="n">wb</span><span class="p">,</span> <span class="s2">&quot;Main&quot;</span><span class="p">,</span> <span class="n">format_beyond_d</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># write instantiation</span>
     <span class="n">wb</span><span class="o">.</span><span class="n">create_sheet</span><span class="p">(</span><span class="s2">&quot;Instantiation&quot;</span><span class="p">,</span> <span class="n">start_row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">start_col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -554,7 +554,7 @@
         <span class="n">audit_dict</span><span class="p">[</span><span class="s2">&quot;instantiation&quot;</span><span class="p">],</span>
         <span class="s2">&quot;INSTANTIATION&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">_format_sheets</span><span class="p">(</span><span class="n">wb</span><span class="p">,</span> <span class="s2">&quot;Instantiation&quot;</span><span class="p">,</span> <span class="n">format_beyond_c</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">_format_widths</span><span class="p">(</span><span class="n">wb</span><span class="o">.</span><span class="n">worksheets</span><span class="p">[</span><span class="s2">&quot;Instantiation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">start_column</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># write steps</span>
     <span class="k">if</span> <span class="s2">&quot;steps&quot;</span> <span class="ow">in</span> <span class="n">audit_dict</span><span class="p">:</span>
@@ -562,14 +562,14 @@
             <span class="n">name</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">wb</span><span class="o">.</span><span class="n">create_sheet</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">start_row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">start_col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="n">_write_sheet</span><span class="p">(</span><span class="n">wb</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-            <span class="n">_format_sheets</span><span class="p">(</span><span class="n">wb</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">format_beyond_c</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">_format_sheets</span><span class="p">(</span><span class="n">wb</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">format_beyond_d</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># write output</span>
     <span class="n">wb</span><span class="o">.</span><span class="n">create_sheet</span><span class="p">(</span><span class="s2">&quot;Output&quot;</span><span class="p">,</span> <span class="n">start_row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">start_col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">_add_section</span><span class="p">(</span>
         <span class="n">wb</span><span class="p">,</span> <span class="s2">&quot;Output&quot;</span><span class="p">,</span> <span class="s2">&quot;Output:&quot;</span><span class="p">,</span> <span class="n">audit_dict</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">],</span> <span class="s2">&quot;OUTPUT&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">_format_sheets</span><span class="p">(</span><span class="n">wb</span><span class="p">,</span> <span class="s2">&quot;Output&quot;</span><span class="p">,</span> <span class="n">format_beyond_c</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">_format_sheets</span><span class="p">(</span><span class="n">wb</span><span class="p">,</span> <span class="s2">&quot;Output&quot;</span><span class="p">,</span> <span class="n">format_beyond_d</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># save file</span>
     <span class="n">wb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file</span><span class="p">)</span></div>

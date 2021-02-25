@@ -222,7 +222,7 @@
 
 
 <div class="viewcode-block" id="calc_discount"><a class="viewcode-back" href="../../../generated/footings.actuarial_tools.calc_discount.html#footings.actuarial_tools.calc_discount">[docs]</a><span class="k">def</span> <span class="nf">calc_discount</span><span class="p">(</span>
-    <span class="n">interest_rate</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">adjustment</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">interest_rate</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">t_adj</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Calculate the discount factor over a series.</span>
 
@@ -230,8 +230,8 @@
 <span class="sd">    ----------</span>
 <span class="sd">    interest_rate : pd.Series</span>
 <span class="sd">        A series of interest rate values</span>
-<span class="sd">    adjustment : Union[int, float], optional</span>
-<span class="sd">        An optinal adjustment to consider timing. As an example, use 0.5 for a midpoint.</span>
+<span class="sd">    t_adj : Union[int, float], optional</span>
+<span class="sd">        An optinal adjustment to the timing for the current duration. As an example, use 0.5 for a midpoint.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -249,21 +249,21 @@
 <span class="sd">    1    0.933532</span>
 <span class="sd">    2    0.889079</span>
 
-<span class="sd">    &gt;&gt;&gt; v_md = calc_discount(interest_rate, adjustment=0.5)</span>
+<span class="sd">    &gt;&gt;&gt; v_md = calc_discount(interest_rate, t_adj=0.5)</span>
 <span class="sd">    &gt;&gt;&gt; v_md</span>
 <span class="sd">    0    0.985329</span>
 <span class="sd">    1    0.952020</span>
 <span class="sd">    2    0.911034</span>
 
-<span class="sd">    &gt;&gt;&gt; v_bd = calc_discount(interest_rate, adjustment=0)</span>
+<span class="sd">    &gt;&gt;&gt; v_bd = calc_discount(interest_rate, t_adj=0)</span>
 <span class="sd">    &gt;&gt;&gt; v_bd</span>
 <span class="sd">    0    1.000000</span>
 <span class="sd">    1    0.970874</span>
 <span class="sd">    2    0.933532</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cum</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">interest_rate</span><span class="p">)</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">adjustment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">cum</span> <span class="o">=</span> <span class="n">cum</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">interest_rate</span><span class="p">)</span> <span class="o">**</span> <span class="n">adjustment</span>
+    <span class="k">if</span> <span class="n">t_adj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cum</span> <span class="o">=</span> <span class="n">cum</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">interest_rate</span><span class="p">)</span> <span class="o">**</span> <span class="n">t_adj</span>
     <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">cum</span></div>
 
 
@@ -387,11 +387,11 @@
         <span class="n">nlp</span> <span class="o">=</span> <span class="n">pvfb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">pvfp</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">pvfnb</span> <span class="o">=</span> <span class="n">pvfp</span> <span class="o">*</span> <span class="n">nlp</span>
     <span class="k">elif</span> <span class="n">net_benefit_method</span> <span class="o">==</span> <span class="s2">&quot;PT1&quot;</span><span class="p">:</span>
-        <span class="n">nlp</span> <span class="o">=</span> <span class="n">pvfb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">pvfb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">nlp</span> <span class="o">=</span> <span class="n">pvfb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">pvfp</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">pvfnb</span> <span class="o">=</span> <span class="n">pvfp</span> <span class="o">*</span> <span class="n">nlp</span>
         <span class="n">pvfnb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pvfb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">elif</span> <span class="n">net_benefit_method</span> <span class="o">==</span> <span class="s2">&quot;PT2&quot;</span><span class="p">:</span>
-        <span class="n">nlp</span> <span class="o">=</span> <span class="n">pvfb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">pvfb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">nlp</span> <span class="o">=</span> <span class="n">pvfb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">pvfp</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">pvfnb</span> <span class="o">=</span> <span class="n">pvfp</span> <span class="o">*</span> <span class="n">nlp</span>
         <span class="n">pvfnb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pvfb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">pvfnb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">pvfb</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -403,7 +403,7 @@
 
 
 <div class="viewcode-block" id="calc_benefit_reserve"><a class="viewcode-back" href="../../../generated/footings.actuarial_tools.calc_benefit_reserve.html#footings.actuarial_tools.calc_benefit_reserve">[docs]</a><span class="k">def</span> <span class="nf">calc_benefit_reserve</span><span class="p">(</span>
-    <span class="n">pvfb</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">pvfnb</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">lives</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">discount</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span>
+    <span class="n">pvfb</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">pvfnb</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">lives</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">discount</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Calculate benefit reserve.</span>
 
