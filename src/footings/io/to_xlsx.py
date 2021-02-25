@@ -393,7 +393,7 @@ def create_footings_xlsx_file(audit_dict, file, **kwargs):
         audit_dict["instantiation"],
         "INSTANTIATION",
     )
-    _format_sheets(wb, "Instantiation", format_beyond_d=True)
+    _format_widths(wb.worksheets["Instantiation"].obj, start_column=1)
 
     # write steps
     if "steps" in audit_dict:
