@@ -25,9 +25,9 @@ def test_calc_discount():
     interest_rate = pd.Series([0.03, 0.04, 0.05])
     v_ed = calc_discount(interest_rate)
     assert_series_equal(v_ed, pd.Series([0.970874, 0.933532, 0.889079]))
-    v_md = calc_discount(interest_rate, adjustment=0.5)
+    v_md = calc_discount(interest_rate, t_adj=0.5)
     assert_series_equal(v_md, pd.Series([0.985329, 0.952020, 0.911034]))
-    v_bd = calc_discount(interest_rate, adjustment=0)
+    v_bd = calc_discount(interest_rate, t_adj=0)
     assert_series_equal(v_bd, pd.Series([1, 0.970874, 0.933532]))
 
 
