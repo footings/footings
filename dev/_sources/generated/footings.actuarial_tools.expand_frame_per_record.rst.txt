@@ -1,0 +1,6 @@
+﻿footings.actuarial\_tools.expand\_frame\_per\_record
+====================================================
+
+.. currentmodule:: footings.actuarial_tools
+
+.. autofunction:: expand_frame_per_record

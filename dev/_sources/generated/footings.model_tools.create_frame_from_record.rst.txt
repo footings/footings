@@ -1,6 +1,0 @@
-﻿footings.model\_tools.create\_frame\_from\_record
-=================================================
-
-.. currentmodule:: footings.model_tools
-
-.. autofunction:: create_frame_from_record

@@ -191,7 +191,7 @@ from footings.model import (
     def_intermediate,
     def_return,
 )
-from footings.model_tools import run_date_time
+from footings.actuarial_tools import run_date_time
 
 @model(steps=["_calculate"])
 class DiscountFactors:

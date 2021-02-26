@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>footings.model_tools.convert_to_records &#8212; Footings 0.10.0rc2 documentation</title>
+    <title>footings.actuarial_tools.run_date_time &#8212; Footings 0.10.0 documentation</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -40,8 +40,8 @@
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="footings.parallel_tools.dask.create_dask_foreach_jig" href="footings.parallel_tools.dask.create_dask_foreach_jig.html" />
-    <link rel="prev" title="footings.model_tools.run_date_time" href="footings.model_tools.run_date_time.html" />
+    <link rel="next" title="footings.actuarial_tools.convert_to_records" href="footings.actuarial_tools.convert_to_records.html" />
+    <link rel="prev" title="footings.actuarial_tools.calculate_age" href="footings.actuarial_tools.calculate_age.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
   </head>
@@ -162,28 +162,27 @@
               
               <div>
                 
-  <div class="section" id="footings-model-tools-convert-to-records">
-<h1>footings.model_tools.convert_to_records<a class="headerlink" href="#footings-model-tools-convert-to-records" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
-<dt id="footings.model_tools.convert_to_records">
-<code class="sig-name descname"><span class="pre">convert_to_records</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_case</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/footings/model_tools/records.html#convert_to_records"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.model_tools.convert_to_records" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a DataFrame into a list of records.</p>
+  <div class="section" id="footings-actuarial-tools-run-date-time">
+<h1>footings.actuarial_tools.run_date_time<a class="headerlink" href="#footings-actuarial-tools-run-date-time" title="Permalink to this headline">¶</a></h1>
+<dl class="py data">
+<dt id="footings.actuarial_tools.run_date_time">
+<code class="sig-name descname"><span class="pre">run_date_time</span></code><em class="property"> <span class="pre">=</span> <span class="pre">Factory(factory=&lt;function</span> <span class="pre">_run_date_time&gt;,</span> <span class="pre">takes_self=False)</span></em><a class="headerlink" href="#footings.actuarial_tools.run_date_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores a factory callable.</p>
+<p>If passed as the default value to <cite>attr.ib</cite>, the factory is used to
+generate a new value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>frame</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>The DataFrame to convert.</p>
-</dd>
-<dt><strong>column_case</strong><span class="classifier">str, optional</span></dt><dd><p>Set to ‘lower’ to convert columns to lower case and ‘upper’ for upper case.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>list</dt><dd><p>A list of records from the DataFrame.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>factory</strong> (<em>callable</em>) – A callable that takes either none or exactly one
+mandatory positional argument depending on <em>takes_self</em>.</p></li>
+<li><p><strong>takes_self</strong> (<em>bool</em>) – Pass the partially initialized instance that is
+being initialized as a positional argument.</p></li>
+</ul>
 </dd>
 </dl>
-</dd>
-</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 17.1.0: </span><em>takes_self</em></p>
+</div>
 </dd></dl>
 
 </div>
@@ -194,8 +193,8 @@
               
               <div class='prev-next-bottom'>
                 
-    <a class='left-prev' id="prev-link" href="footings.model_tools.run_date_time.html" title="previous page">footings.model_tools.run_date_time</a>
-    <a class='right-next' id="next-link" href="footings.parallel_tools.dask.create_dask_foreach_jig.html" title="next page">footings.parallel_tools.dask.create_dask_foreach_jig</a>
+    <a class='left-prev' id="prev-link" href="footings.actuarial_tools.calculate_age.html" title="previous page">footings.actuarial_tools.calculate_age</a>
+    <a class='right-next' id="next-link" href="footings.actuarial_tools.convert_to_records.html" title="next page">footings.actuarial_tools.convert_to_records</a>
 
               </div>
               

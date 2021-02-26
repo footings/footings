@@ -75,8 +75,8 @@ Next, the discount factors are calculated to consider the time value-of-money. T
 ```{code-cell} ipython3
 from footings.actuarial_tools import calc_discount
 
-df["v_bd"] = calc_discount(df["interest_rate"], adjustment = 0)
-df["v_md"] = calc_discount(df["interest_rate"], adjustment = 0.5)
+df["v_bd"] = calc_discount(df["interest_rate"], t_adj=0)
+df["v_md"] = calc_discount(df["interest_rate"], t_adj=0.5)
 df["v_ed"] = calc_discount(df["interest_rate"])
 
 df[["policy_duration", "interest_rate", "v_bd", "v_md", "v_ed"]]

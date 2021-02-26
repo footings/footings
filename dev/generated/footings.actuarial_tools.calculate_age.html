@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>footings.model_tools.calculate_age &#8212; Footings 0.10.0rc2 documentation</title>
+    <title>footings.actuarial_tools.calculate_age &#8212; Footings 0.10.0 documentation</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -40,8 +40,8 @@
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="footings.model_tools.run_date_time" href="footings.model_tools.run_date_time.html" />
-    <link rel="prev" title="footings.model_tools.frame_filter" href="footings.model_tools.frame_filter.html" />
+    <link rel="next" title="footings.actuarial_tools.run_date_time" href="footings.actuarial_tools.run_date_time.html" />
+    <link rel="prev" title="footings.actuarial_tools.frame_filter" href="footings.actuarial_tools.frame_filter.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
   </head>
@@ -162,11 +162,11 @@
               
               <div>
                 
-  <div class="section" id="footings-model-tools-calculate-age">
-<h1>footings.model_tools.calculate_age<a class="headerlink" href="#footings-model-tools-calculate-age" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="footings-actuarial-tools-calculate-age">
+<h1>footings.actuarial_tools.calculate_age<a class="headerlink" href="#footings-actuarial-tools-calculate-age" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="footings.model_tools.calculate_age">
-<code class="sig-name descname"><span class="pre">calculate_age</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">birth_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.date</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas.core.series.Series</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_of_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.date</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas.core.series.Series</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas.core.series.Series</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/footings/model_tools/age.html#calculate_age"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.model_tools.calculate_age" title="Permalink to this definition">¶</a></dt>
+<dt id="footings.actuarial_tools.calculate_age">
+<code class="sig-name descname"><span class="pre">calculate_age</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">birth_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.date</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas.core.series.Series</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_of_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">datetime.date</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas.core.series.Series</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span> </span><span class="pre">pandas.core.series.Series</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/footings/actuarial_tools/age.html#calculate_age"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.actuarial_tools.calculate_age" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate age given a birth date and an as of date.</p>
 <p>The calculate age accepts many different types for both the birth_dt and as_of_dt. Thus, this
 formula can be used to calculate the age difference between a single date as well as a pandas
@@ -226,8 +226,8 @@ parameter is a pd.Series.</p>
               
               <div class='prev-next-bottom'>
                 
-    <a class='left-prev' id="prev-link" href="footings.model_tools.frame_filter.html" title="previous page">footings.model_tools.frame_filter</a>
-    <a class='right-next' id="next-link" href="footings.model_tools.run_date_time.html" title="next page">footings.model_tools.run_date_time</a>
+    <a class='left-prev' id="prev-link" href="footings.actuarial_tools.frame_filter.html" title="previous page">footings.actuarial_tools.frame_filter</a>
+    <a class='right-next' id="next-link" href="footings.actuarial_tools.run_date_time.html" title="next page">footings.actuarial_tools.run_date_time</a>
 
               </div>
               

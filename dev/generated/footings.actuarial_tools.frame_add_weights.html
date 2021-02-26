@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>footings.model_tools.frame_add_weights &#8212; Footings 0.10.0rc2 documentation</title>
+    <title>footings.actuarial_tools.frame_add_weights &#8212; Footings 0.10.0 documentation</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -40,8 +40,8 @@
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="footings.model_tools.frame_filter" href="footings.model_tools.frame_filter.html" />
-    <link rel="prev" title="footings.model_tools.frame_add_exposure" href="footings.model_tools.frame_add_exposure.html" />
+    <link rel="next" title="footings.actuarial_tools.frame_filter" href="footings.actuarial_tools.frame_filter.html" />
+    <link rel="prev" title="footings.actuarial_tools.frame_add_exposure" href="footings.actuarial_tools.frame_add_exposure.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
   </head>
@@ -162,11 +162,11 @@
               
               <div>
                 
-  <div class="section" id="footings-model-tools-frame-add-weights">
-<h1>footings.model_tools.frame_add_weights<a class="headerlink" href="#footings-model-tools-frame-add-weights" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="footings-actuarial-tools-frame-add-weights">
+<h1>footings.actuarial_tools.frame_add_weights<a class="headerlink" href="#footings-actuarial-tools-frame-add-weights" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="footings.model_tools.frame_add_weights">
-<code class="sig-name descname"><span class="pre">frame_add_weights</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_of_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">begin_duration_col</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'DATE_BD'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_duration_col</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'DATE_ED'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt_current_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'WT_0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt_next_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'WT_1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/footings/model_tools/frames.html#frame_add_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.model_tools.frame_add_weights" title="Permalink to this definition">¶</a></dt>
+<dt id="footings.actuarial_tools.frame_add_weights">
+<code class="sig-name descname"><span class="pre">frame_add_weights</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_of_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">begin_duration_col</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'DATE_BD'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_duration_col</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'DATE_ED'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt_current_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'WT_0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt_next_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'WT_1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/footings/actuarial_tools/frames.html#frame_add_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.actuarial_tools.frame_add_weights" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add cell weights to a duration based frame as an as of date.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -208,7 +208,7 @@ and tend end date is excluded as a day in the numerator. The next period
 weight would be 1 - 0.827586 or 0.172414.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">footings.model_tools</span> <span class="kn">import</span> <span class="n">frame_add_weights</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">footings.actuarial_tools</span> <span class="kn">import</span> <span class="n">frame_add_weights</span>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
@@ -248,8 +248,8 @@ weight would be 1 - 0.827586 or 0.172414.</p>
               
               <div class='prev-next-bottom'>
                 
-    <a class='left-prev' id="prev-link" href="footings.model_tools.frame_add_exposure.html" title="previous page">footings.model_tools.frame_add_exposure</a>
-    <a class='right-next' id="next-link" href="footings.model_tools.frame_filter.html" title="next page">footings.model_tools.frame_filter</a>
+    <a class='left-prev' id="prev-link" href="footings.actuarial_tools.frame_add_exposure.html" title="previous page">footings.actuarial_tools.frame_add_exposure</a>
+    <a class='right-next' id="next-link" href="footings.actuarial_tools.frame_filter.html" title="next page">footings.actuarial_tools.frame_filter</a>
 
               </div>
               

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>footings.model_tools.frame_add_exposure &#8212; Footings 0.10.0rc2 documentation</title>
+    <title>footings.actuarial_tools.frame_filter &#8212; Footings 0.10.0 documentation</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -40,8 +40,8 @@
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="footings.model_tools.frame_add_weights" href="footings.model_tools.frame_add_weights.html" />
-    <link rel="prev" title="footings.model_tools.expand_frame_per_record" href="footings.model_tools.expand_frame_per_record.html" />
+    <link rel="next" title="footings.actuarial_tools.calculate_age" href="footings.actuarial_tools.calculate_age.html" />
+    <link rel="prev" title="footings.actuarial_tools.frame_add_weights" href="footings.actuarial_tools.frame_add_weights.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
   </head>
@@ -162,12 +162,12 @@
               
               <div>
                 
-  <div class="section" id="footings-model-tools-frame-add-exposure">
-<h1>footings.model_tools.frame_add_exposure<a class="headerlink" href="#footings-model-tools-frame-add-exposure" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="footings-actuarial-tools-frame-filter">
+<h1>footings.actuarial_tools.frame_filter<a class="headerlink" href="#footings-actuarial-tools-frame-filter" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="footings.model_tools.frame_add_exposure">
-<code class="sig-name descname"><span class="pre">frame_add_exposure</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">begin_date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exposure_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'EXPOSURE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">begin_duration_col</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'DATE_BD'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_duration_col</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'DATE_ED'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/footings/model_tools/frames.html#frame_add_exposure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.model_tools.frame_add_exposure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add an exposure values to a duration based frame.</p>
+<dt id="footings.actuarial_tools.frame_filter">
+<code class="sig-name descname"><span class="pre">frame_filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">begin_date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">begin_duration_col</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'DATE_BD'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_duration_col</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'DATE_ED'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/footings/actuarial_tools/frames.html#frame_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.actuarial_tools.frame_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter a duration based frame based on a being and/or an end date.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -176,8 +176,6 @@
 <dt><strong>begin_date</strong><span class="classifier">pd.Timestamp, optional</span></dt><dd><p>Begin date for measuring exposure, by default None.</p>
 </dd>
 <dt><strong>end_date</strong><span class="classifier">pd.Timestamp, optional</span></dt><dd><p>End date for measuring exposure, by default None.</p>
-</dd>
-<dt><strong>exposure_name</strong><span class="classifier">str, optional</span></dt><dd><p>The name to give the column added representing the exposure, by default = EXPOSURE.</p>
 </dd>
 <dt><strong>begin_duration_col</strong><span class="classifier">str, optional</span></dt><dd><p>The column name representing the start of a duration, by default DATE_BD.</p>
 </dd>
@@ -195,19 +193,14 @@
 <dd class="field-odd"><dl class="simple">
 <dt>ValueError</dt><dd><p>If begin_duration_col is not in frame.</p>
 </dd>
-<dt>ValueError</dt><dd><p>if end_ducration_col is not in frame.</p>
+<dt>ValueError</dt><dd><p>If end_duration_col is not in frame.</p>
 </dd>
 </dl>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>As an example, with a date of 2020-03-15 and a duration covering the period
-from 2020-03-10 through 2020-04-10, the exposure would be 0.838710 = 26 / 31.
-Notice the 15th is included as a day in the numerator and the end date is
-excluded in the denominator.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">footings.model_tools</span> <span class="kn">import</span> <span class="n">frame_add_exposure</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">footings.actuarial_tools</span> <span class="kn">import</span> <span class="n">frame_filter</span>
 <span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
@@ -219,22 +212,24 @@ excluded in the denominator.</p>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="p">),</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#   BEGIN_DURATION_COL  END_DURATION_COL</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 0 2020-02-10          2020-03-10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 1 2020-03-10          2020-04-10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 2 2020-04-10          2020-05-10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 3 2020-05-10          2020-06-10</span>
 <span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">example</span> <span class="o">=</span> <span class="n">frame_add_exposure</span><span class="p">(</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">frame</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">exposure_name</span><span class="o">=</span><span class="s2">&quot;EXPOSURE&quot;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">example</span> <span class="o">=</span> <span class="n">frame_filter</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">frame</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">begin_date</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-03-15&quot;</span><span class="p">),</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">end_date</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-05-01&quot;</span><span class="p">),</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">begin_duration_col</span><span class="o">=</span><span class="s2">&quot;BEGIN_DURATION_COL&quot;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">end_duration_col</span><span class="o">=</span><span class="s2">&quot;END_DURATION_COL&quot;</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">begin_date</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-03-15&quot;</span><span class="p">),</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">end_date</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-04-20&quot;</span><span class="p">),</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">example</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1">#       BEGIN_DURATION_COL      END_DURATION_COL        EXPOSURE</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 0     2020-02-10              2020-03-10              0.000000</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 1     2020-03-10              2020-04-10              0.838710</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 2     2020-04-10              2020-05-10              0.838710</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 3     2020-05-10              2020-06-10              0.000000</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#   BEGIN_DURATION_COL  END_DURATION_COL</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 1 2020-03-10          2020-04-10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 2 2020-04-10          2020-05-10</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -247,8 +242,8 @@ excluded in the denominator.</p>
               
               <div class='prev-next-bottom'>
                 
-    <a class='left-prev' id="prev-link" href="footings.model_tools.expand_frame_per_record.html" title="previous page">footings.model_tools.expand_frame_per_record</a>
-    <a class='right-next' id="next-link" href="footings.model_tools.frame_add_weights.html" title="next page">footings.model_tools.frame_add_weights</a>
+    <a class='left-prev' id="prev-link" href="footings.actuarial_tools.frame_add_weights.html" title="previous page">footings.actuarial_tools.frame_add_weights</a>
+    <a class='right-next' id="next-link" href="footings.actuarial_tools.calculate_age.html" title="next page">footings.actuarial_tools.calculate_age</a>
 
               </div>
               
