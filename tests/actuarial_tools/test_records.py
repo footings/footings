@@ -1,6 +1,6 @@
 import pandas as pd
 
-from footings.model_tools import convert_to_records
+from footings.actuarial_tools import convert_to_records
 
 
 def test_convert_to_records():

@@ -293,13 +293,13 @@ def create_frame(
 
     See Also
     --------
-    footings.model_tools.create_frame_from_record
-    footings.model_tools.expand_frame_per_record
+    footings.actuarial_tools.create_frame_from_record
+    footings.actuarial_tools.expand_frame_per_record
 
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.model_tools import create_frame
+    >>> from footings.actuarial_tools import create_frame
     >>> frame = create_frame(
     ...     start_dt = pd.Timestamp("2020-01-10"),
     ...     end_dt = pd.Timestamp("2020-05-30"),
@@ -347,7 +347,7 @@ def create_frame_from_record(
     and an end date. All columns from the original record will be duplicated the length of the date
     range. See example for usage.
 
-    If wanting to do this for many records use the function ``footings.model_tools.expand_frame_per_record``.
+    If wanting to do this for many records use the function ``footings.actuarial_tools.expand_frame_per_record``.
     When doing one record ``create_frame_from_record`` is faster than expand_frame_per_record.
 
     Parameters
@@ -363,7 +363,7 @@ def create_frame_from_record(
     col_date_nm : str
         The column name to assign the date column.
     kwargs :
-        See kwargs under footings.model_tools.create_frame
+        See kwargs under footings.actuarial_tools.create_frame
 
     Returns
     -------
@@ -377,13 +377,13 @@ def create_frame_from_record(
 
     See Also
     --------
-    footings.model_tools.create_frame
-    footings.model_tools.expand_frame_per_record
+    footings.actuarial_tools.create_frame
+    footings.actuarial_tools.expand_frame_per_record
 
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.model_tools import create_frame_from_record
+    >>> from footings.actuarial_tools import create_frame_from_record
     >>> record = pd.DataFrame(
     >>>     {
     >>>         "POLICY": ["P1"],
@@ -439,7 +439,7 @@ def expand_frame_per_record(
     """
     Create a frame with a date colum ranging from the start_dt to the end_dt from a record.
 
-    This function expands the function ``footings.model_tools.create_frame_from_record`` to cover the
+    This function expands the function ``footings.actuarial_tools.create_frame_from_record`` to cover the
     application of covering many records. Internally, it applies the function
     ``create_frame_from_record`` for each record.
 
@@ -456,7 +456,7 @@ def expand_frame_per_record(
     col_date_nm : str
         The column name to assign the date column.
     kwargs :
-        See kwargs under footings.model_tools.create_frame
+        See kwargs under footings.actuarial_tools.create_frame
 
     Returns
     -------
@@ -465,13 +465,13 @@ def expand_frame_per_record(
 
     See Also
     --------
-    footings.model_tools.create_frame
-    footings.model_tools.create_frame_from_record
+    footings.actuarial_tools.create_frame
+    footings.actuarial_tools.create_frame_from_record
 
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.model_tools import expand_frame_per_record
+    >>> from footings.actuarial_tools import expand_frame_per_record
     >>> df = pd.DataFrame(
     >>>     {
     >>>         "POLICY": ["P1", "P2"],
@@ -566,7 +566,7 @@ def frame_add_exposure(
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.model_tools import frame_add_exposure
+    >>> from footings.actuarial_tools import frame_add_exposure
     >>>
     >>> frame = pd.DataFrame(
     >>>     {
@@ -672,7 +672,7 @@ def frame_add_weights(
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.model_tools import frame_add_weights
+    >>> from footings.actuarial_tools import frame_add_weights
     >>>
     >>> frame = pd.DataFrame(
     >>>     {
@@ -757,7 +757,7 @@ def frame_filter(
     Examples
     --------
     >>> import pandas as pd
-    >>> from footings.model_tools import frame_filter
+    >>> from footings.actuarial_tools import frame_filter
     >>>
     >>> frame = pd.DataFrame(
     >>>     {

@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
 
-from footings.model_tools.frames import (
+from footings.actuarial_tools.frames import (
     create_frame,
     create_frame_from_record,
     expand_frame_per_record,
@@ -15,7 +15,7 @@ from footings.model_tools.frames import (
     kwarg_dispatcher,
 )
 
-FILE = os.path.join("tests", "model_tools", "data", "frame-examples.xlsx")
+FILE = os.path.join("tests", "actuarial_tools", "data", "frame-examples.xlsx")
 TEST_PARAMS = [
     (
         "test-month-duration",
