@@ -32,7 +32,7 @@ def create_docs(session):
 
 
 @nox.session(python="3.7", venv_backend="none")
-def changelog(session):
+def update_changelog(session):
     session.run(
         "auto-changelog",
         "--output",
