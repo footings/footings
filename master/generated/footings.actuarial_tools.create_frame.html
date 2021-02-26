@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>footings.model_tools.create_frame &#8212; Footings 0.10.0rc2 documentation</title>
+    <title>footings.actuarial_tools.create_frame &#8212; Footings 0.10.0 documentation</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -40,8 +40,8 @@
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="footings.model_tools.create_frame_from_record" href="footings.model_tools.create_frame_from_record.html" />
-    <link rel="prev" title="footings.validators.equal_to" href="footings.validators.equal_to.html" />
+    <link rel="next" title="footings.actuarial_tools.create_frame_from_record" href="footings.actuarial_tools.create_frame_from_record.html" />
+    <link rel="prev" title="footings.actuarial_tools.calc_pvfnb" href="footings.actuarial_tools.calc_pvfnb.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
   </head>
@@ -162,11 +162,11 @@
               
               <div>
                 
-  <div class="section" id="footings-model-tools-create-frame">
-<h1>footings.model_tools.create_frame<a class="headerlink" href="#footings-model-tools-create-frame" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="footings-actuarial-tools-create-frame">
+<h1>footings.actuarial_tools.create_frame<a class="headerlink" href="#footings-actuarial-tools-create-frame" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="footings.model_tools.create_frame">
-<code class="sig-name descname"><span class="pre">create_frame</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_date_nm</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pandas.core.frame.DataFrame</span><a class="reference internal" href="../_modules/footings/model_tools/frames.html#create_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.model_tools.create_frame" title="Permalink to this definition">¶</a></dt>
+<dt id="footings.actuarial_tools.create_frame">
+<code class="sig-name descname"><span class="pre">create_frame</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas._libs.tslibs.timestamps.Timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_date_nm</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pandas.core.frame.DataFrame</span><a class="reference internal" href="../_modules/footings/actuarial_tools/frames.html#create_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.actuarial_tools.create_frame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a frame with a date colum ranging from the start_dt to the end_dt.</p>
 <p>Additional columns can be created by passing kwargs (see list below) where the value is the
 assigned name. As an example, to add a column for duration month to be called DURATION_MONTH,
@@ -210,13 +210,13 @@ passing the kwarg “duration_month”: “DURATION_MONTH”.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="footings.model_tools.create_frame_from_record.html#footings.model_tools.create_frame_from_record" title="footings.model_tools.create_frame_from_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">footings.model_tools.create_frame_from_record</span></code></a></dt><dd></dd>
-<dt><a class="reference internal" href="footings.model_tools.expand_frame_per_record.html#footings.model_tools.expand_frame_per_record" title="footings.model_tools.expand_frame_per_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">footings.model_tools.expand_frame_per_record</span></code></a></dt><dd></dd>
+<dt><a class="reference internal" href="footings.actuarial_tools.create_frame_from_record.html#footings.actuarial_tools.create_frame_from_record" title="footings.actuarial_tools.create_frame_from_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">footings.actuarial_tools.create_frame_from_record</span></code></a></dt><dd></dd>
+<dt><a class="reference internal" href="footings.actuarial_tools.expand_frame_per_record.html#footings.actuarial_tools.expand_frame_per_record" title="footings.actuarial_tools.expand_frame_per_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">footings.actuarial_tools.expand_frame_per_record</span></code></a></dt><dd></dd>
 </dl>
 </div>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">footings.model_tools</span> <span class="kn">import</span> <span class="n">create_frame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">footings.actuarial_tools</span> <span class="kn">import</span> <span class="n">create_frame</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="n">create_frame</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">start_dt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-01-10&quot;</span><span class="p">),</span>
 <span class="gp">... </span>    <span class="n">end_dt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-05-30&quot;</span><span class="p">),</span>
@@ -244,8 +244,8 @@ passing the kwarg “duration_month”: “DURATION_MONTH”.</p>
               
               <div class='prev-next-bottom'>
                 
-    <a class='left-prev' id="prev-link" href="footings.validators.equal_to.html" title="previous page">footings.validators.equal_to</a>
-    <a class='right-next' id="next-link" href="footings.model_tools.create_frame_from_record.html" title="next page">footings.model_tools.create_frame_from_record</a>
+    <a class='left-prev' id="prev-link" href="footings.actuarial_tools.calc_pvfnb.html" title="previous page">footings.actuarial_tools.calc_pvfnb</a>
+    <a class='right-next' id="next-link" href="footings.actuarial_tools.create_frame_from_record.html" title="next page">footings.actuarial_tools.create_frame_from_record</a>
 
               </div>
               

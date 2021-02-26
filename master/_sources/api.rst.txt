@@ -13,12 +13,21 @@ footings.actuarial_tools
    :nosignatures:
    :toctree: generated
 
-    calc_benefit_reserve
-    calc_continuance
-    calc_discount
-    calc_interpolation
-    calc_pv
-    calc_pvfnb
+   calc_benefit_reserve
+   calc_continuance
+   calc_discount
+   calc_interpolation
+   calc_pv
+   calc_pvfnb
+   create_frame
+   create_frame_from_record
+   expand_frame_per_record
+   frame_add_exposure
+   frame_add_weights
+   frame_filter
+   calculate_age
+   run_date_time
+   convert_to_records
 |
 
 
@@ -155,29 +164,6 @@ footings.validators
    :toctree: generated
 
    equal_to
-
-|
-
-
-footings.model_tools
---------------------
-
-.. automodule:: footings.model_tools
-   :exclude-members:
-
-.. autosummary::
-   :nosignatures:
-   :toctree: generated
-
-   create_frame
-   create_frame_from_record
-   expand_frame_per_record
-   frame_add_exposure
-   frame_add_weights
-   frame_filter
-   calculate_age
-   run_date_time
-   convert_to_records
 
 |
 

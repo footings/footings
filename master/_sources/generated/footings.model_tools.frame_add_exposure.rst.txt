@@ -1,6 +1,0 @@
-﻿footings.model\_tools.frame\_add\_exposure
-==========================================
-
-.. currentmodule:: footings.model_tools
-
-.. autofunction:: frame_add_exposure

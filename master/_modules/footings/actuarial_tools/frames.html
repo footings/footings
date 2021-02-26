@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>footings.model_tools.frames &#8212; Footings 0.10.0rc2 documentation</title>
+    <title>footings.actuarial_tools.frames &#8212; Footings 0.10.0 documentation</title>
     
   <link rel="stylesheet" href="../../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -158,7 +158,7 @@
               
               <div>
                 
-  <h1>Source code for footings.model_tools.frames</h1><div class="highlight"><pre>
+  <h1>Source code for footings.actuarial_tools.frames</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">math</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -407,7 +407,7 @@
     <span class="k">return</span> <span class="n">tbl</span>
 
 
-<div class="viewcode-block" id="create_frame"><a class="viewcode-back" href="../../../generated/footings.model_tools.create_frame.html#footings.model_tools.create_frame">[docs]</a><span class="k">def</span> <span class="nf">create_frame</span><span class="p">(</span>
+<div class="viewcode-block" id="create_frame"><a class="viewcode-back" href="../../../generated/footings.actuarial_tools.create_frame.html#footings.actuarial_tools.create_frame">[docs]</a><span class="k">def</span> <span class="nf">create_frame</span><span class="p">(</span>
     <span class="n">start_dt</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">,</span>
     <span class="n">end_dt</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">,</span>
     <span class="n">frequency</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -454,13 +454,13 @@
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    footings.model_tools.create_frame_from_record</span>
-<span class="sd">    footings.model_tools.expand_frame_per_record</span>
+<span class="sd">    footings.actuarial_tools.create_frame_from_record</span>
+<span class="sd">    footings.actuarial_tools.expand_frame_per_record</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
-<span class="sd">    &gt;&gt;&gt; from footings.model_tools import create_frame</span>
+<span class="sd">    &gt;&gt;&gt; from footings.actuarial_tools import create_frame</span>
 <span class="sd">    &gt;&gt;&gt; frame = create_frame(</span>
 <span class="sd">    ...     start_dt = pd.Timestamp(&quot;2020-01-10&quot;),</span>
 <span class="sd">    ...     end_dt = pd.Timestamp(&quot;2020-05-30&quot;),</span>
@@ -492,7 +492,7 @@
     <span class="k">return</span> <span class="n">tbl</span></div>
 
 
-<div class="viewcode-block" id="create_frame_from_record"><a class="viewcode-back" href="../../../generated/footings.model_tools.create_frame_from_record.html#footings.model_tools.create_frame_from_record">[docs]</a><span class="k">def</span> <span class="nf">create_frame_from_record</span><span class="p">(</span>
+<div class="viewcode-block" id="create_frame_from_record"><a class="viewcode-back" href="../../../generated/footings.actuarial_tools.create_frame_from_record.html#footings.actuarial_tools.create_frame_from_record">[docs]</a><span class="k">def</span> <span class="nf">create_frame_from_record</span><span class="p">(</span>
     <span class="n">record</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">col_start_dt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">col_end_dt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -508,7 +508,7 @@
 <span class="sd">    and an end date. All columns from the original record will be duplicated the length of the date</span>
 <span class="sd">    range. See example for usage.</span>
 
-<span class="sd">    If wanting to do this for many records use the function ``footings.model_tools.expand_frame_per_record``.</span>
+<span class="sd">    If wanting to do this for many records use the function ``footings.actuarial_tools.expand_frame_per_record``.</span>
 <span class="sd">    When doing one record ``create_frame_from_record`` is faster than expand_frame_per_record.</span>
 
 <span class="sd">    Parameters</span>
@@ -524,7 +524,7 @@
 <span class="sd">    col_date_nm : str</span>
 <span class="sd">        The column name to assign the date column.</span>
 <span class="sd">    kwargs :</span>
-<span class="sd">        See kwargs under footings.model_tools.create_frame</span>
+<span class="sd">        See kwargs under footings.actuarial_tools.create_frame</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -538,13 +538,13 @@
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    footings.model_tools.create_frame</span>
-<span class="sd">    footings.model_tools.expand_frame_per_record</span>
+<span class="sd">    footings.actuarial_tools.create_frame</span>
+<span class="sd">    footings.actuarial_tools.expand_frame_per_record</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
-<span class="sd">    &gt;&gt;&gt; from footings.model_tools import create_frame_from_record</span>
+<span class="sd">    &gt;&gt;&gt; from footings.actuarial_tools import create_frame_from_record</span>
 <span class="sd">    &gt;&gt;&gt; record = pd.DataFrame(</span>
 <span class="sd">    &gt;&gt;&gt;     {</span>
 <span class="sd">    &gt;&gt;&gt;         &quot;POLICY&quot;: [&quot;P1&quot;],</span>
@@ -589,7 +589,7 @@
     <span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">record</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="expand_frame_per_record"><a class="viewcode-back" href="../../../generated/footings.model_tools.expand_frame_per_record.html#footings.model_tools.expand_frame_per_record">[docs]</a><span class="k">def</span> <span class="nf">expand_frame_per_record</span><span class="p">(</span>
+<div class="viewcode-block" id="expand_frame_per_record"><a class="viewcode-back" href="../../../generated/footings.actuarial_tools.expand_frame_per_record.html#footings.actuarial_tools.expand_frame_per_record">[docs]</a><span class="k">def</span> <span class="nf">expand_frame_per_record</span><span class="p">(</span>
     <span class="n">frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">col_start_dt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">col_end_dt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -600,7 +600,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a frame with a date colum ranging from the start_dt to the end_dt from a record.</span>
 
-<span class="sd">    This function expands the function ``footings.model_tools.create_frame_from_record`` to cover the</span>
+<span class="sd">    This function expands the function ``footings.actuarial_tools.create_frame_from_record`` to cover the</span>
 <span class="sd">    application of covering many records. Internally, it applies the function</span>
 <span class="sd">    ``create_frame_from_record`` for each record.</span>
 
@@ -617,7 +617,7 @@
 <span class="sd">    col_date_nm : str</span>
 <span class="sd">        The column name to assign the date column.</span>
 <span class="sd">    kwargs :</span>
-<span class="sd">        See kwargs under footings.model_tools.create_frame</span>
+<span class="sd">        See kwargs under footings.actuarial_tools.create_frame</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -626,13 +626,13 @@
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    footings.model_tools.create_frame</span>
-<span class="sd">    footings.model_tools.create_frame_from_record</span>
+<span class="sd">    footings.actuarial_tools.create_frame</span>
+<span class="sd">    footings.actuarial_tools.create_frame_from_record</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
-<span class="sd">    &gt;&gt;&gt; from footings.model_tools import expand_frame_per_record</span>
+<span class="sd">    &gt;&gt;&gt; from footings.actuarial_tools import expand_frame_per_record</span>
 <span class="sd">    &gt;&gt;&gt; df = pd.DataFrame(</span>
 <span class="sd">    &gt;&gt;&gt;     {</span>
 <span class="sd">    &gt;&gt;&gt;         &quot;POLICY&quot;: [&quot;P1&quot;, &quot;P2&quot;],</span>
@@ -679,7 +679,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="frame_add_exposure"><a class="viewcode-back" href="../../../generated/footings.model_tools.frame_add_exposure.html#footings.model_tools.frame_add_exposure">[docs]</a><span class="k">def</span> <span class="nf">frame_add_exposure</span><span class="p">(</span>
+<div class="viewcode-block" id="frame_add_exposure"><a class="viewcode-back" href="../../../generated/footings.actuarial_tools.frame_add_exposure.html#footings.actuarial_tools.frame_add_exposure">[docs]</a><span class="k">def</span> <span class="nf">frame_add_exposure</span><span class="p">(</span>
     <span class="n">frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">begin_date</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -727,7 +727,7 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
-<span class="sd">    &gt;&gt;&gt; from footings.model_tools import frame_add_exposure</span>
+<span class="sd">    &gt;&gt;&gt; from footings.actuarial_tools import frame_add_exposure</span>
 <span class="sd">    &gt;&gt;&gt;</span>
 <span class="sd">    &gt;&gt;&gt; frame = pd.DataFrame(</span>
 <span class="sd">    &gt;&gt;&gt;     {</span>
@@ -784,7 +784,7 @@
     <span class="k">return</span> <span class="n">frame</span></div>
 
 
-<div class="viewcode-block" id="frame_add_weights"><a class="viewcode-back" href="../../../generated/footings.model_tools.frame_add_weights.html#footings.model_tools.frame_add_weights">[docs]</a><span class="k">def</span> <span class="nf">frame_add_weights</span><span class="p">(</span>
+<div class="viewcode-block" id="frame_add_weights"><a class="viewcode-back" href="../../../generated/footings.actuarial_tools.frame_add_weights.html#footings.actuarial_tools.frame_add_weights">[docs]</a><span class="k">def</span> <span class="nf">frame_add_weights</span><span class="p">(</span>
     <span class="n">frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">as_of_dt</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -833,7 +833,7 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
-<span class="sd">    &gt;&gt;&gt; from footings.model_tools import frame_add_weights</span>
+<span class="sd">    &gt;&gt;&gt; from footings.actuarial_tools import frame_add_weights</span>
 <span class="sd">    &gt;&gt;&gt;</span>
 <span class="sd">    &gt;&gt;&gt; frame = pd.DataFrame(</span>
 <span class="sd">    &gt;&gt;&gt;     {</span>
@@ -880,7 +880,7 @@
     <span class="k">return</span> <span class="n">frame</span></div>
 
 
-<div class="viewcode-block" id="frame_filter"><a class="viewcode-back" href="../../../generated/footings.model_tools.frame_filter.html#footings.model_tools.frame_filter">[docs]</a><span class="k">def</span> <span class="nf">frame_filter</span><span class="p">(</span>
+<div class="viewcode-block" id="frame_filter"><a class="viewcode-back" href="../../../generated/footings.actuarial_tools.frame_filter.html#footings.actuarial_tools.frame_filter">[docs]</a><span class="k">def</span> <span class="nf">frame_filter</span><span class="p">(</span>
     <span class="n">frame</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">begin_date</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -918,7 +918,7 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
-<span class="sd">    &gt;&gt;&gt; from footings.model_tools import frame_filter</span>
+<span class="sd">    &gt;&gt;&gt; from footings.actuarial_tools import frame_filter</span>
 <span class="sd">    &gt;&gt;&gt;</span>
 <span class="sd">    &gt;&gt;&gt; frame = pd.DataFrame(</span>
 <span class="sd">    &gt;&gt;&gt;     {</span>

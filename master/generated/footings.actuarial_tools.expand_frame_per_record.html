@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>footings.model_tools.create_frame_from_record &#8212; Footings 0.10.0rc2 documentation</title>
+    <title>footings.actuarial_tools.expand_frame_per_record &#8212; Footings 0.10.0 documentation</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -40,8 +40,8 @@
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="footings.model_tools.expand_frame_per_record" href="footings.model_tools.expand_frame_per_record.html" />
-    <link rel="prev" title="footings.model_tools.create_frame" href="footings.model_tools.create_frame.html" />
+    <link rel="next" title="footings.actuarial_tools.frame_add_exposure" href="footings.actuarial_tools.frame_add_exposure.html" />
+    <link rel="prev" title="footings.actuarial_tools.create_frame_from_record" href="footings.actuarial_tools.create_frame_from_record.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
   </head>
@@ -162,22 +162,19 @@
               
               <div>
                 
-  <div class="section" id="footings-model-tools-create-frame-from-record">
-<h1>footings.model_tools.create_frame_from_record<a class="headerlink" href="#footings-model-tools-create-frame-from-record" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="footings-actuarial-tools-expand-frame-per-record">
+<h1>footings.actuarial_tools.expand_frame_per_record<a class="headerlink" href="#footings-actuarial-tools-expand-frame-per-record" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="footings.model_tools.create_frame_from_record">
-<code class="sig-name descname"><span class="pre">create_frame_from_record</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_start_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_end_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_date_nm</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pandas.core.frame.DataFrame</span><a class="reference internal" href="../_modules/footings/model_tools/frames.html#create_frame_from_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.model_tools.create_frame_from_record" title="Permalink to this definition">¶</a></dt>
+<dt id="footings.actuarial_tools.expand_frame_per_record">
+<code class="sig-name descname"><span class="pre">expand_frame_per_record</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_start_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_end_dt</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_date_nm</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pandas.core.frame.DataFrame</span><a class="reference internal" href="../_modules/footings/actuarial_tools/frames.html#expand_frame_per_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.actuarial_tools.expand_frame_per_record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a frame with a date colum ranging from the start_dt to the end_dt from a record.</p>
-<p>This function is to be used when you have a record of data from a DataFrame and you want to
-expand the data out over a date range. Note the DataFrame must contain a column for a start date
-and an end date. All columns from the original record will be duplicated the length of the date
-range. See example for usage.</p>
-<p>If wanting to do this for many records use the function <code class="docutils literal notranslate"><span class="pre">footings.model_tools.expand_frame_per_record</span></code>.
-When doing one record <code class="docutils literal notranslate"><span class="pre">create_frame_from_record</span></code> is faster than expand_frame_per_record.</p>
+<p>This function expands the function <code class="docutils literal notranslate"><span class="pre">footings.actuarial_tools.create_frame_from_record</span></code> to cover the
+application of covering many records. Internally, it applies the function
+<code class="docutils literal notranslate"><span class="pre">create_frame_from_record</span></code> for each record.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>record</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>A single record from a DataFrame.</p>
+<dt><strong>frame</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>The DataFrame to expand.</p>
 </dd>
 <dt><strong>col_start_dt</strong><span class="classifier">str</span></dt><dd><p>The name of the start date column.</p>
 </dd>
@@ -187,19 +184,13 @@ When doing one record <code class="docutils literal notranslate"><span class="pr
 </dd>
 <dt><strong>col_date_nm</strong><span class="classifier">str</span></dt><dd><p>The column name to assign the date column.</p>
 </dd>
-<dt><strong>kwargs :</strong></dt><dd><p>See kwargs under footings.model_tools.create_frame</p>
+<dt><strong>kwargs :</strong></dt><dd><p>See kwargs under footings.actuarial_tools.create_frame</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt>pandas.DataFrame</dt><dd><p>A DataFrame with a date column, any passed kwargs, and columns from the record.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><dl class="simple">
-<dt>ValueError</dt><dd><p>If the length of record is not 1.</p>
+<dt>pandas.DataFrame</dt><dd><p>A DataFrame with a date column, any passed kwargs, and columns from the original frame.</p>
 </dd>
 </dl>
 </dd>
@@ -207,23 +198,23 @@ When doing one record <code class="docutils literal notranslate"><span class="pr
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="footings.model_tools.create_frame.html#footings.model_tools.create_frame" title="footings.model_tools.create_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">footings.model_tools.create_frame</span></code></a></dt><dd></dd>
-<dt><a class="reference internal" href="footings.model_tools.expand_frame_per_record.html#footings.model_tools.expand_frame_per_record" title="footings.model_tools.expand_frame_per_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">footings.model_tools.expand_frame_per_record</span></code></a></dt><dd></dd>
+<dt><a class="reference internal" href="footings.actuarial_tools.create_frame.html#footings.actuarial_tools.create_frame" title="footings.actuarial_tools.create_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">footings.actuarial_tools.create_frame</span></code></a></dt><dd></dd>
+<dt><a class="reference internal" href="footings.actuarial_tools.create_frame_from_record.html#footings.actuarial_tools.create_frame_from_record" title="footings.actuarial_tools.create_frame_from_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">footings.actuarial_tools.create_frame_from_record</span></code></a></dt><dd></dd>
 </dl>
 </div>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">footings.model_tools</span> <span class="kn">import</span> <span class="n">create_frame_from_record</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">footings.actuarial_tools</span> <span class="kn">import</span> <span class="n">expand_frame_per_record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
-<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;POLICY&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;P1&quot;</span><span class="p">],</span>
-<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;GENDER&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">],</span>
-<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;START_DATE&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-01-10&quot;</span><span class="p">)],</span>
-<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;END_DATE&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-05-30&quot;</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;POLICY&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;P1&quot;</span><span class="p">,</span> <span class="s2">&quot;P2&quot;</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;GENDER&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;F&quot;</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;START_DATE&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-01-10&quot;</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-02-01&quot;</span><span class="p">)],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;END_DATE&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-05-30&quot;</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-04-18&quot;</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="n">create_frame_from_record</span><span class="p">(</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span> <span class="o">=</span> <span class="n">expand_frame_per_record</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">frame</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">col_start_dt</span><span class="o">=</span><span class="s2">&quot;START_DATE&quot;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">col_end_dt</span><span class="o">=</span><span class="s2">&quot;END_DATE&quot;</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">frequency</span><span class="o">=</span><span class="s2">&quot;M&quot;</span><span class="p">,</span>
@@ -231,13 +222,17 @@ When doing one record <code class="docutils literal notranslate"><span class="pr
 <span class="gp">&gt;&gt;&gt; </span>    <span class="n">duration_month</span><span class="o">=</span><span class="s2">&quot;DURATION_MONTH&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">frame</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1">#       DATE            DURATION_MONTH      POLICY      GENDER</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 0     2020-01-10      1                   P1          M</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 1     2020-02-10      2                   P1          M</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 2     2020-03-10      3                   P1          M</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 3     2020-04-10      4                   P1          M</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 4     2020-05-10      5                   P1          M</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 5     2020-06-10      6                   P1          M</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#       DATE            DURATION_MONTH  POLICY      GENDER</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 0     2020-01-10      1               P1          M</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 1     2020-02-10      2               P1          M</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 2     2020-03-10      3               P1          M</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 3     2020-04-10      4               P1          M</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 4     2020-05-10      5               P1          M</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 5     2020-06-10      6               P1          M</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 6     2020-02-01      1               P2          F</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 7     2020-03-01      2               P2          F</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 8     2020-04-01      3               P2          F</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 9     2020-05-01      4               P2          F</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -250,8 +245,8 @@ When doing one record <code class="docutils literal notranslate"><span class="pr
               
               <div class='prev-next-bottom'>
                 
-    <a class='left-prev' id="prev-link" href="footings.model_tools.create_frame.html" title="previous page">footings.model_tools.create_frame</a>
-    <a class='right-next' id="next-link" href="footings.model_tools.expand_frame_per_record.html" title="next page">footings.model_tools.expand_frame_per_record</a>
+    <a class='left-prev' id="prev-link" href="footings.actuarial_tools.create_frame_from_record.html" title="previous page">footings.actuarial_tools.create_frame_from_record</a>
+    <a class='right-next' id="next-link" href="footings.actuarial_tools.frame_add_exposure.html" title="next page">footings.actuarial_tools.frame_add_exposure</a>
 
               </div>
               

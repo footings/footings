@@ -1,0 +1,6 @@
+﻿footings.actuarial\_tools.create\_frame
+=======================================
+
+.. currentmodule:: footings.actuarial_tools
+
+.. autofunction:: create_frame

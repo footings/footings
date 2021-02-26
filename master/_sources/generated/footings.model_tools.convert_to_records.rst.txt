@@ -1,6 +1,0 @@
-﻿footings.model\_tools.convert\_to\_records
-==========================================
-
-.. currentmodule:: footings.model_tools
-
-.. autofunction:: convert_to_records

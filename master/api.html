@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>API &#8212; Footings 0.10.0rc2 documentation</title>
+    <title>API &#8212; Footings 0.10.0 documentation</title>
     
   <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -189,10 +189,6 @@
         </li>
     
         <li class="nav-item toc-entry toc-h2">
-            <a href="#module-footings.model_tools" class="nav-link">footings.model_tools</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
             <a href="#module-footings.parallel_tools" class="nav-link">footings.parallel_tools</a>
         </li>
     
@@ -240,6 +236,33 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/footings.actuarial_tools.calc_pvfnb.html#footings.actuarial_tools.calc_pvfnb" title="footings.actuarial_tools.calc_pvfnb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calc_pvfnb</span></code></a></p></td>
 <td><p>Calculate the present value of net future benefits.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.actuarial_tools.create_frame.html#footings.actuarial_tools.create_frame" title="footings.actuarial_tools.create_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_frame</span></code></a></p></td>
+<td><p>Create a frame with a date colum ranging from the start_dt to the end_dt.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.actuarial_tools.create_frame_from_record.html#footings.actuarial_tools.create_frame_from_record" title="footings.actuarial_tools.create_frame_from_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_frame_from_record</span></code></a></p></td>
+<td><p>Create a frame with a date colum ranging from the start_dt to the end_dt from a record.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.actuarial_tools.expand_frame_per_record.html#footings.actuarial_tools.expand_frame_per_record" title="footings.actuarial_tools.expand_frame_per_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_frame_per_record</span></code></a></p></td>
+<td><p>Create a frame with a date colum ranging from the start_dt to the end_dt from a record.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.actuarial_tools.frame_add_exposure.html#footings.actuarial_tools.frame_add_exposure" title="footings.actuarial_tools.frame_add_exposure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frame_add_exposure</span></code></a></p></td>
+<td><p>Add an exposure values to a duration based frame.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.actuarial_tools.frame_add_weights.html#footings.actuarial_tools.frame_add_weights" title="footings.actuarial_tools.frame_add_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frame_add_weights</span></code></a></p></td>
+<td><p>Add cell weights to a duration based frame as an as of date.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.actuarial_tools.frame_filter.html#footings.actuarial_tools.frame_filter" title="footings.actuarial_tools.frame_filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frame_filter</span></code></a></p></td>
+<td><p>Filter a duration based frame based on a being and/or an end date.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.actuarial_tools.calculate_age.html#footings.actuarial_tools.calculate_age" title="footings.actuarial_tools.calculate_age"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_age</span></code></a></p></td>
+<td><p>Calculate age given a birth date and an as of date.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.actuarial_tools.run_date_time.html#footings.actuarial_tools.run_date_time" title="footings.actuarial_tools.run_date_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_date_time</span></code></a></p></td>
+<td><p>Stores a factory callable.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.actuarial_tools.convert_to_records.html#footings.actuarial_tools.convert_to_records" title="footings.actuarial_tools.convert_to_records"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_to_records</span></code></a></p></td>
+<td><p>Convert a DataFrame into a list of records.</p></td>
 </tr>
 </tbody>
 </table>
@@ -427,47 +450,6 @@
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.validators.equal_to.html#footings.validators.equal_to" title="footings.validators.equal_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">equal_to</span></code></a></p></td>
 <td><p>A validator that raises a <cite>ValueError</cite> if the initializer is called with a value that is not equal to the value provided.</p></td>
-</tr>
-</tbody>
-</table>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-</div>
-<div class="section" id="module-footings.model_tools">
-<span id="footings-model-tools"></span><h2>footings.model_tools<a class="headerlink" href="#module-footings.model_tools" title="Permalink to this headline">¶</a></h2>
-<table class="longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.model_tools.create_frame.html#footings.model_tools.create_frame" title="footings.model_tools.create_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_frame</span></code></a></p></td>
-<td><p>Create a frame with a date colum ranging from the start_dt to the end_dt.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.model_tools.create_frame_from_record.html#footings.model_tools.create_frame_from_record" title="footings.model_tools.create_frame_from_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_frame_from_record</span></code></a></p></td>
-<td><p>Create a frame with a date colum ranging from the start_dt to the end_dt from a record.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.model_tools.expand_frame_per_record.html#footings.model_tools.expand_frame_per_record" title="footings.model_tools.expand_frame_per_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">expand_frame_per_record</span></code></a></p></td>
-<td><p>Create a frame with a date colum ranging from the start_dt to the end_dt from a record.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.model_tools.frame_add_exposure.html#footings.model_tools.frame_add_exposure" title="footings.model_tools.frame_add_exposure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frame_add_exposure</span></code></a></p></td>
-<td><p>Add an exposure values to a duration based frame.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.model_tools.frame_add_weights.html#footings.model_tools.frame_add_weights" title="footings.model_tools.frame_add_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frame_add_weights</span></code></a></p></td>
-<td><p>Add cell weights to a duration based frame as an as of date.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.model_tools.frame_filter.html#footings.model_tools.frame_filter" title="footings.model_tools.frame_filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frame_filter</span></code></a></p></td>
-<td><p>Filter a duration based frame based on a being and/or an end date.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.model_tools.calculate_age.html#footings.model_tools.calculate_age" title="footings.model_tools.calculate_age"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_age</span></code></a></p></td>
-<td><p>Calculate age given a birth date and an as of date.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.model_tools.run_date_time.html#footings.model_tools.run_date_time" title="footings.model_tools.run_date_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_date_time</span></code></a></p></td>
-<td><p>Stores a factory callable.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.model_tools.convert_to_records.html#footings.model_tools.convert_to_records" title="footings.model_tools.convert_to_records"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_to_records</span></code></a></p></td>
-<td><p>Convert a DataFrame into a list of records.</p></td>
 </tr>
 </tbody>
 </table>
