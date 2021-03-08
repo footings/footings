@@ -31,6 +31,24 @@ footings.actuarial_tools
 |
 
 
+footings.assumption_registry
+----------------------------
+
+.. automodule:: footings.assumption_registry
+   :exclude-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated
+
+   def_assumption_set
+   assumption_registry
+   AssumptionSet
+   AssumptionRegistry
+
+|
+
+
 footings.audit
 --------------
 
@@ -120,18 +138,19 @@ footings.model
 |
 
 
-footings.utils
---------------
+footings.scenario_registry
+--------------------------
 
-.. automodule:: footings.utils
+.. automodule:: footings.scenario_registry
    :exclude-members:
 
 .. autosummary::
    :nosignatures:
    :toctree: generated
 
-   dispatch_function
-   once
+   def_attribute
+   scenario_registry
+   ScenarioRegistry
 
 |
 
@@ -149,6 +168,22 @@ footings.testing
    assert_footings_files_equal
    assert_footings_json_files_equal
    assert_footings_xlsx_files_equal
+
+|
+
+
+footings.utils
+--------------
+
+.. automodule:: footings.utils
+   :exclude-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated
+
+   dispatch_function
+   once
 
 |
 
