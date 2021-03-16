@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>footings.assumption_registry.def_assumption_set &#8212; Footings 0.10.0 documentation</title>
+    <title>footings.assumption_registry.Assumption &#8212; Footings 0.10.0 documentation</title>
     
   <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -40,8 +40,8 @@
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="footings.audit.AuditConfig" href="footings.audit.AuditConfig.html" />
-    <link rel="prev" title="footings.assumption_registry.assumption_registry" href="footings.assumption_registry.assumption_registry.html" />
+    <link rel="next" title="footings.assumption_registry.AssumptionSet" href="footings.assumption_registry.AssumptionSet.html" />
+    <link rel="prev" title="footings.actuarial_tools.convert_to_records" href="footings.actuarial_tools.convert_to_records.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
   </head>
@@ -162,12 +162,32 @@
               
               <div>
                 
-  <div class="section" id="footings-assumption-registry-def-assumption-set">
-<h1>footings.assumption_registry.def_assumption_set<a class="headerlink" href="#footings-assumption-registry-def-assumption-set" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
-<dt id="footings.assumption_registry.def_assumption_set">
-<code class="sig-name descname"><span class="pre">def_assumption_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/footings/assumption_registry.html#def_assumption_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.assumption_registry.def_assumption_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define a set withan an assumption registry.</p>
+  <div class="section" id="footings-assumption-registry-assumption">
+<h1>footings.assumption_registry.Assumption<a class="headerlink" href="#footings-assumption-registry-assumption" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="footings.assumption_registry.Assumption">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Assumption</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uses</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assumption</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_generator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">callable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/footings/assumption_registry.html#Assumption"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.assumption_registry.Assumption" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="footings.assumption_registry.Assumption.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uses</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assumption</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc_generator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">callable</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#footings.assumption_registry.Assumption.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method generated by attrs for class Assumption.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>(*args, **kwargs)</p></td>
+<td><p>Call self as a function.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code>(*, assumption[, name, description, …])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -178,8 +198,8 @@
               
               <div class='prev-next-bottom'>
                 
-    <a class='left-prev' id="prev-link" href="footings.assumption_registry.assumption_registry.html" title="previous page">footings.assumption_registry.assumption_registry</a>
-    <a class='right-next' id="next-link" href="footings.audit.AuditConfig.html" title="next page">footings.audit.AuditConfig</a>
+    <a class='left-prev' id="prev-link" href="footings.actuarial_tools.convert_to_records.html" title="previous page">footings.actuarial_tools.convert_to_records</a>
+    <a class='right-next' id="next-link" href="footings.assumption_registry.AssumptionSet.html" title="next page">footings.assumption_registry.AssumptionSet</a>
 
               </div>
               
