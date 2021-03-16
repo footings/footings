@@ -1,0 +1,32 @@
+﻿footings.scenario\_registry.ScenarioRegistry
+============================================
+
+.. currentmodule:: footings.scenario_registry
+
+.. autoclass:: ScenarioRegistry
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScenarioRegistry.get
+      ~ScenarioRegistry.register
+      ~ScenarioRegistry.scenario_items
+      ~ScenarioRegistry.scenario_keys
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScenarioRegistry.attributes
+      ~ScenarioRegistry.registry
+   
+   

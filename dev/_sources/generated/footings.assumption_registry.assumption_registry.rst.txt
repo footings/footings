@@ -1,0 +1,6 @@
+﻿footings.assumption\_registry.assumption\_registry
+==================================================
+
+.. currentmodule:: footings.assumption_registry
+
+.. autofunction:: assumption_registry

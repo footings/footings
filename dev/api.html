@@ -157,6 +157,10 @@
         </li>
     
         <li class="nav-item toc-entry toc-h2">
+            <a href="#module-footings.assumption_registry" class="nav-link">footings.assumption_registry</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
             <a href="#module-footings.audit" class="nav-link">footings.audit</a>
         </li>
     
@@ -177,11 +181,15 @@
         </li>
     
         <li class="nav-item toc-entry toc-h2">
-            <a href="#module-footings.utils" class="nav-link">footings.utils</a>
+            <a href="#module-footings.scenario_registry" class="nav-link">footings.scenario_registry</a>
         </li>
     
         <li class="nav-item toc-entry toc-h2">
             <a href="#module-footings.testing" class="nav-link">footings.testing</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#module-footings.utils" class="nav-link">footings.utils</a>
         </li>
     
         <li class="nav-item toc-entry toc-h2">
@@ -263,6 +271,32 @@
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.actuarial_tools.convert_to_records.html#footings.actuarial_tools.convert_to_records" title="footings.actuarial_tools.convert_to_records"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_to_records</span></code></a></p></td>
 <td><p>Convert a DataFrame into a list of records.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="module-footings.assumption_registry">
+<span id="footings-assumption-registry"></span><h2>footings.assumption_registry<a class="headerlink" href="#module-footings.assumption_registry" title="Permalink to this headline">¶</a></h2>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.assumption_registry.def_assumption_set.html#footings.assumption_registry.def_assumption_set" title="footings.assumption_registry.def_assumption_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">def_assumption_set</span></code></a></p></td>
+<td><p>Define a set withan an assumption registry.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.assumption_registry.assumption_registry.html#footings.assumption_registry.assumption_registry" title="footings.assumption_registry.assumption_registry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assumption_registry</span></code></a></p></td>
+<td><p>Decorator to declare assumption registry.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.assumption_registry.AssumptionSet.html#footings.assumption_registry.AssumptionSet" title="footings.assumption_registry.AssumptionSet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AssumptionSet</span></code></a></p></td>
+<td><p>Base class representing a temporary assumption set.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.assumption_registry.AssumptionRegistry.html#footings.assumption_registry.AssumptionRegistry" title="footings.assumption_registry.AssumptionRegistry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AssumptionRegistry</span></code></a></p></td>
+<td><p>Base class representing an assumption repository.</p></td>
 </tr>
 </tbody>
 </table>
@@ -397,19 +431,22 @@
 <div class="line"><br /></div>
 </div>
 </div>
-<div class="section" id="module-footings.utils">
-<span id="footings-utils"></span><h2>footings.utils<a class="headerlink" href="#module-footings.utils" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-footings.scenario_registry">
+<span id="footings-scenario-registry"></span><h2>footings.scenario_registry<a class="headerlink" href="#module-footings.scenario_registry" title="Permalink to this headline">¶</a></h2>
 <table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.utils.dispatch_function.html#footings.utils.dispatch_function" title="footings.utils.dispatch_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch_function</span></code></a></p></td>
-<td><p>Transform a function into a generic dispatch function.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.scenario_registry.def_attribute.html#footings.scenario_registry.def_attribute" title="footings.scenario_registry.def_attribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">def_attribute</span></code></a></p></td>
+<td><p>Define an attribute within a scenario.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.utils.once.html#footings.utils.once" title="footings.utils.once"><code class="xref py py-obj docutils literal notranslate"><span class="pre">once</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.scenario_registry.scenario_registry.html#footings.scenario_registry.scenario_registry" title="footings.scenario_registry.scenario_registry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scenario_registry</span></code></a></p></td>
+<td><p>Decorator to declare scenario registry.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.scenario_registry.ScenarioRegistry.html#footings.scenario_registry.ScenarioRegistry" title="footings.scenario_registry.ScenarioRegistry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScenarioRegistry</span></code></a></p></td>
+<td><p>Base class representing a scenario repository.</p></td>
 </tr>
 </tbody>
 </table>
@@ -433,6 +470,26 @@
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.testing.assert_footings_xlsx_files_equal.html#footings.testing.assert_footings_xlsx_files_equal" title="footings.testing.assert_footings_xlsx_files_equal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assert_footings_xlsx_files_equal</span></code></a></p></td>
 <td><p>Assert whether two footing xlsx files are equal.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="module-footings.utils">
+<span id="footings-utils"></span><h2>footings.utils<a class="headerlink" href="#module-footings.utils" title="Permalink to this headline">¶</a></h2>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/footings.utils.dispatch_function.html#footings.utils.dispatch_function" title="footings.utils.dispatch_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch_function</span></code></a></p></td>
+<td><p>Transform a function into a generic dispatch function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/footings.utils.once.html#footings.utils.once" title="footings.utils.once"><code class="xref py py-obj docutils literal notranslate"><span class="pre">once</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -513,7 +570,7 @@
   <div class="container">
     <p>
           &copy; Copyright 2020, Dustin Tindall.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.1.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
     </p>
   </div>
 </footer>

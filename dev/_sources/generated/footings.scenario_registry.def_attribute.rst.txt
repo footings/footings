@@ -1,0 +1,6 @@
+﻿footings.scenario\_registry.def\_attribute
+==========================================
+
+.. currentmodule:: footings.scenario_registry
+
+.. autofunction:: def_attribute
