@@ -1,0 +1,22 @@
+﻿footings.assumption\_registry.AssumptionSet
+===========================================
+
+.. currentmodule:: footings.assumption_registry
+
+.. autoclass:: AssumptionSet
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AssumptionSet.get
+   
+   
+
+   
+   
+   

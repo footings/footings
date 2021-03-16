@@ -1,0 +1,6 @@
+﻿footings.scenario\_registry.scenario\_registry
+==============================================
+
+.. currentmodule:: footings.scenario_registry
+
+.. autofunction:: scenario_registry

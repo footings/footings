@@ -1,0 +1,23 @@
+﻿footings.assumption\_registry.Assumption
+========================================
+
+.. currentmodule:: footings.assumption_registry
+
+.. autoclass:: Assumption
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Assumption.__call__
+      ~Assumption.create
+   
+   
+
+   
+   
+   
