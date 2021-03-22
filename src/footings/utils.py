@@ -3,9 +3,9 @@ import types
 from collections.abc import Iterable
 from functools import partial, update_wrapper, wraps
 from itertools import product
-from typing import Callable, Tuple
+from typing import Any, Callable, Tuple
 
-__all__ = ["dispatch_function", "once"]
+__all__ = ["dispatch_function", "once", "get_kws"]
 
 
 class DispatchMissingArgumentError(ValueError):
@@ -213,8 +213,11 @@ def loaded_function(function: Callable = None):
     return wrapper
 
 
-# https://discuss.python.org/t/reduce-the-overhead-of-functools-lru-cache-for-functions-with-no-parameters/3956/3
 def once(function):
+    """Decorator to call function once and have it be available.
+
+    https://discuss.python.org/t/reduce-the-overhead-of-functools-lru-cache-for-functions-with-no-parameters/3956/3
+    """
     obj = None
 
     @wraps(function)
@@ -225,3 +228,9 @@ def once(function):
         return obj
 
     return inner
+
+
+def get_kws(func: callable, obj: Any):
+    """Get attributes from obj based on a passed callable."""
+    parameters = inspect.signature(func).parameters
+    return {p: getattr(obj, p) for p in parameters}

@@ -1,8 +1,10 @@
 import pytest
+from attr import attrs
 
 from footings.utils import (
     DispatchMissingArgumentError,
     dispatch_function,
+    get_kws,
     loaded_function,
 )
 
@@ -148,3 +150,20 @@ def test_loaded_function_existing():
 
     assert loaded2(a=1, b=1) == 5
     assert loaded2(1, 1) == 5
+
+
+class Test_get_kws:
+    def test_get_kws(self):
+        @attrs(auto_attribs=True, frozen=True, slots=True)
+        class TestKws:
+            x: int
+            y: int
+
+        test = TestKws(x=1, y=2)
+
+        # pass
+        assert get_kws(lambda x: x, test) == {"x": 1}
+        assert get_kws(lambda x, y: (x, y,), test) == {"x": 1, "y": 2}
+
+        # error
+        pytest.raises(AttributeError, get_kws, lambda z: z, test)
