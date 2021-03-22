@@ -1,23 +1,29 @@
 from functools import partial
 from inspect import signature
+from types import MethodType
 from typing import Dict, Union
 
 from attr import attrib, attrs, make_class
 from attr.validators import instance_of, is_callable, optional
 
+from .model import Model
+
 
 def assumption_doc_generator(self):
-    def _get(x):
-        return f"[get('{x}', *args, **kwargs)]"
+    def prepare_description(doc):
+        ret = ""
+        for line in doc.split("\n"):
+            ret += line.strip() + "\n"
+        return ret + "\n"
 
     if self.name != self.assumption.__name__:
-        ret = f"**{self.name} {_get(self.assumption.__name__)} :**\n"
+        ret = f"**{self.name} [{self.assumption.__name__}] :**\n"
     else:
         ret = f"**{self.name} :**\n"
     if self.description is not None and self.description != "":
-        ret += "" + self.description + "\n\n"
+        ret += prepare_description(self.description) + "\n\n"
     elif self.assumption.__doc__ is not None:
-        ret += "" + self.assumption.__doc__ + "\n\n"
+        ret += prepare_description(self.assumption.__doc__) + "\n\n"
     else:
         ret += "\n"
     # if len(self.uses) > 0:
@@ -29,18 +35,15 @@ def assumption_doc_generator(self):
     return ret
 
 
-@attrs(frozen=True)  # slots=True is excluded so we can update the signature on init
+@attrs(frozen=True, slots=True)
 class Assumption:
     name = attrib(type=str, validator=instance_of(str))
     description = attrib(type=str, validator=instance_of(str))
-    uses = attrib(type=tuple, validator=instance_of(tuple))
     assumption = attrib(type=callable, validator=is_callable())
+    uses = attrib(type=tuple, validator=instance_of(tuple))
+    bounded = attrib(type=bool, validator=instance_of(bool))
     metadata = attrib(type=dict, validator=instance_of(dict))
     doc_generator = attrib(type=callable, validator=is_callable())
-
-    def __attrs_post_init__(self):
-        object.__setattr__(self, "__signature__", signature(self.assumption))
-        object.__setattr__(self, "__doc__", self.doc_generator(self))
 
     @classmethod
     def create(
@@ -48,6 +51,7 @@ class Assumption:
         *,
         assumption: callable,
         name: Union[str, None] = None,
+        bounded: Union[bool, None] = None,
         description: Union[str, None] = None,
         uses: Union[tuple, None] = None,
         cache: Union[tuple, None] = None,
@@ -56,6 +60,8 @@ class Assumption:
     ):
         if name is None:
             name = assumption.__name__
+        if bounded is None:
+            bounded = False
         if description is None:
             description = ""
         if uses is None:
@@ -69,9 +75,18 @@ class Assumption:
             description=description,
             uses=uses,
             assumption=assumption,
+            bounded=bounded,
             metadata=metadata,
             doc_generator=doc_generator,
         )
+
+    @property
+    def __signature__(self):
+        return signature(self.assumption)
+
+    @property
+    def __doc__(self):
+        return self.doc_generator(self)
 
     def __call__(self, *args, **kwargs):
         return self.assumption(*args, **kwargs)
@@ -90,6 +105,7 @@ class AssumptionSetRegistry:
         *,
         name: Union[str, None] = None,
         description: Union[str, None] = None,
+        bounded: Union[bool, None] = None,
         uses: Union[list, None] = None,
         cache: Union[tuple, None] = None,
         metadata: Union[dict, None] = None,
@@ -101,6 +117,7 @@ class AssumptionSetRegistry:
                 self.register,
                 name=name,
                 description=description,
+                bounded=bounded,
                 uses=uses,
                 metadata=metadata,
                 doc_generator=doc_generator,
@@ -108,6 +125,7 @@ class AssumptionSetRegistry:
         self.registry[assumption.__name__] = Assumption.create(
             name=name,
             description=description,
+            bounded=bounded,
             uses=uses,
             assumption=assumption,
             metadata=metadata,
@@ -141,17 +159,19 @@ def make_assumption_set_doc(name, description, registry):
 class AssumptionSet:
     """Base class representing a temporary assumption set."""
 
-    def get(self, assumption: callable, *args, **kwargs):
+    def get(self, assumption: callable):
         """Register an assumption."""
 
-        return getattr(self, assumption)(*args, **kwargs)
+        return getattr(self, assumption)
 
 
 def make_assumption_set(name: str, description: str, registry: dict):
     """Make an assumption set. That is a child of the parent AssumptionSet."""
     cls = make_class(name=name, attrs={}, bases=(AssumptionSet,), slots=True, frozen=True)
-    for asn_nm, asn_val in registry.items():
-        setattr(cls, asn_nm, staticmethod(asn_val))
+    for k, v in registry.items():
+        setattr(
+            cls, k, MethodType(v, cls) if v.bounded else staticmethod(v),
+        )
     cls.__doc__ = make_assumption_set_doc(name, description, registry)
     return cls()
 
@@ -160,10 +180,9 @@ def make_assumption_set(name: str, description: str, registry: dict):
 class AssumptionRegistry:
     """Base class representing an assumption repository."""
 
-    def get(self, assumption_set: str, assumption: str, *args, **kwargs):
+    def get(self, assumption_set: str, assumption: str, model: Model = None):
         """Get an assumption from an assumption set."""
-
-        return getattr(self, assumption_set).get(assumption, *args, **kwargs)
+        return getattr(self, assumption_set).get(assumption)
 
 
 def _make_registry_doc(summary: str, assumption_sets: Dict[str, AssumptionSet]):
@@ -172,9 +191,6 @@ def _make_registry_doc(summary: str, assumption_sets: Dict[str, AssumptionSet]):
     else:
         doc = summary + "\n\n"
     doc += ".. rubric:: Assumption Sets\n\n"
-
-    # doc += "Assumption Sets\n"
-    # doc += "---------------\n"
     for v in assumption_sets.values():
         doc += v.__doc__
         doc += "\n\n"

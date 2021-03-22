@@ -1,4 +1,5 @@
 from inspect import signature
+from types import MethodType
 
 from footings.assumption_registry import (
     Assumption,
@@ -34,6 +35,9 @@ class TestAssumption:
     asn_5 = Assumption.create(
         name="Assumption5", assumption=func, doc_generator=lambda self: ""
     )
+    asn_6 = Assumption.create(
+        name="Assumption6", assumption=lambda self, x, y: x + y, bounded=True
+    )
 
     def test_init(self):
         assert isinstance(self.asn_1, Assumption)
@@ -41,6 +45,7 @@ class TestAssumption:
         assert isinstance(self.asn_3, Assumption)
         assert isinstance(self.asn_4, Assumption)
         assert isinstance(self.asn_5, Assumption)
+        # assert isinstance(self.asn_6, Assumption)
 
     def test_signature(self):
         assert signature(self.asn_1) == signature(func)
@@ -48,6 +53,7 @@ class TestAssumption:
         assert signature(self.asn_3) == signature(func)
         assert signature(self.asn_4) == signature(func)
         assert signature(self.asn_5) == signature(func)
+        # assert signature(self.asn_6) == signature(func)
 
     def test_doc(self):
         assert (
@@ -107,8 +113,10 @@ class TestAssumptionSetRegistry:
 class TestAssumptionSet:
 
     registry = {
-        "asn_1": Assumption.create(name="Assumption1", assumption=func),
-        "asn_2": Assumption.create(name="Assumption2", assumption=func),
+        "asn_1": Assumption.create(name="Assumption1", assumption=lambda x, y: x + y),
+        "asn_2": Assumption.create(
+            name="Assumption2", assumption=lambda self, x, y: x + y, bounded=True
+        ),
     }
     asn_set_1 = make_assumption_set(
         name="AssumptionSet1", description="This is AssumptionSet1.", registry=registry
@@ -117,11 +125,14 @@ class TestAssumptionSet:
     def test_init(self):
         assert isinstance(self.asn_set_1, AssumptionSet)
         assert isinstance(self.asn_set_1.asn_1, Assumption)
-        assert isinstance(self.asn_set_1.asn_2, Assumption)
+        assert isinstance(self.asn_set_1.asn_2, MethodType)
+        assert isinstance(self.asn_set_1.asn_2.__func__, Assumption)
 
     def test_get(self):
-        assert self.asn_set_1.get("asn_1", x=1, y=2) == 3
-        assert self.asn_set_1.get("asn_2", x=1, y=2) == 3
+        assert self.asn_set_1.get("asn_1")(x=1, y=2) == 3
+        assert self.asn_set_1.asn_1(x=1, y=2) == 3
+        assert self.asn_set_1.get("asn_2")(x=1, y=2) == 3
+        assert self.asn_set_1.asn_2(x=1, y=2) == 3
 
     # def test_doc(self):
     #     print(self.asn_set_1.__doc__)
@@ -164,14 +175,14 @@ class TestAssumptionRegistry:
         assert isinstance(self.Registry.Two.func_3, Assumption)
 
     def test_get(self):
-        assert self.Registry.get("One", "func_1", 1) == 2
-        assert self.Registry.One.get("func_1", 1) == 2
-        assert self.Registry.get("One", "func_3", 1) == 4
-        assert self.Registry.One.get("func_3", 1) == 4
-        assert self.Registry.get("Two", "func_2", 1) == 3
-        assert self.Registry.Two.get("func_2", 1) == 3
-        assert self.Registry.get("Two", "func_3", 1) == 4
-        assert self.Registry.Two.get("func_3", 1) == 4
+        assert self.Registry.get("One", "func_1")(1) == 2
+        assert self.Registry.One.get("func_1")(1) == 2
+        assert self.Registry.get("One", "func_3")(1) == 4
+        assert self.Registry.One.get("func_3")(1) == 4
+        assert self.Registry.get("Two", "func_2")(1) == 3
+        assert self.Registry.Two.get("func_2")(1) == 3
+        assert self.Registry.get("Two", "func_3")(1) == 4
+        assert self.Registry.Two.get("func_3")(1) == 4
 
     def test_attributes(self):
         pass
