@@ -115,7 +115,11 @@ class MappedModel:
     """
 
     mapping = attrib(type=dict, validator=instance_of(dict))
+    iterator_keys = attrib(type=tuple, validator=instance_of(tuple))
     mapped_keys = attrib(type=tuple, validator=instance_of(tuple))
+
+    def __signature__(self):
+        return _make_mapping_signature(self.iterator_keys)
 
     @classmethod
     def create(
@@ -152,10 +156,7 @@ class MappedModel:
             "parallel_kwargs": parallel_kwargs,
         }
         mapping = {k: model_wrapper(v, **kws) for k, v in mapping.items()}
-        sig = _make_mapping_signature(iterator_keys)
-        cls.__signature__ = sig
-
-        return cls(mapped_keys=mapped_keys, mapping=mapping)
+        return cls(mapped_keys=mapped_keys, iterator_keys=iterator_keys, mapping=mapping)
 
     def get_model(self, **kwargs):
         """Get model based on pass kwargs."""
@@ -210,6 +211,10 @@ class ForeachJig:
     compute = attrib(type=Optional[Callable], validator=optional(is_callable()))
     compute_kwargs = attrib(type=Optional[Dict], validator=instance_of(dict))
 
+    @property
+    def __signature__(self):
+        return _make_foreach_signature(self.iterator_name, self.constant_params)
+
     @classmethod
     def create(
         cls,
@@ -247,7 +252,6 @@ class ForeachJig:
         if compute_kwargs is None:
             compute_kwargs = {}
 
-        cls.__signature__ = _make_foreach_signature(iterator_name, constant_params)
         return cls(
             model=model,
             iterator_name=iterator_name,
