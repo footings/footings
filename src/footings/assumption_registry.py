@@ -14,16 +14,16 @@ def assumption_doc_generator(self):
         ret = ""
         for line in doc.split("\n"):
             ret += line.strip() + "\n"
-        return ret + "\n"
+        return ret
 
     if self.name != self.assumption.__name__:
         ret = f"**{self.name} [{self.assumption.__name__}] :**\n"
     else:
         ret = f"**{self.name} :**\n"
     if self.description is not None and self.description != "":
-        ret += prepare_description(self.description) + "\n\n"
+        ret += prepare_description(self.description) + "\n"
     elif self.assumption.__doc__ is not None:
-        ret += prepare_description(self.assumption.__doc__) + "\n\n"
+        ret += prepare_description(self.assumption.__doc__) + "\n"
     else:
         ret += "\n"
     # if len(self.uses) > 0:
@@ -151,7 +151,6 @@ def make_assumption_set_doc(name, description, registry):
         doc += lines[0] + "\n"
         for line in lines[1:]:
             doc += "\t" + line + "\n"
-        doc += "\n"
     return doc
 
 
@@ -193,7 +192,6 @@ def _make_registry_doc(summary: str, assumption_sets: Dict[str, AssumptionSet]):
     doc += ".. rubric:: Assumption Sets\n\n"
     for v in assumption_sets.values():
         doc += v.__doc__
-        doc += "\n\n"
 
     return doc
 

@@ -118,6 +118,7 @@ class MappedModel:
     iterator_keys = attrib(type=tuple, validator=instance_of(tuple))
     mapped_keys = attrib(type=tuple, validator=instance_of(tuple))
 
+    @property
     def __signature__(self):
         return _make_mapping_signature(self.iterator_keys)
 
