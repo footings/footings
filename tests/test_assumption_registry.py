@@ -56,22 +56,10 @@ class TestAssumption:
         # assert signature(self.asn_6) == signature(func)
 
     def test_doc(self):
-        assert (
-            self.asn_1.__doc__
-            == "**Assumption1 [get('func', *args, **kwargs)] :**\nThis is func.\n\n"
-        )
-        assert (
-            self.asn_2.__doc__
-            == "**Assumption2 [get('func', *args, **kwargs)] :**\nThis is assumption 2.\n\n"
-        )
-        assert (
-            self.asn_3.__doc__
-            == "**Assumption3 [get('func', *args, **kwargs)] :**\nThis is assumption 3.\n\n"
-        )
-        assert (
-            self.asn_4.__doc__
-            == "**Assumption4 [get('func', *args, **kwargs)] :**\nThis is assumption 4.\n\n"
-        )
+        assert self.asn_1.__doc__ == "**Assumption1 [func] :**\nThis is func.\n\n"
+        assert self.asn_2.__doc__ == "**Assumption2 [func] :**\nThis is assumption 2.\n\n"
+        assert self.asn_3.__doc__ == "**Assumption3 [func] :**\nThis is assumption 3.\n\n"
+        assert self.asn_4.__doc__ == "**Assumption4 [func] :**\nThis is assumption 4.\n\n"
         assert self.asn_5.__doc__ == ""
 
     def test_call(self):
