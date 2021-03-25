@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>footings.model.Model &#8212; Footings 0.10.0 documentation</title>
     
-  <link rel="stylesheet" href="../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+  <link href="../_static/css/theme.css" rel="stylesheet" />
+  <link href="../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
 
     
   <link rel="stylesheet"
@@ -19,10 +20,6 @@
 
     
       
-  <link rel="stylesheet"
-    href="../_static/vendor/open-sans_all/1.44.1/index.css">
-  <link rel="stylesheet"
-    href="../_static/vendor/lato_latin-ext/1.44.1/index.css">
 
     
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -30,7 +27,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.d3f166471bb80abb5163.js">
+  <link rel="preload" as="script" href="../_static/js/index.1e043a052b0af929e4d8.js">
 
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -47,65 +44,72 @@
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
-<div class="container-xl">
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
+
+    
     <a class="navbar-brand" href="../index.html">
-    
       <p class="title">Footings</p>
-    
     </a>
+    
+
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 
+    
     <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
       <ul id="navbar-main-elements" class="navbar-nav mr-auto">
-        
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../installation.html">Installation</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../principles.html">Principles</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-        </li>
-        
-        <li class="nav-item active">
-            <a class="nav-link" href="../api.html">API</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../license.html">License</a>
-        </li>
-        
-        <li class="nav-item ">
-            <a class="nav-link" href="../changelog.html">Changelog</a>
-        </li>
-        
+        <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../installation.html">
+  Installation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../principles.html">
+  Principles
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../api.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../license.html">
+  License
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../changelog.html">
+  Changelog
+ </a>
+</li>
+
         
       </ul>
-
 
       <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this site..." aria-label="Search this site..." autocomplete="off" >
 </form>
-      
-
-      <ul class="navbar-nav">
-        
-          <li class="nav-item">
-            <a class="nav-link" href="https://github.com/footings/footings" target="_blank" rel="noopener">
-              <span><i class="fab fa-github-square"></i></span>
-            </a>
-          </li>
-        
-        
+      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/footings/footings" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
       </ul>
     </div>
 </div>
@@ -115,31 +119,266 @@
     <div class="container-xl">
       <div class="row">
           
-          <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
-
-    <div class="bd-toc-item active">
-    
-  
-    <ul class="nav bd-sidenav">
-        
-        
-        
-        
-        
-        
-        
-        
-          
-        
-        
-        
-        
-        
-        
-      </ul>
-  
-  </nav>
-          </div>
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.calc_benefit_reserve.html">
+   footings.actuarial_tools.calc_benefit_reserve
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.calc_continuance.html">
+   footings.actuarial_tools.calc_continuance
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.calc_discount.html">
+   footings.actuarial_tools.calc_discount
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.calc_interpolation.html">
+   footings.actuarial_tools.calc_interpolation
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.calc_pv.html">
+   footings.actuarial_tools.calc_pv
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.calc_pvfnb.html">
+   footings.actuarial_tools.calc_pvfnb
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.create_frame.html">
+   footings.actuarial_tools.create_frame
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.create_frame_from_record.html">
+   footings.actuarial_tools.create_frame_from_record
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.expand_frame_per_record.html">
+   footings.actuarial_tools.expand_frame_per_record
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.frame_add_exposure.html">
+   footings.actuarial_tools.frame_add_exposure
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.frame_add_weights.html">
+   footings.actuarial_tools.frame_add_weights
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.frame_filter.html">
+   footings.actuarial_tools.frame_filter
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.calculate_age.html">
+   footings.actuarial_tools.calculate_age
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.run_date_time.html">
+   footings.actuarial_tools.run_date_time
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.actuarial_tools.convert_to_records.html">
+   footings.actuarial_tools.convert_to_records
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.assumption_registry.AssumptionSet.html">
+   footings.assumption_registry.AssumptionSet
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.assumption_registry.AssumptionRegistry.html">
+   footings.assumption_registry.AssumptionRegistry
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.assumption_registry.assumption_registry.html">
+   footings.assumption_registry.assumption_registry
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.assumption_registry.def_assumption_set.html">
+   footings.assumption_registry.def_assumption_set
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.audit.AuditConfig.html">
+   footings.audit.AuditConfig
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.audit.AuditStepConfig.html">
+   footings.audit.AuditStepConfig
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.data_dictionary.PandasDtype.html">
+   footings.data_dictionary.PandasDtype
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.data_dictionary.data_dictionary.html">
+   footings.data_dictionary.data_dictionary
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.data_dictionary.def_column.html">
+   footings.data_dictionary.def_column
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.io.create_footings_json_file.html">
+   footings.io.create_footings_json_file
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.io.create_footings_xlsx_file.html">
+   footings.io.create_footings_xlsx_file
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.io.load_footings_file.html">
+   footings.io.load_footings_file
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.io.load_footings_json_file.html">
+   footings.io.load_footings_json_file
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.io.load_footings_xlsx_file.html">
+   footings.io.load_footings_xlsx_file
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.jigs.create_foreach_jig.html">
+   footings.jigs.create_foreach_jig
+  </a>
+ </li>
+ <li class="toctree-l2 current active">
+  <a class="current reference internal" href="#">
+   footings.model.Model
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.model.model.html">
+   footings.model.model
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.model.step.html">
+   footings.model.step
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.model.def_parameter.html">
+   footings.model.def_parameter
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.model.def_sensitivity.html">
+   footings.model.def_sensitivity
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.model.def_meta.html">
+   footings.model.def_meta
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.model.def_intermediate.html">
+   footings.model.def_intermediate
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.model.def_return.html">
+   footings.model.def_return
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.scenario_registry.def_attribute.html">
+   footings.scenario_registry.def_attribute
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.scenario_registry.scenario_registry.html">
+   footings.scenario_registry.scenario_registry
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.scenario_registry.ScenarioRegistry.html">
+   footings.scenario_registry.ScenarioRegistry
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.testing.assert_footings_files_equal.html">
+   footings.testing.assert_footings_files_equal
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.testing.assert_footings_json_files_equal.html">
+   footings.testing.assert_footings_json_files_equal
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.testing.assert_footings_xlsx_files_equal.html">
+   footings.testing.assert_footings_xlsx_files_equal
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.utils.dispatch_function.html">
+   footings.utils.dispatch_function
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.utils.once.html">
+   footings.utils.once
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.utils.get_kws.html">
+   footings.utils.get_kws
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.validators.equal_to.html">
+   footings.validators.equal_to
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.parallel_tools.dask.create_dask_foreach_jig.html">
+   footings.parallel_tools.dask.create_dask_foreach_jig
+  </a>
+ </li>
+ <li class="toctree-l2">
+  <a class="reference internal" href="footings.parallel_tools.ray.create_ray_foreach_jig.html">
+   footings.parallel_tools.ray.create_ray_foreach_jig
+  </a>
+ </li>
+</ul>
+  </div>
+</nav>
+            </div>
+            
           
 
           
@@ -147,9 +386,7 @@
               
 
 <nav id="bd-toc-nav">
-    <ul class="nav section-nav flex-column">
     
-    </ul>
 </nav>
 
 
@@ -157,6 +394,9 @@
           </div>
           
 
+          
+          
+            
           
           <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
               
@@ -214,14 +454,14 @@
     </div>
 
     
-  <script src="../_static/js/index.d3f166471bb80abb5163.js"></script>
+  <script src="../_static/js/index.1e043a052b0af929e4d8.js"></script>
 
 
     <footer class="footer mt-5 mt-md-0">
   <div class="container">
     <p>
           &copy; Copyright 2020, Dustin Tindall.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.2.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
     </p>
   </div>
 </footer>
