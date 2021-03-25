@@ -41,7 +41,7 @@ extensions = [
     "myst_nb",
 ]
 # autodoc settings
-autodoc_default_options = {"exclude-members": "__init__, __call__"}
+autodoc_default_options = {"exclude-members": "__init__, __call__, __signature__"}
 
 # autosummary settings
 autosummary_generate = True

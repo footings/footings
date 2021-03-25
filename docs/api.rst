@@ -41,7 +41,7 @@ footings.assumption_registry
    :nosignatures:
    :toctree: generated
 
-   Assumption
+
    AssumptionSet
    AssumptionRegistry
    assumption_registry
