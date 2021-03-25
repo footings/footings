@@ -1,0 +1,6 @@
+﻿footings.utils.get\_kws
+=======================
+
+.. currentmodule:: footings.utils
+
+.. autofunction:: get_kws
