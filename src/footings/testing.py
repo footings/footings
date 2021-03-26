@@ -1,7 +1,7 @@
 import pathlib
 from fnmatch import fnmatch
 from functools import singledispatch
-from typing import Optional
+from typing import Any, Optional, Union
 
 import pandas as pd
 
@@ -18,94 +18,147 @@ MAX_STR_LEN_TO_SHOW = 100
 
 
 @singledispatch
-def compare_values(result_value, expected_value, tolerance=None):
-    """A dispatch function to compare two values."""
-    return compare_values(str(result_value), str(expected_value))
+def compare_values(
+    test_value: Any, expected_value: Any, tolerance: Union[float, None] = None
+):
+    """A dispatch function to compare value against an expecte value.
+
+    :param Any test_value: The value to test.
+    :param Any expected_value: The value expected.
+    :param Union[float,None] tolerance: The tolerance (absolute) level to use when testing.
+
+    :return: A tuple with first position being bool and the result of the comparison and the
+        second is the comaprison message (if True the message is an empty string).
+    :rtype: Tuple[bool, str]
+    """
+    return compare_values(str(test_value), str(expected_value))
 
 
 @compare_values.register(str)
-def _(result_value, expected_value, tolerance=None):
-    if type(result_value) != type(expected_value):
-        return compare_values(result_value, str(expected_value), tolerance)
-    result = result_value == expected_value
+def _(test_value, expected_value, tolerance=None):
+    if type(test_value) != type(expected_value):
+        return compare_values(test_value, str(expected_value), tolerance)
+    result = test_value == expected_value
     if result:
         msg = ""
     else:
         if (
-            len(result_value) <= MAX_STR_LEN_TO_SHOW
+            len(test_value) <= MAX_STR_LEN_TO_SHOW
             and len(expected_value) <= MAX_STR_LEN_TO_SHOW
         ):
-            msg = f"The result value [{result_value}] is not equal to the expected value [{expected_value}]."
+            msg = f"The test_value [{test_value}] is not equal to the expected_value [{expected_value}]."
         else:
-            msg = "The result and expected strings are not equal and they are to long to display."
+            msg = "The test_value and expected_value strings are not equal and they are to long to display."
     return result, msg
 
 
 @compare_values.register(bool)
 @compare_values.register(int)
 @compare_values.register(float)
-def _(result_value, expected_value, tolerance=None):
-    if type(result_value) != type(expected_value):
-        return compare_values(str(result_value), str(expected_value))
-    if result_value == float("nan") or expected_value == float("nan"):
-        return compare_values(str(result_value), str(expected_value))
+def _(test_value, expected_value, tolerance=None):
+    if type(test_value) != type(expected_value):
+        return compare_values(str(test_value), str(expected_value))
+    if test_value == float("nan") or expected_value == float("nan"):
+        return compare_values(str(test_value), str(expected_value))
     if tolerance is None:
-        result = result_value == expected_value
+        result = test_value == expected_value
     else:
-        result = abs(result_value - expected_value) < tolerance
+        result = abs(test_value - expected_value) < tolerance
     if result:
         msg = ""
     else:
-        msg = f"The result value [{str(result_value)}] is not equal to the expected value [{str(expected_value)}]."
+        msg = f"The test_value [{str(test_value)}] is not equal to the expected_value [{str(expected_value)}]."
         if tolerance is not None:
             msg = msg[:-1] + f" using a tolerance of {str(tolerance)}."
     return result, msg
 
 
 @compare_values.register(list)
-def _(result_value, expected_value, tolerance=None):
-    result = all(
-        compare_values(r, e, tolerance)[0] for r, e in zip(result_value, expected_value)
-    )
+def _(test_value, expected_value, tolerance=None):
+    if isinstance(expected_value, list) is False:
+        return False, "The expected_value is not type list."
+    if len(test_value) != len(expected_value):
+        result = False
+        msg = "The list values have different lengths."
+        return result, msg
+    results = [
+        compare_values(r, e, tolerance)[0] for r, e in zip(test_value, expected_value)
+    ]
+    result = all(results)
+    correct = "{:.2%}".format(sum(results) / len(results))
     if result:
         msg = ""
     else:
-        msg = "The result list values are different from the expected list values.\n\n"
-        msg += f"The result list values are - \n\n{str(result_value)}\n\n"
-        msg += f"The expected list values are - \n\n{str(expected_value)}\n\n"
+        msg = f"The test_value list values are different from the expected_value list values (equal = {correct}).\n\n"
+        msg += f"The test_value list values are - \n\n{str(test_value)}\n\n"
+        msg += f"The expected_value list values are - \n\n{str(expected_value)}\n\n"
     return result, msg
 
 
+@compare_values.register(dict)
+def _(test_value, expected_value, tolerance=None):
+    if isinstance(expected_value, dict) is False:
+        return False, "The expected_value is not type dict."
+    if set(test_value.keys()) != set(expected_value.keys()):
+        msg = "The test_value and expected_value have different keys.\n\n"
+        msg += f"The test_value keys are - \n\n{str(list(test_value.keys()))}\n\n"
+        msg += f"The expected_value keys are - \n\n{str(list(expected_value.keys()))}\n\n"
+        return False, msg
+    result = True
+    msgs = []
+    for k in test_value.keys():
+        temp_r, temp_m = compare_values(test_value[k], expected_value[k], tolerance)
+        if temp_r is False:
+            result = False
+            msgs.append(f"{k} : {temp_m}")
+    return result, "\n".join(msgs)
+
+
 @compare_values.register(pd.Series)
-def _(result_value, expected_value, tolerance=None):
-    result = all(
-        compare_values(r, e, tolerance)[0] for r, e in zip(result_value, expected_value)
+def _(test_value, expected_value, tolerance=None):
+    if isinstance(expected_value, pd.Series) is False:
+        return False, "The expected_value is not type pd.Series."
+    if test_value.name != expected_value.name:
+        msg = f"The test_value name [{test_value.name}] is different then the "
+        msg += f"expected_value name [{expected_value.name}]."
+        return (False, msg)
+    if test_value.dtype != expected_value.dtype:
+        msg = f"The test_value dtype [{test_value.dtype}] is different then the "
+        msg += f"expected_value dtype [{expected_value.dtype}]."
+        return (False, msg)
+    result, msg = compare_values(
+        test_value.to_list(), expected_value.to_list(), tolerance
     )
-    if result:
-        msg = ""
-    else:
-        if result_value.name is None:
-            msg = "The result pd.Series is different from the expected pd.Series.\n\n"
-        else:
-            msg = f"The result pd.Series for column [{result_value.name}] is different"
-            msg += " from the expected pd.Series.\n\n"
-        msg += f"The result pd.Series is - \n\n{str(result_value.values)}\n\n"
-        msg += f"The expected pd.Series is - \n\n{str(expected_value.values)}\n\n"
+    if result is False:
+        msg = msg.replace("list", "pd.Series")
     return result, msg
 
 
 @compare_values.register(pd.DataFrame)
-def _(result_value, expected_value, tolerance=None):
+def _(test_value, expected_value, tolerance=None):
+    def _format_str(x):
+        name = x[0]
+        results = x[1][1]
+        inner = "\n\n\t".join(results.split("\n\n")[1:])
+        return f"For column, {name} - \n\n\t{inner}"
+
+    if isinstance(expected_value, pd.DataFrame) is False:
+        return False, "The expected_value is not type pd.DataFrame."
+    if set(test_value.columns) != set(expected_value.columns):
+        msg = "The test_value and expected_value DataFrames have different columns.\n\n"
+        msg += f"The test_value columns are - \n\n{str(list(test_value.columns))}\n\n"
+        msg += f"The expected_value columns are - \n\n{str(list(expected_value.columns))}\n\n"
+        return False, msg
     series_compare = [
-        compare_values(result_value[r], expected_value[e], tolerance)
-        for r, e in zip(result_value.columns, expected_value.columns)
+        (col, compare_values(test_value[col], expected_value[col], tolerance),)
+        for col in test_value.columns
     ]
-    result = all(x[0] for x in series_compare)
+    result = all(x[1][0] for x in series_compare)
     if result:
         msg = ""
     else:
-        msg = "The result pd.DataFrame is different from the expected pd.DataFrame.\n\n"
-        msg += "\n\n".join(x[1] for x in series_compare)
+        msg = "The test_value and expected_value pd.DataFrames are different.\n\n"
+        msg += "\n".join(_format_str(x) for x in series_compare)
     return result, msg
 
 
@@ -122,34 +175,30 @@ def make_key_checker(exclude_keys: Optional[list] = None) -> callable:
 
 
 def compare_file_dicts(
-    result: dict,
+    test: dict,
     expected: dict,
-    tolerance: Optional[float],
-    exclude_keys: Optional[list],
+    tolerance: Union[float, None] = None,
+    exclude_keys: Union[list, None] = None,
 ):
-    """ """
-    test = True
+    """Compare file dicts generated from footings framework."""
+    result = True
     log = {}
     key_exclude = make_key_checker(exclude_keys)
-    keys = set(list(result.keys()) + list(expected.keys()))
+    keys = set(list(test.keys()) + list(expected.keys()))
     for key in keys:
         temp = True
         if key_exclude(key):
             continue
         try:
-            res_val = result[key]
+            res_val = test[key]
         except KeyError:
-            msg = (
-                "The result file is missing this key, but it exists in the expected file."
-            )
+            msg = "The test file is missing this key, but it exists in the expected file."
             temp = False
 
         try:
             exp_val = expected[key]
         except KeyError:
-            msg = (
-                "The expected file is missing this key, but it exists in the result file."
-            )
+            msg = "The expected file is missing this key, but it exists in the test file."
             temp = False
 
         if temp:
@@ -160,168 +209,133 @@ def compare_file_dicts(
                 temp, msg = compare_values(res_val, exp_val, tolerance)
 
         if temp is False:
-            test = False
+            result = False
         log.update({key: {"result": temp, "msg": msg}})
 
+    skeys = sorted(log.keys())
     message = "\n".join(
-        [f"{k} : {v['msg']}" for k, v in log.items() if v["result"] is False]
+        [f"{k} : {log.get(k)['msg']}" for k in skeys if log.get(k)["result"] is False]
     )
-    return test, message
+    return result, message
 
 
-def check_extensions_equal(result, expected):
-    result_ext = pathlib.Path(result).suffix
+def check_extensions_equal(test, expected):
+    test_ext = pathlib.Path(test).suffix
     expected_ext = pathlib.Path(expected).suffix
-    if result_ext != expected_ext:
-        msg = f"The file extensions for result [{result_ext}] and expected [{expected_ext}] do not match."
+    if test_ext != expected_ext:
+        msg = f"The file extensions for test [{test_ext}] and expected [{expected_ext}] do not match."
         raise ValueError(msg)
     return True
 
 
 def assert_footings_json_files_equal(
-    result: str,
+    test: str,
     expected: str,
-    tolerance: Optional[float] = None,
-    exclude_keys: Optional[list] = None,
+    tolerance: Union[float, None] = None,
+    exclude_keys: Union[list, None] = None,
 ):
     """Assert whether two footing json files are equal.  This function is
     useful for unit testing models to ensure models stay true over time.
 
-    Parameters
-    ----------
-    result : str
-        The path to the result file.
-    expected : str
-        The path to the expected file.
-    tolerance : float, optional
-        The tolerance to test on numeric values.
-    exclude_keys : list, optional
-        Keys to exclude from testing.
+    :param str test: The path to the test file.
+    :param str expected: The path to the expected file.
+    :param Union[float,None] tolerance: The tolerance to test on numeric values.
+    :param Union[list,None] exclude_keys: Keys to exclude from testing.
 
-    Returns
-    -------
-    bool
-        True or false on whether files are equal given parameters.
+    :return: True or false on whether files are equal given parameters.
+    :rtype: bool
 
-    Raises
-    ------
-    ValueError
-        If the result and expected files share different extension types.
-    AssertionError
-        If any records between the result and expected files are different.
+    :raises ValueError: If the test and expected files share different extension types.
+    :raises AssertionError: If any records between the test and expected files are different.
     """
-    check_extensions_equal(result, expected)
-    result = load_footings_json_file(result)
+    check_extensions_equal(test, expected)
+    test = load_footings_json_file(test)
     expected = load_footings_json_file(expected)
-    test, message = compare_file_dicts(
-        result=result, expected=expected, tolerance=tolerance, exclude_keys=exclude_keys,
+    result, message = compare_file_dicts(
+        test=test, expected=expected, tolerance=tolerance, exclude_keys=exclude_keys,
     )
-    if test is False:
+    if result is False:
         raise AssertionError(f"\n{str(message)}")
     return True
 
 
 def assert_footings_xlsx_files_equal(
-    result: str,
+    test: str,
     expected: str,
-    tolerance: Optional[float] = None,
-    exclude_keys: Optional[list] = None,
+    tolerance: Union[float, None] = None,
+    exclude_keys: Union[list, None] = None,
 ):
-    """Assert whether two footing xlsx files are equal. This function is
+    """Assert whether two footing xlsx files are equal.  This function is
     useful for unit testing models to ensure models stay true over time.
 
-    Parameters
-    ----------
-    result : str
-        The path to the result file.
-    expected : str
-        The path to the expected file.
-    tolerance : float, optional
-        The tolerance to test on numeric values.
-    exclude_keys : list, optional
-        Keys to exclude from testing.
+    :param str test: The path to the test file.
+    :param str expected: The path to the expected file.
+    :param Union[float,None] tolerance: The tolerance to test on numeric values.
+    :param Union[list,None] exclude_keys: Keys to exclude from testing.
 
-    Returns
-    -------
-    bool
-        True or false on whether files are equal given parameters.
+    :return: True or false on whether files are equal given parameters.
+    :rtype: bool
 
-    Raises
-    ------
-    ValueError
-        If the result and expected files share different extension types.
-    AssertionError
-        If any records between the result and expected files are different.
+    :raises ValueError: If the test and expected files share different extension types.
+    :raises AssertionError: If any records between the test and expected files are different.
     """
-    check_extensions_equal(result, expected)
-    result = load_footings_xlsx_file(result)
+    check_extensions_equal(test, expected)
+    test = load_footings_xlsx_file(test)
     expected = load_footings_xlsx_file(expected)
-    test, message = compare_file_dicts(
-        result=result, expected=expected, tolerance=tolerance, exclude_keys=exclude_keys,
+    result, message = compare_file_dicts(
+        test=test, expected=expected, tolerance=tolerance, exclude_keys=exclude_keys,
     )
-    if test is False:
+    if result is False:
         raise AssertionError(f"\n{message}")
     return True
 
 
 @dispatch_function(key_parameters=("file_ext",))
-def _assert_footings_files_equal(file_ext, result, expected, **kwargs):
+def _assert_footings_files_equal(file_ext, test, expected, **kwargs):
     """test run_model audit"""
     msg = "No registered function based on passed paramters and no default function."
     raise NotImplementedError(msg)
 
 
 @_assert_footings_files_equal.register(file_ext=".json")
-def _(result: str, expected: str, **kwargs):
-    assert_footings_json_files_equal(result, expected, **kwargs)
+def _(test: str, expected: str, **kwargs):
+    assert_footings_json_files_equal(test, expected, **kwargs)
 
 
 @_assert_footings_files_equal.register(file_ext=".xlsx")
-def _(result: str, expected: str, **kwargs):
-    assert_footings_xlsx_files_equal(result, expected, **kwargs)
+def _(test: str, expected: str, **kwargs):
+    assert_footings_xlsx_files_equal(test, expected, **kwargs)
 
 
 def assert_footings_files_equal(
-    result: str,
+    test: str,
     expected: str,
-    tolerance: Optional[float] = None,
-    exclude_keys: Optional[list] = None,
+    tolerance: Union[float, None] = None,
+    exclude_keys: Union[list, None] = None,
 ):
     """A generic function to assert whether two footing files are equal. This function is
     useful for unit testing models to ensure models stay true over time.
 
-    Parameters
-    ----------
-    result : str
-        The path to the result file.
-    expected : str
-        The path to the expected file.
-    tolerance : float, optional
-        The tolerance to test on numeric values.
-    exclude_keys : list, optional
-        Keys to exclude from testing.
+    :param str test: The path to the test file.
+    :param str expected: The path to the expected file.
+    :param Union[float,None] tolerance: The tolerance to test on numeric values.
+    :param Union[list,None] exclude_keys: Keys to exclude from testing.
 
-    Returns
-    -------
-    bool
-        True or false on whether files are equal given parameters.
+    :return: True or false on whether files are equal given parameters.
+    :rtype: bool
 
-    Raises
-    ------
-    ValueError
-        If the result and expected files share different extension types.
-    AssertionError
-        If any records between the result and expected files are different.
+    :raises ValueError: If the test and expected files share different extension types.
+    :raises AssertionError: If any records between the test and expected files are different.
 
-    See Also
-    --------
-    assert_footings_json_files_equal
-    assert_footings_xlsx_files_equal
+    .. seealso::
+
+        :obj:`footings.testing.assert_footings_json_files_equal`
+        :obj:`footings.testing.assert_footings_xlsx_files_equal`
     """
-    file_ext = pathlib.Path(result).suffix
+    file_ext = pathlib.Path(test).suffix
     _assert_footings_files_equal(
         file_ext=file_ext,
-        result=result,
+        test=test,
         expected=expected,
         tolerance=tolerance,
         exclude_keys=exclude_keys,
