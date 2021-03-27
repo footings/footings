@@ -14,12 +14,8 @@ class FootingsXlsxEntry:
     """FootingsXlsxEntry"""
 
     worksheet: str = attrib()
-    source: str = attrib()
     mapping: str = attrib()
-    end_point: str = attrib()
-    column_name: str = attrib()
     dtype: str = attrib()
-    stable: str = attrib()
     row_start: int = attrib()
     col_start: int = attrib()
     row_end: int = attrib()
@@ -47,12 +43,8 @@ def _obj_to_xlsx_builtins(obj, worksheet, **kwargs):
     return [
         FootingsXlsxEntry(
             worksheet=worksheet.obj.title,
-            source=kwargs.get("source", None),
             mapping=kwargs.get("mapping", None),
-            end_point=kwargs.get("end_point", None),
-            column_name=kwargs.get("column_name", None),
             dtype=str(type(obj)),
-            stable=kwargs.get("stable", None),
             row_start=row,
             col_start=col,
             row_end=row,
@@ -70,12 +62,8 @@ def _obj_to_xlsx_series(obj, worksheet, **kwargs):
     return [
         FootingsXlsxEntry(
             worksheet=worksheet.obj.title,
-            source=kwargs.get("source", None),
             mapping=kwargs.get("mapping", None),
-            end_point=kwargs.get("end_point", None),
-            column_name=obj.name,
             dtype=str(pd.Series),
-            stable=kwargs.get("stable", None),
             row_start=row,
             col_start=col,
             row_end=row + obj.shape[0],
@@ -98,8 +86,8 @@ def _obj_to_xlsx_dataframe(obj, worksheet, **kwargs):
 def _obj_to_xlsx_mapping(obj, worksheet, **kwargs):
     def _make_key(mapping, key):
         if mapping is None:
-            return f"/{str(key)}/"
-        return f"{mapping}{str(key)}/"
+            return f"/{str(key)}"
+        return f"{mapping}/{str(key)}"
 
     ret = []
     mapping = kwargs.pop("mapping", None)
@@ -109,12 +97,11 @@ def _obj_to_xlsx_mapping(obj, worksheet, **kwargs):
                 k = str(k)
             except:
                 raise ValueError("Converting key of mapping to string failed.")
-        kwargs.pop("end_point", None)
         key = _make_key(mapping, k)
-        key_entries = obj_to_xlsx(k, worksheet, mapping=key, end_point="KEY", **kwargs)
+        key_entries = obj_to_xlsx(k, worksheet, mapping=key, **kwargs)
         ret.extend(key_entries)
         worksheet.col += 1
-        val_entries = obj_to_xlsx(v, worksheet, mapping=key, end_point="VALUE", **kwargs)
+        val_entries = obj_to_xlsx(v, worksheet, mapping=key, **kwargs)
         ret.extend(val_entries)
         worksheet.row = max([entry.row_end for entry in val_entries]) + 1
         worksheet.col -= 1
@@ -206,13 +193,13 @@ class FootingsXlsxWb:
 
     @classmethod
     def create(cls):
-        """Create xlsx workbook"""
+        """Create xlsx workbook."""
         return cls(workbook=Workbook())
 
     def create_sheet(
         self, name: str, start_row: int = 0, start_col: int = 0, hidden=False
     ):
-        """Add worksheet"""
+        """Add worksheet."""
         wrksht = FootingsXlsxSheet(
             obj=self.workbook.create_sheet(name), row=start_row, col=start_col,
         )
@@ -221,7 +208,7 @@ class FootingsXlsxWb:
         self.worksheets.update({name: wrksht})
 
     def add_named_style(self, name: str, style: NamedStyle):
-        """Add style"""
+        """Add style."""
         if isinstance(style, NamedStyle) is False:
             msg = f"The value passsed to style is not an instance of {NamedStyle}."
             raise TypeError(msg)
@@ -230,7 +217,7 @@ class FootingsXlsxWb:
     def write_obj(
         self, worksheet: str, obj: Any, add_rows: int = 0, add_cols: int = 0, **kwargs
     ):
-        """Write object to worksheet"""
+        """Write object to worksheet."""
         wrksht = self.worksheets[worksheet]
         entries = obj_to_xlsx(obj, wrksht, **kwargs)
         wrksht.update(entries, add_rows, add_cols)
@@ -244,7 +231,7 @@ class FootingsXlsxWb:
             self.entries.extend([{**asdict(entry)}])
 
     def save(self, file: str):
-        """Close workbook"""
+        """Close workbook."""
         self.create_sheet("__footings__", 1, 1, hidden=True)
         df = pd.DataFrame.from_records(self.entries)
         self.write_obj("__footings__", df, record_entry=False)
@@ -257,11 +244,11 @@ class FootingsXlsxWb:
 #########################################################################################
 
 
-def _add_section(wb, sheet, section_name, section_value, source):
+def add_section(wb, sheet, section_name, section_value, mapping):
     wb.write_obj(
-        sheet, section_name, add_cols=1, style=XLSX_FORMATS["title"], source=source
+        sheet, section_name, add_cols=1, style=XLSX_FORMATS["title"], mapping=mapping
     )
-    wb.write_obj(sheet, section_value, add_rows=2, add_cols=-1, source=source)
+    wb.write_obj(sheet, section_value, add_rows=2, add_cols=-1, mapping=mapping)
 
 
 def _format_docstring(docstring):
@@ -316,29 +303,40 @@ def _format_sheets(wb, sheet, format_beyond_d=False):
 
 
 def _write_sheet(wb, sheet, step):
-    _add_section(wb, sheet, "Step Name:", step["name"], "NAME")
+    prefix = f"/steps/{step['method_name']}/"
+    add_section(wb, sheet, "Step Name:", step["name"], mapping=prefix + "name")
     if "method_name" in step:
-        _add_section(wb, sheet, "Method Name:", step["method_name"], "MTEHOD_NAME")
+        add_section(
+            wb, sheet, "Method Name:", step["method_name"], mapping=prefix + "method_name"
+        )
     if "docstring" in step:
-        _add_section(
-            wb, sheet, "Docstring:", _format_docstring(step["docstring"]), "DOCSTRING",
+        add_section(
+            wb,
+            sheet,
+            "Docstring:",
+            _format_docstring(step["docstring"]),
+            mapping=prefix + "docstring",
         )
     if "uses" in step:
-        _add_section(
-            wb, sheet, "Uses:", str(step["uses"]).replace("'", ""), "USES",
+        add_section(
+            wb,
+            sheet,
+            "Uses:",
+            str(step["uses"]).replace("'", ""),
+            mapping=prefix + "uses",
         )
     if "impacts" in step:
-        _add_section(
-            wb, sheet, "Impacts:", str(step["impacts"]).replace("'", ""), "IMPACTS",
+        add_section(
+            wb,
+            sheet,
+            "Impacts:",
+            str(step["impacts"]).replace("'", ""),
+            mapping=prefix + "impacts",
         )
     if "metadata" in step:
-        _add_section(
-            wb, sheet, "Metadata:", step["metadata"], "METADATA",
-        )
+        add_section(wb, sheet, "Metadata:", step["metadata"], mapping=prefix + "metadata")
     if "output" in step:
-        _add_section(
-            wb, sheet, "Output:", step["output"], "OUTPUT",
-        )
+        add_section(wb, sheet, "Output:", step["output"], mapping=prefix + "output")
 
 
 #########################################################################################
@@ -362,36 +360,36 @@ def create_footings_xlsx_file(audit_dict, file, **kwargs):
 
     # write main
     wb.create_sheet("Main", start_row=2, start_col=2)
-    _add_section(wb, "Main", "Model Name:", audit_dict["name"], "NAME")
+    add_section(wb, "Main", "Model Name:", audit_dict["name"], mapping="/name")
 
     if "signature" in audit_dict:
-        _add_section(
+        add_section(
             wb,
             "Main",
             "Signature:",
             _format_signature(audit_dict["signature"]),
-            "SIGNATURE",
+            mapping="/signature",
         )
 
     if "docstring" in audit_dict:
-        _add_section(
+        add_section(
             wb,
             "Main",
             "Docstring:",
             _format_docstring(audit_dict["docstring"]),
-            "DOCSTRING",
+            mapping="/docstring",
         )
 
     _format_sheets(wb, "Main", format_beyond_d=False)
 
     # write instantiation
     wb.create_sheet("Instantiation", start_row=2, start_col=2)
-    _add_section(
+    add_section(
         wb,
         "Instantiation",
         "Instantiation:",
         audit_dict["instantiation"],
-        "INSTANTIATION",
+        mapping="/instantiation",
     )
     _format_widths(wb.worksheets["Instantiation"].obj, start_column=1)
 
@@ -405,10 +403,14 @@ def create_footings_xlsx_file(audit_dict, file, **kwargs):
 
     # write output
     wb.create_sheet("Output", start_row=2, start_col=2)
-    _add_section(
-        wb, "Output", "Output:", audit_dict["output"], "OUTPUT",
-    )
+    add_section(wb, "Output", "Output:", audit_dict["output"], mapping="/output")
     _format_sheets(wb, "Output", format_beyond_d=True)
+
+    # write output
+    if "config" in audit_dict:
+        wb.create_sheet("Config", start_row=2, start_col=2)
+        add_section(wb, "Config", "Config:", audit_dict["config"], mapping="/config")
+        _format_sheets(wb, "Config", format_beyond_d=True)
 
     # save file
     wb.save(file)

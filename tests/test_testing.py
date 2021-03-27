@@ -159,10 +159,6 @@ class Test_compare_values:
 def test_key_checker():
     kws = {
         "worksheet": "test_dict",
-        "source": None,
-        "column_name": None,
-        "stable": None,
-        "end_point": "KEY",
         "row_start": 2,
         "col_start": 2,
         "row_end": 2,

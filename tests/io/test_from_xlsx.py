@@ -17,23 +17,16 @@ def test_load_xlsx_file():
     # wb.create_sheet("test_dict", start_row=2, start_col=2)
     # wb.write_obj("test_dict", test_dict)
     # wb.save("test-load-xlsx-file.xlsx")
-    kws = {"worksheet": "test_dict", "source": None, "column_name": None, "stable": None}
+    kws = {"worksheet": "test_dict"}
     kws_str = {**kws, "dtype": "<class 'str'>"}
     kws_int = {**kws, "dtype": "<class 'int'>"}
 
     expected_dict = {
         FootingsXlsxEntry(
-            mapping="/outer/",
-            end_point="KEY",
-            row_start=2,
-            col_start=2,
-            row_end=2,
-            col_end=2,
-            **kws_str,
+            mapping="/outer", row_start=2, col_start=2, row_end=2, col_end=2, **kws_str,
         ): "outer",
         FootingsXlsxEntry(
-            mapping="/outer/inner/",
-            end_point="KEY",
+            mapping="/outer/inner",
             row_start=2,
             col_start=3,
             row_end=2,
@@ -41,8 +34,7 @@ def test_load_xlsx_file():
             **kws_str,
         ): "inner",
         FootingsXlsxEntry(
-            mapping="/outer/inner/endpoint1/",
-            end_point="KEY",
+            mapping="/outer/inner/endpoint1",
             row_start=2,
             col_start=4,
             row_end=2,
@@ -50,8 +42,7 @@ def test_load_xlsx_file():
             **kws_str,
         ): "endpoint1",
         FootingsXlsxEntry(
-            mapping="/outer/inner/endpoint1/",
-            end_point="VALUE",
+            mapping="/outer/inner/endpoint1",
             row_start=2,
             col_start=5,
             row_end=2,
@@ -59,8 +50,7 @@ def test_load_xlsx_file():
             **kws_int,
         ): 1,
         FootingsXlsxEntry(
-            mapping="/outer/inner/endpoint2/",
-            end_point="KEY",
+            mapping="/outer/inner/endpoint2",
             row_start=3,
             col_start=4,
             row_end=3,
@@ -68,8 +58,7 @@ def test_load_xlsx_file():
             **kws_str,
         ): "endpoint2",
         FootingsXlsxEntry(
-            mapping="/outer/inner/endpoint2/",
-            end_point="VALUE",
+            mapping="/outer/inner/endpoint2",
             row_start=3,
             col_start=5,
             row_end=3,
@@ -77,8 +66,7 @@ def test_load_xlsx_file():
             **kws_int,
         ): 2,
         FootingsXlsxEntry(
-            mapping="/endpoint3/",
-            end_point="KEY",
+            mapping="/endpoint3",
             row_start=4,
             col_start=2,
             row_end=4,
@@ -86,8 +74,7 @@ def test_load_xlsx_file():
             **kws_str,
         ): "endpoint3",
         FootingsXlsxEntry(
-            mapping="/endpoint3/",
-            end_point="VALUE",
+            mapping="/endpoint3",
             row_start=4,
             col_start=3,
             row_end=4,

@@ -7,26 +7,17 @@ from ..io.to_xlsx import FootingsXlsxEntry
 def load_footings_xlsx_file(file: str):
     """Load footings generated xlsx file.
 
-    Parameters
-    ----------
-    file : str
-        The path to the file.
+    :param str file: The path to the file.
 
-    Returns
-    -------
-    dict
-        A dict representing the respective file type.
+    :return: A dict of entries from the xlsx file.
+    :rtype: dict
     """
 
     def _make_key(x: pd.Series):
         return FootingsXlsxEntry(
             worksheet=x.worksheet,
-            source=x.source,
             mapping=x.mapping,
-            end_point=x.end_point,
-            column_name=x.column_name,
             dtype=x.dtype,
-            stable=x.stable,
             row_start=x.row_start,
             col_start=x.col_start,
             row_end=x.row_end,
