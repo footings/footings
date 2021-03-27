@@ -406,35 +406,29 @@
 <h1>footings.testing.assert_footings_xlsx_files_equal<a class="headerlink" href="#footings-testing-assert-footings-xlsx-files-equal" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="footings.testing.assert_footings_xlsx_files_equal">
-<code class="sig-name descname"><span class="pre">assert_footings_xlsx_files_equal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_keys</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/footings/testing.html#assert_footings_xlsx_files_equal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.testing.assert_footings_xlsx_files_equal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assert whether two footing xlsx files are equal. This function is
+<code class="sig-name descname"><span class="pre">assert_footings_xlsx_files_equal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_keys</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/footings/testing.html#assert_footings_xlsx_files_equal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#footings.testing.assert_footings_xlsx_files_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert whether two footing xlsx files are equal.  This function is
 useful for unit testing models to ensure models stay true over time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>result</strong><span class="classifier">str</span></dt><dd><p>The path to the result file.</p>
-</dd>
-<dt><strong>expected</strong><span class="classifier">str</span></dt><dd><p>The path to the expected file.</p>
-</dd>
-<dt><strong>tolerance</strong><span class="classifier">float, optional</span></dt><dd><p>The tolerance to test on numeric values.</p>
-</dd>
-<dt><strong>exclude_keys</strong><span class="classifier">list, optional</span></dt><dd><p>Keys to exclude from testing.</p>
-</dd>
-</dl>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test</strong> (<em>str</em>) – The path to the test file.</p></li>
+<li><p><strong>expected</strong> (<em>str</em>) – The path to the expected file.</p></li>
+<li><p><strong>tolerance</strong> (<em>Union</em><em>[</em><em>float</em><em>,</em><em>None</em><em>]</em>) – The tolerance to test on numeric values.</p></li>
+<li><p><strong>exclude_keys</strong> (<em>Union</em><em>[</em><em>list</em><em>,</em><em>None</em><em>]</em>) – Keys to exclude from testing.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>bool</dt><dd><p>True or false on whether files are equal given parameters.</p>
+<dd class="field-even"><p>True or false on whether files are equal given parameters.</p>
 </dd>
-</dl>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><dl class="simple">
-<dt>ValueError</dt><dd><p>If the result and expected files share different extension types.</p>
-</dd>
-<dt>AssertionError</dt><dd><p>If any records between the result and expected files are different.</p>
-</dd>
-</dl>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the test and expected files share different extension types.</p></li>
+<li><p><strong>AssertionError</strong> – If any records between the test and expected files are different.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
