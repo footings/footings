@@ -85,7 +85,10 @@ def _(test_value, expected_value, tolerance=None):
         compare_values(r, e, tolerance)[0] for r, e in zip(test_value, expected_value)
     ]
     result = all(results)
-    correct = "{:.2%}".format(sum(results) / len(results))
+    if len(results) > 0:
+        correct = "{:.2%}".format(sum(results) / len(results))
+    else:
+        correct = "0 len list"
     if result:
         msg = ""
     else:
