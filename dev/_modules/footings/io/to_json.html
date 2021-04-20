@@ -152,6 +152,7 @@
   <h1>Source code for footings.io.to_json</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">isclass</span>
 
@@ -159,24 +160,12 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 
-<span class="k">def</span> <span class="nf">_set_key</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">k</span>
-
-
-<span class="k">def</span> <span class="nf">_column_to_json</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">_set_val</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-                <span class="k">return</span> <span class="kc">None</span>
-            <span class="k">return</span> <span class="n">val</span>
-        <span class="k">return</span> <span class="n">val</span>
-
-    <span class="n">col</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
-    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">col</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">))):</span>
-        <span class="n">col</span> <span class="o">=</span> <span class="p">[</span><span class="n">_set_val</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">col</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_series_to_json</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="s2">&quot;dt&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">hour</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">col</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">minute</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">col_json</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">,</span> <span class="n">date_format</span><span class="o">=</span><span class="s2">&quot;iso&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;@@</span><span class="si">{</span><span class="n">col_json</span><span class="si">}</span><span class="s2">@@&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">AuditJSONEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
@@ -190,10 +179,14 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">generic</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">_column_to_json</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">col</span><span class="p">])</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">columns</span><span class="p">}</span>
+            <span class="k">return</span> <span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">_series_to_json</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">col</span><span class="p">])</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">columns</span><span class="p">}</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">{</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">_column_to_json</span><span class="p">(</span><span class="n">obj</span><span class="p">)}</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="p">{</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">_series_to_json</span><span class="p">(</span><span class="n">obj</span><span class="p">)}</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">hour</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">minute</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="p">)):</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
             <span class="k">return</span> <span class="s2">&quot;callable: &quot;</span> <span class="o">+</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__qualname__</span>
@@ -201,6 +194,14 @@
             <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">iterencode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">_one_shot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">super</span><span class="p">(</span><span class="n">AuditJSONEncoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">iterencode</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">_one_shot</span><span class="o">=</span><span class="n">_one_shot</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;&quot;@@[&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;@@[&#39;</span><span class="p">,</span> <span class="s2">&quot;[&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s1">&#39;]@@&quot;&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;]@@&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;]&quot;</span><span class="p">))</span>
+            <span class="k">yield</span> <span class="n">s</span>
 
 
 <div class="viewcode-block" id="create_footings_json_file"><a class="viewcode-back" href="../../../generated/footings.io.create_footings_json_file.html#footings.io.create_footings_json_file">[docs]</a><span class="k">def</span> <span class="nf">create_footings_json_file</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
