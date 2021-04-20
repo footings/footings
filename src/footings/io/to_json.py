@@ -1,5 +1,6 @@
 import json
 import math
+import re
 from datetime import date, datetime
 from inspect import isclass
 
@@ -7,24 +8,12 @@ import numpy as np
 import pandas as pd
 
 
-def _set_key(k):
-    if type(k) not in [str, int, float, bool, None]:
-        return str(k)
-    return k
-
-
-def _column_to_json(col):
-    def _set_val(val):
-        if isinstance(val, (int, float, bool)):
-            if math.isnan(val):
-                return None
-            return val
-        return val
-
-    col = col.to_list()
-    if any(math.isnan(val) for val in col if isinstance(val, (int, float, bool))):
-        col = [_set_val(val) for val in col]
-    return json.dumps(col)
+def _series_to_json(col):
+    if hasattr(col, "dt"):
+        if col.dt.hour.sum() == 0 and col.dt.minute.sum() == 0:
+            col = col.dt.strftime("%Y-%m-%d")
+    col_json = col.to_json(orient="records", date_format="iso")
+    return f"@@{col_json}@@"
 
 
 class AuditJSONEncoder(json.JSONEncoder):
@@ -38,10 +27,14 @@ class AuditJSONEncoder(json.JSONEncoder):
         elif isinstance(obj, np.generic):
             return obj.item()
         elif isinstance(obj, pd.DataFrame):
-            return {col: _column_to_json(obj[col]) for col in obj.columns}
+            return {col: _series_to_json(obj[col]) for col in obj.columns}
         elif isinstance(obj, pd.Series):
-            return {obj.name: _column_to_json(obj)}
-        elif isinstance(obj, (pd.Timestamp, date, datetime)):
+            return {obj.name: _series_to_json(obj)}
+        elif isinstance(obj, pd.Timestamp):
+            if obj.hour == 0 and obj.minute == 0:
+                return str(obj.date())
+            return str(obj)
+        elif isinstance(obj, (date, datetime)):
             return str(obj)
         elif callable(obj):
             return "callable: " + obj.__module__ + "." + obj.__qualname__
@@ -49,6 +42,14 @@ class AuditJSONEncoder(json.JSONEncoder):
             return obj.__name__
         else:
             return super().default(obj)
+
+    def iterencode(self, o, _one_shot=False):
+        for s in super(AuditJSONEncoder, self).iterencode(o, _one_shot=_one_shot):
+            if '"@@[' in s:
+                s = re.sub(r'\\"', '"', s.replace('"@@[', "["))
+            if ']@@"' in s:
+                s = re.sub(r'\\"', '"', s.replace(']@@"', "]"))
+            yield s
 
 
 def create_footings_json_file(d, file, **kwargs):
