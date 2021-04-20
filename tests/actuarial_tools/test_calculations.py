@@ -1,4 +1,5 @@
 import pandas as pd
+import pytest
 from pandas.testing import assert_series_equal
 
 from footings.actuarial_tools import (  # calc_change_in_reserve,
@@ -32,13 +33,41 @@ def test_calc_discount():
 
 
 def test_calc_interpolation():
+    # test nonzero values
     val_0 = pd.Series([1, 2, 3])
     val_1 = pd.Series([2, 3, 4])
     wt_0 = pd.Series([0.5, 0.5, 0.5])
     linear = calc_interpolation(val_0, val_1, wt_0, method="linear")
     assert_series_equal(linear, pd.Series([1.5, 2.5, 3.5]))
-    log = calc_interpolation(val_0, val_1, wt_0, method="log")
+    log = calc_interpolation(val_0, val_1, wt_0, method="log-linear")
     assert_series_equal(log, pd.Series([1.414214, 2.449490, 3.464102]))
+
+    # test one zero value
+    val_0 = pd.Series([0, 1, 2])
+    val_1 = pd.Series([1, 2, 3])
+    wt_0 = pd.Series([0.5, 0.5, 0.5])
+    linear = calc_interpolation(val_0, val_1, wt_0, method="linear")
+    assert_series_equal(linear, pd.Series([0.5, 1.5, 2.5]))
+    log = calc_interpolation(val_0, val_1, wt_0, method="log-linear")
+    assert_series_equal(log, pd.Series([0.414214, 1.449490, 2.464102]))
+
+    # test two zero values
+    val_0 = pd.Series([0, 0, 1])
+    val_1 = pd.Series([0, 1, 2])
+    wt_0 = pd.Series([0.5, 0.5, 0.5])
+    linear = calc_interpolation(val_0, val_1, wt_0, method="linear")
+    assert_series_equal(linear, pd.Series([0, 0.5, 1.5]))
+    log = calc_interpolation(val_0, val_1, wt_0, method="log-linear")
+    assert_series_equal(log, pd.Series([0, 0.414214, 1.449490]))
+
+    # test value less than zero
+    val_0 = pd.Series([-1, 0, 1])
+    val_1 = pd.Series([0, 1, 2])
+    wt_0 = pd.Series([0.5, 0.5, 0.5])
+    linear = calc_interpolation(val_0, val_1, wt_0, method="linear")
+    assert_series_equal(linear, pd.Series([-0.5, 0.5, 1.5]))
+    # log-linear raises ValueError
+    pytest.raises(ValueError, calc_interpolation, val_0, val_1, wt_0, method="log-linear")
 
 
 def test_calc_pv():

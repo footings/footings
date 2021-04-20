@@ -145,7 +145,7 @@ def calc_interpolation(
     0    1.5
     1    2.5
     2    3.5
-    >>> log = calc_interpolation(val_0, val_1, wt_0, method="log")
+    >>> log = calc_interpolation(val_0, val_1, wt_0, method="log-linear")
     >>> log
     0    1.414214
     1    2.449490
@@ -153,15 +153,26 @@ def calc_interpolation(
     """
     if wt_1 is None:
         wt_1 = 1 - wt_0
-
     if method == "linear":
         ret = val_0 * wt_0 + val_1 * wt_1
-    elif method == "log":
-        ret = np.exp(np.log(val_1) * wt_1 + np.log(val_0) * wt_0)
+    elif method == "log-linear":
+        if val_0.min() < 0 or val_1.min() < 0:
+            msg = f"No values in val_0 (min = {val_0.min()}) or "
+            msg += f"val_1 (min = {val_1.min()}) can be less than 0."
+            raise ValueError(msg)
+        elif val_0.min() == 0 or val_1.min() == 0:
+            val_0 = np.log(val_0 + 1)
+            val_1 = np.log(val_1 + 1)
+            ret = pd.Series(np.exp(val_0 * wt_0 + val_1 * wt_1)) - 1
+        else:
+            val_0 = np.log(val_0)
+            val_1 = np.log(val_1)
+            ret = pd.Series(np.exp(val_0 * wt_0 + val_1 * wt_1))
     else:
         msg = f"The value passed to method [{str(method)}] is not recognized."
         msg += " Please use one of 'linear' or 'log'."
         raise ValueError(msg)
+
     return ret
 
 
