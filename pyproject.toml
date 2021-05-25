@@ -25,6 +25,7 @@ numpy = "^1.11"
 pandas = "^1.0"
 numpydoc = "^1.0"
 openpyxl = "^3.0"
+importlib-metadata = {version = "^3.0", python = "<3.8"}
 
 
 [tool.poetry.dev-dependencies]
@@ -40,7 +41,6 @@ nox = ">=2020.0.0"
 toolz = "^0.11"
 dask = ">=2021.0"
 ray = "^1.1"
-importlib-metadata = {version = "^3.0", python = "<3.8"}
 
 
 [build-system]
