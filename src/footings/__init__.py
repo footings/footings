@@ -1,4 +1,4 @@
-from . import audit, data_dictionary, jigs, model, testing, utils, validators
+from . import audit, data_dictionary, factories, jigs, model, testing, utils, validators
 
 try:
     import importlib.metadata as importlib_metadata
