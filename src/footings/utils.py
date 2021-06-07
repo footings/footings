@@ -26,20 +26,16 @@ def dispatch_function(key_parameters: Tuple, default_function: Callable = None):
     A dispatch_function is a useful function to replace a block of if else statements that call
     different functions.
 
-    Parameters
-    ----------
-    key_parameters : tuple
-        A tuple of the paramters to use as
-    default_function : callable
-        The default function to use when the function is called and a regestered function cannot be
-        found. function docstring and signature sourced.
+    :param tuple key_parameters: A tuple of the paramters to use as.
+    :param callable default_function: The default function to use when the function is called
+        and a regestered function cannot be found. function docstring and signature sourced.
 
-    See Also
-    --------
-    functools.singledispatch
+    .. seealso::
 
-    Examples
-    --------
+        functools.singledispatch
+
+    :examples:
+
     >>> @dispatch_function(key_parameters=("key",))
     >>> def dispatch(key):
     >>>     return "default"
@@ -65,17 +61,10 @@ def dispatch_function(key_parameters: Tuple, default_function: Callable = None):
     def register(function: Callable = None, **kwargs):
         """Register a function using a key established by the required parameters.
 
-        Parameters
-        ----------
-        function : callable
-            The function to register.
-        **kwargs
-            The key_parameters to register for the given function.
+        :param callable function: The function to register.
+        :param **kwargs: The key_parameters to register for the given function.
 
-        Raises
-        ------
-        DispatchMissingArgumentError
-            Missing Argument to dispatch_function.register.
+        :raises DispatchMissingArgumentError: Missing Argument to dispatch_function.register.
         """
         if function is None:
             return partial(register, **kwargs)
@@ -128,13 +117,10 @@ def loaded_function(function: Callable = None):
     This is a useful object to add validation of inputs before the function is called or validation
     of output after the function has been called.
 
-    Parameters
-    ----------
-    function: callable
-        The primary function.
+    :param callable function: The primary function.
 
-    Examples
-    --------
+    :examples:
+
     >>> @loaded_function
     >>> def loaded(a, b):
     >>>     '''Main function'''
@@ -172,17 +158,10 @@ def loaded_function(function: Callable = None):
     def register(position: str, function: Callable = None):
         """Register a function into the registry.
 
-        Parameters
-        ----------
-        function : callable
-            The function to register.
-        position : str
-            Use 'end' if adding to the end of the registry or 'start' to add to the begining.
+        :param callable function: The function to register.
+        :param str position: Use 'end' if adding to the end of the registry or 'start' to add to the begining.
 
-        Raises
-        ------
-        ValueError
-            If position is not 'end' or 'start'.
+        :raises ValueError: If position is not 'end' or 'start'.
         """
         if function is None:
             return partial(register, position)

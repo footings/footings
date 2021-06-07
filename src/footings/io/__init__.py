@@ -10,20 +10,15 @@ from .to_xlsx import create_footings_xlsx_file
 def load_footings_file(file: str):
     """Load footings generated file.
 
-    Parameters
-    ----------
-    file : str
-        The path to the file.
+    :param str file: The path to the file.
 
-    Returns
-    -------
-    dict
-        A dict representing the respective file type.
+    :return: A dict representing the respective file type.
+    :rtype: dict
 
-    See Also
-    --------
-    load_footings_json_file
-    load_footings_xlsx_file
+    .. seealso::
+
+        :obj:`footings.testing.load_footings_json_file`
+        :obj:`footings.testing.load_footings_xlsx_file`
     """
     file_ext = pathlib.Path(file).suffix
     return _load_footings_file(file_ext=file_ext, file=file)

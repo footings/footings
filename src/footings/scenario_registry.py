@@ -22,14 +22,9 @@ def _is_attribute(x):
 def def_attribute(default: Any, dtype: type = None, description: str = None):
     """Define an attribute within a scenario.
 
-    Parameters
-    ----------
-    default : Any
-        The default value for the attribute.
-    dtype : type
-        The dtype of the attribute.
-    description : str
-        The attribute description.
+    :param Any default: The default value for the attribute.
+    :param type dtype: The dtype of the attribute.
+    :param str description: The attribute description.
     """
 
     if dtype is None:

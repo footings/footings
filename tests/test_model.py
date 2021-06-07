@@ -3,10 +3,8 @@ import inspect
 import pytest
 from attr import attrib, attrs
 from attr.setters import FrozenAttributeError, frozen
-from numpydoc.docscrape import Parameter
 
 from footings.model import (
-    FootingsDoc,
     ModelAttributeType,
     ModelCreationError,
     ModelRunError,
@@ -168,13 +166,14 @@ def test_model_documentation():
             """Do subtraction."""
             pass
 
-    doc = FootingsDoc(Test)
-    assert doc["Returns"] == [Parameter("ret", "int", ["This is a return."])]
-    assert doc["Meta"] == [Parameter("meta", "", ["This is meta."])]
-    assert doc["Sensitivities"] == [
-        Parameter("sensitivity", "", ["This is a sensitivity."])
-    ]
-    assert doc["Parameters"] == [Parameter("parameter", "", ["This is a parameter."])]
+    print(Test.__doc__)
+    assert 0
+    # assert doc["Returns"] == [Parameter("ret", "int", ["This is a return."])]
+    # assert doc["Meta"] == [Parameter("meta", "", ["This is meta."])]
+    # assert doc["Sensitivities"] == [
+    #     Parameter("sensitivity", "", ["This is a sensitivity."])
+    # ]
+    # assert doc["Parameters"] == [Parameter("parameter", "", ["This is a parameter."])]
 
 
 def test_model_attributes():

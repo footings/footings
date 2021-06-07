@@ -24,15 +24,10 @@ def flatten_dict(d):
 def load_footings_json_file(file: str):
     """Load footings generated json file.
 
-    Parameters
-    ----------
-    file : str
-        The path to the file.
+    :param str file: The path to the file.
 
-    Returns
-    -------
-    dict
-        A dict representing the respective file type.
+    :return: A dict representing the respective file type.
+    :rtype: dict
     """
     with open(file, "r") as f:
         loaded_json = json.load(f)

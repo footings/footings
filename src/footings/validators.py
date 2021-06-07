@@ -65,15 +65,9 @@ def equal_to(value):
 
     Can be used under both a `DataDictionary` and a `Model`.
 
-    Parameters
-    ----------
-    value : Any
-        The value to compare for equality.
+    :param Any value: The value to compare for equality..
 
-    Raises
-    ------
-    ValueError
-        With a human readable error message, the attribute (of type `attr.Attribute`), the
+    :raises ValueError: With a human readable error message, the attribute (of type `attr.Attribute`), the
         equality value, and the value passed.
     """
     return _EqualToValidator(value)
@@ -107,15 +101,9 @@ def not_equal_to(value):
 
     Can be used under both a `DataDictionary` and a `Model`.
 
-    Parameters
-    ----------
-    value : Any
-        The value to compare for equality.
+    :param Any value: The value to compare for equality.
 
-    Raises
-    ------
-    ValueError
-        With a human readable error message, the attribute (of type `attr.Attribute`), the
+    :raises ValueError: With a human readable error message, the attribute (of type `attr.Attribute`), the
         equality value, and the value passed.
     """
     return _NotEqualToValidator(value)
