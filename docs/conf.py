@@ -37,7 +37,6 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
-    "footings.doc_tools",
     "myst_nb",
 ]
 # autodoc settings
@@ -47,9 +46,6 @@ autodoc_default_options = {"exclude-members": "__init__, __call__, __signature__
 autosummary_generate = True
 autosummary_generate_overwrite = True
 add_module_names = False
-
-# footings.doc_tools settings
-numpydoc_show_class_members = False
 
 # myst_nb settings
 # jupyter_execute_notebooks = "cache"
@@ -96,6 +92,8 @@ source_suffix = {
 def skip(app, what, name, obj, would_skip, options):
     if name == "__call__":
         return False
+    elif name[:1] == "_":
+        return True
     elif name[:2] == "__":
         return True
     return False

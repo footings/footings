@@ -190,12 +190,3 @@ footings.parallel_tools
 
    dask.create_dask_foreach_jig
    ray.create_ray_foreach_jig
-
-
-footings.doc_tools
-------------------
-
-.. currentmodule:: footings.doc_tools
-
-.. automodule:: footings.doc_tools
-   :exclude-members:
