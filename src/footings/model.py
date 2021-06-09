@@ -1,16 +1,16 @@
 import sys
+import types
 from enum import Enum, auto
 from functools import partial
 from traceback import extract_tb, format_list
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 
-import numpydoc.docscrape as numpydoc
-from attr import NOTHING, attrib, attrs, evolve, make_class
+import regex as re
+from attr import NOTHING, attrib, attrs, evolve, fields_dict, make_class
 from attr._make import _CountingAttr
 from attr.setters import NO_OP, frozen
 
 from .audit import run_model_audit
-from .doc_tools.docscrape import FootingsDoc
 from .exceptions import ModelCreationError, ModelRunError
 from .visualize import visualize_model
 
@@ -225,44 +225,6 @@ def def_return(
     )
 
 
-def _run(self, to_step):
-    if len(self.__model_steps__) == 0:
-        raise ModelRunError("Not able to run model because no steps are registered.")
-    if len(self.__model_returns__) == 0:
-        raise ModelRunError(
-            "Not able to run model because no return attributes are registered."
-        )
-    if to_step is None:
-        steps = self.__model_steps__
-    else:
-        try:
-            position = self.__model_steps__.index(to_step)
-            steps = self.__model_steps__[: (position + 1)]
-        except ValueError as e:
-            msg = f"The step passed to to_step '{to_step}' does not exist as a step."
-            raise e(msg)
-
-    def _run_step(step):
-        try:
-            return getattr(self, step)()
-        except:
-            exc_type, exc_value, exc_trace = sys.exc_info()
-            msg = f"At step [{step}], an error occured.\n"
-            msg += f"  Error Type = {exc_type.__name__}\n"
-            msg += f"  Error Message = {exc_value}\n"
-            msg += f"  Error Trace = {format_list(extract_tb(exc_trace))}\n"
-            raise ModelRunError(msg)
-
-    for step in steps:
-        _run_step(step)
-
-    if to_step is not None:
-        return self
-    if len(self.__model_returns__) > 1:
-        return tuple(getattr(self, ret) for ret in self.__model_returns__)
-    return getattr(self, self.__model_returns__[0])
-
-
 @attrs(slots=True, repr=False)
 class Model:
     """The parent modeling class providing the key methods of run, audit, and visualize."""
@@ -282,30 +244,53 @@ class Model:
     def audit(self, file: str = None, **kwargs):
         """Audit the model which returns copies of the object as it is modified across each step.
 
-        Parameters
-        ----------
-        file : str, optional
-            The name of the audit output file.
-        kwargs
-            Additional key words passed to audit.
+        :param Union[str, None] file: The name of the audit output file.
+        :param kwargs: Additional key words passed to audit.
 
-        Returns
-        -------
-        None
-            An audit file in specfified format (e.g., .xlsx).
+        :return: If file is None, an AuditContainer else an audit file in specfified format (e.g., .xlsx).
         """
         return run_model_audit(model=self, file=file, **kwargs)
 
     def run(self, to_step=None):
         """Runs the model and returns any returns defined.
 
-        Parameters
-        ----------
-        to_step : str, optional
-            The name of the step to run model to.
-
+        :param Union[str, None]: The name of the step to run model through.
         """
-        return _run(self, to_step=to_step)
+        if len(self.__model_steps__) == 0:
+            raise ModelRunError("Not able to run model because no steps are registered.")
+        if len(self.__model_returns__) == 0:
+            raise ModelRunError(
+                "Not able to run model because no return attributes are registered."
+            )
+        if to_step is None:
+            steps = self.__model_steps__
+        else:
+            try:
+                position = self.__model_steps__.index(to_step)
+                steps = self.__model_steps__[: (position + 1)]
+            except ValueError as e:
+                msg = f"The step passed to to_step '{to_step}' does not exist as a step."
+                raise e(msg)
+
+        def _run_step(step):
+            try:
+                return getattr(self, step)()
+            except:
+                exc_type, exc_value, exc_trace = sys.exc_info()
+                msg = f"At step [{step}], an error occured.\n"
+                msg += f"  Error Type = {exc_type.__name__}\n"
+                msg += f"  Error Message = {exc_value}\n"
+                msg += f"  Error Trace = {format_list(extract_tb(exc_trace))}\n"
+                raise ModelRunError(msg)
+
+        for step in steps:
+            _run_step(step)
+
+        if to_step is not None:
+            return self
+        if len(self.__model_returns__) > 1:
+            return tuple(getattr(self, ret) for ret in self.__model_returns__)
+        return getattr(self, self.__model_returns__[0])
 
 
 @attrs(frozen=True, slots=True)
@@ -352,31 +337,26 @@ class Step:
 
 
 def step(
-    method: callable = None,
+    method: Union[callable, None] = None,
     *,
     uses: List[str],
     impacts: List[str],
-    name: str = None,
-    docstring: str = None,
-    metadata: dict = None,
+    name: Union[str, None] = None,
+    docstring: Union[str, None] = None,
+    metadata: Union[dict, None] = None,
 ):
     """Turn a method into a step within the footings framework.
 
-    Parameters
-    ----------
-    method : callable, optional
-        The method to decorate, by default None.
-    uses : List[str]
-        A list of the object names used by the step.
-    impacts : List[str]
-        A list of the object names that are impacted by the step (i.e., the returns and intermediates).
-    wrap : callable, optional
-        Wrap or source the docstring from another object, by default None.
+    :param Union[callable, None] method: The method to decorate, by default None.
+    :param List[str] uses: A list of the object names used by the step.
+    :param List[str] impacts: A list of the object names that are impacted by the step (i.e., the returns and
+        intermediates).
+    :param Union[str, none] name: Assign a step name to step, optional.
+    :param Union[str, none] docstring: Assign a docstring to step, optional.
+    :param Union[dict, none] metadata: Assign metadata to step, optional.
 
-    Returns
-    -------
-    callable
-        The decorated method with a attributes for uses and impacts and updated docstring if wrap passed.
+    :return: The decorated method with a attributes for uses and impacts and updated docstring if wrap passed.
+    :rtype: callable
     """
     if method is None:
         return partial(
@@ -398,65 +378,93 @@ def step(
     )
 
 
-def _make_doc_parameter(attribute):
-    if attribute.type is None:
-        atype = ""
-    elif isinstance(attribute.type, str):
-        atype = attribute.type
-    elif hasattr(attribute.type, "__qualname__"):
-        atype = attribute.type.__qualname__
+def _make_entry(name: str, attribute) -> str:
+    def get_type(attribute):
+        if attribute.type is None:
+            stype = ""
+        elif isinstance(attribute.type, str):
+            stype = f" ({attribute.type})"
+        elif hasattr(attribute.type, "__qualname__"):
+            stype = f" ({attribute.type.__qualname__})"
+        else:
+            try:
+                stype = f" ({str(attribute.type)})"
+            except:
+                stype = ""
+        return stype
+
+    def get_description(attribute):
+        description = attribute.metadata.get("description", "")
+        if description != "":
+            description = " - " + description
+        return description
+
+    return f"- **{name}{get_type(attribute)}**{get_description(attribute)}"
+
+
+def create_model_docstring(model: Model) -> str:
+    """Create model docstring."""
+
+    def clean(s):
+        def inner(s):
+            return "\n".join([x.strip() for x in s.split("\n")])
+
+        return "\n\n".join([inner(x).strip() for x in s.split("\n\n")])
+
+    def check(name):
+        return len(getattr(model, name)) > 0
+
+    def load(attribute, steps=False):
+        def get(name):
+            attribute = getattr(model, name)
+            if isinstance(attribute, types.MemberDescriptorType):
+                return attrs_attrs.get(name)
+            return attribute
+
+        def as_str(idx, x):
+            return f"{idx}) **{x}** - {getattr(model, x).docstring}"
+
+        # if model is inherited need to look up attribute in __attrs_attrs__
+        if hasattr(model, "__attrs_attrs__"):
+            attrs_attrs = fields_dict(model)
+        else:
+            attrs_attrs = {}
+
+        if steps:
+            items = [
+                as_str(idx, x) for idx, x in enumerate(getattr(model, attribute), start=1)
+            ]
+        else:
+            items = [_make_entry(x, get(x)) for x in getattr(model, attribute)]
+        return "\n".join(items) + "\n\n"
+
+    def add_section(docstring, src, rubric, steps=False):
+        if src in docstring:
+            docstring = docstring.replace(
+                src, f".. rubric:: {rubric}\n\n{load(src, steps)}"
+            )
+        else:
+            docstring += f".. rubric:: {rubric}\n\n{load(src, steps)}"
+        return docstring
+
+    if model.__doc__ is None:
+        docstring = ""
     else:
-        try:
-            atype = str(attribute.type)
-        except:
-            atype = ""
-    return numpydoc.Parameter(
-        attribute.name, atype, [attribute.metadata.get("description", "")]
-    )
+        docstring = clean(model.__doc__) + "\n\n"
 
-
-def _parse_attriubtes(cls):
-    sections = ["Parameters", "Sensitivities", "Meta", "Intermediates", "Returns"]
-    parsed_attributes = {section: [] for section in sections}
-
-    for attribute in cls.__attrs_attrs__:
-        attribute_type = attribute.metadata.get("footings_attribute_type", None)
-        if attribute_type is ModelAttributeType.Parameter:
-            parsed_attributes["Parameters"].append(_make_doc_parameter(attribute))
-        elif attribute_type is ModelAttributeType.Sensitivity:
-            parsed_attributes["Sensitivities"].append(_make_doc_parameter(attribute))
-        elif attribute_type is ModelAttributeType.Meta:
-            parsed_attributes["Meta"].append(_make_doc_parameter(attribute))
-        elif attribute_type is ModelAttributeType.Intermediate:
-            parsed_attributes["Intermediates"].append(_make_doc_parameter(attribute))
-        elif attribute_type is ModelAttributeType.Return:
-            parsed_attributes["Returns"].append(_make_doc_parameter(attribute))
-
-    return parsed_attributes
-
-
-def _generate_steps_sections(cls, steps):
-    return [
-        f"{idx}) {getattr(cls, step).name} - {getattr(cls, step).docstring}"
-        for idx, step in enumerate(steps, start=1)
-    ]
-
-
-def _attr_doc(cls, steps):
-
-    parsed_attributes = _parse_attriubtes(cls)
-    doc = FootingsDoc(cls)
-
-    doc["Parameters"] = parsed_attributes["Parameters"]
-    doc["Sensitivities"] = parsed_attributes["Sensitivities"]
-    doc["Meta"] = parsed_attributes["Meta"]
-    doc["Intermediates"] = parsed_attributes["Intermediates"]
-    doc["Returns"] = parsed_attributes["Returns"]
-    doc["Steps"] = _generate_steps_sections(cls, steps)
-    doc["Methods"] = []
-
-    cls.__doc__ = str(doc)
-    return cls
+    if check("__model_parameters__"):
+        docstring = add_section(docstring, "__model_parameters__", "Parameters")
+    if check("__model_sensitivities__"):
+        docstring = add_section(docstring, "__model_sensitivities__", "Sensitivities")
+    if check("__model_intermediates__"):
+        docstring = add_section(docstring, "__model_intermediates__", "Intermediates")
+    if check("__model_returns__"):
+        docstring = add_section(docstring, "__model_returns__", "Returns")
+    if check("__model_meta__"):
+        docstring = add_section(docstring, "__model_meta__", "Meta")
+    if check("__model_steps__"):
+        docstring = add_section(docstring, "__model_steps__", "Steps", True)
+    return re.sub("\n{2,}", "\n\n", docstring)
 
 
 def _update_uses_impacts(src, attribute_map):
@@ -476,17 +484,11 @@ def _update_uses_impacts(src, attribute_map):
 def model(cls: type = None, *, steps: List[str] = []):
     """Turn a class into a model within the footings framework.
 
-    Parameters
-    ----------
-    cls : type
-        The class to turn into a model.
-    steps : List[str], optional
-        The list of steps to the model.
+    :param type cls: The class to turn into a model.
+    :param Union[List[str], None] steps: The list of steps to the model.
 
-    Returns
-    -------
-    cls
-        Returns cls as a model within footings framework.
+    :return: Returns cls as a model within footings framework.
+    :rtype: cls
     """
     if cls is None:
         return partial(model, steps=steps)
@@ -583,8 +585,8 @@ def model(cls: type = None, *, steps: List[str] = []):
             if x[0] != "_" and x not in exclude
         }
 
-        # Make attrs dataclass and update signature
-        cls = make_class(
+        # Make attrs dataclass and update docstring
+        new_cls = make_class(
             cls.__name__,
             attrs=attrs,
             bases=(cls, Model,),
@@ -593,6 +595,7 @@ def model(cls: type = None, *, steps: List[str] = []):
             repr=False,
             slots=True,
         )
-        return _attr_doc(cls, steps)
+        new_cls.__doc__ = create_model_docstring(cls)
+        return new_cls
 
     return inner(cls)

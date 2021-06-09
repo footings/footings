@@ -1,7 +1,7 @@
 {
   "name": "IntegerModel",
   "signature": "IntegerModel(*, a: int, b: int, c: int, d: int)",
-  "docstring": "\nInteger model for testing.\n\nParameters\n----------\na : int\n    A number A\nb : int\n    A number B\nc : int\n    A number C\nd : int\n    A number D\n\nIntermediates\n-------------\nret_1 : int\n    Results a + b\nret_2 : int\n    Results c - d\n\nReturns\n-------\nret_3 : int\n    Result total of step_1 and step_2\n\nSteps\n-----\n1) _step_1 - Add a and b together.\n2) _step_2 - Subtract d from c\n3) _step_3 - Add total of steps 1 and 2.\n",
+  "docstring": "Integer model for testing.\n\n.. rubric:: Parameters\n\n- **a (int)** - A number A\n- **b (int)** - A number B\n- **c (int)** - A number C\n- **d (int)** - A number D\n\n.. rubric:: Intermediates\n\n- **ret_1 (int)** - Results a + b\n- **ret_2 (int)** - Results c - d\n\n.. rubric:: Returns\n\n- **ret_3 (int)** - Result total of step_1 and step_2\n\n.. rubric:: Steps\n\n1) **_step_1** - Add a and b together.\n2) **_step_2** - Subtract d from c\n3) **_step_3** - Add total of steps 1 and 2.\n\n",
   "instantiation": {
     "parameter.a": 1,
     "parameter.b": 1,

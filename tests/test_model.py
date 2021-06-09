@@ -8,6 +8,7 @@ from footings.model import (
     ModelAttributeType,
     ModelCreationError,
     ModelRunError,
+    create_model_docstring,
     def_intermediate,
     def_meta,
     def_parameter,
@@ -148,13 +149,23 @@ def test_model_instantiation():
                 self.ret = self.ret + self.parameter
 
 
-def test_model_documentation():
-    @model(steps=["_add", "_subtract"])
-    class Test:
-        parameter = def_parameter(description="This is a parameter.")
+class Test_model_docstring:
+    class TestBasic:
+        """Test doc."""
+
+        parameter1 = def_parameter(description="This is a parameter 1.")
+        parameter2 = def_parameter(description="This is a parameter 2.")
         sensitivity = def_sensitivity(default=1, description="This is a sensitivity.")
         meta = def_meta(meta="meta", description="This is meta.")
+        inter = def_intermediate(dtype="int", description="This is an intermediate.")
         ret = def_return(dtype="int", description="This is a return.")
+
+        __model_steps__ = tuple(["_add", "_subtract"])
+        __model_parameters__ = tuple(["parameter1", "parameter2"])
+        __model_sensitivities__ = tuple(["sensitivity"])
+        __model_meta__ = tuple(["meta"])
+        __model_intermediates__ = tuple(["inter"])
+        __model_returns__ = tuple(["ret"])
 
         @step(uses=["parameter"], impacts=["ret"])
         def _add(self):
@@ -166,14 +177,94 @@ def test_model_documentation():
             """Do subtraction."""
             pass
 
-    print(Test.__doc__)
-    assert 0
-    # assert doc["Returns"] == [Parameter("ret", "int", ["This is a return."])]
-    # assert doc["Meta"] == [Parameter("meta", "", ["This is meta."])]
-    # assert doc["Sensitivities"] == [
-    #     Parameter("sensitivity", "", ["This is a sensitivity."])
-    # ]
-    # assert doc["Parameters"] == [Parameter("parameter", "", ["This is a parameter."])]
+    class TestAdvanced:
+        """Test doc.
+
+        __model_parameters__
+        __model_sensitivities__
+        __model_intermediates__
+        __model_returns__
+        __model_meta__
+        __model_steps__
+
+        .. warnings also::
+
+            This is a warning.
+
+        .. note::
+
+            This is a note.
+        """
+
+        parameter1 = def_parameter(description="This is a parameter 1.")
+        parameter2 = def_parameter(description="This is a parameter 2.")
+        sensitivity = def_sensitivity(default=1, description="This is a sensitivity.")
+        meta = def_meta(meta="meta", description="This is meta.")
+        inter = def_intermediate(dtype="int", description="This is an intermediate.")
+        ret = def_return(dtype="int", description="This is a return.")
+
+        __model_steps__ = tuple(["_add", "_subtract"])
+        __model_parameters__ = tuple(["parameter1", "parameter2"])
+        __model_sensitivities__ = tuple(["sensitivity"])
+        __model_meta__ = tuple(["meta"])
+        __model_intermediates__ = tuple(["inter"])
+        __model_returns__ = tuple(["ret"])
+
+        @step(uses=["parameter"], impacts=["ret"])
+        def _add(self):
+            """Do addition."""
+            pass
+
+        @step(uses=["ret", "sensitivity"], impacts=["ret"])
+        def _subtract(self):
+            """Do subtraction."""
+            pass
+
+    def test_basic(self):
+        test = create_model_docstring(self.TestBasic)
+        expected = [
+            "Test doc.\n\n",
+            ".. rubric:: Parameters\n\n",
+            "- **parameter1** - This is a parameter 1.\n",
+            "- **parameter2** - This is a parameter 2.\n\n",
+            ".. rubric:: Sensitivities\n\n",
+            "- **sensitivity** - This is a sensitivity.\n\n",
+            ".. rubric:: Intermediates\n\n",
+            "- **inter (int)** - This is an intermediate.\n\n",
+            ".. rubric:: Returns\n\n",
+            "- **ret (int)** - This is a return.\n\n",
+            ".. rubric:: Meta\n\n",
+            "- **meta** - This is meta.\n\n",
+            ".. rubric:: Steps\n\n",
+            "1) **_add** - Do addition.\n",
+            "2) **_subtract** - Do subtraction.\n\n",
+        ]
+        assert test == "".join(expected)
+
+    def test_advanced(self):
+        test = create_model_docstring(self.TestAdvanced)
+        expected = [
+            "Test doc.\n\n",
+            ".. rubric:: Parameters\n\n",
+            "- **parameter1** - This is a parameter 1.\n",
+            "- **parameter2** - This is a parameter 2.\n\n",
+            ".. rubric:: Sensitivities\n\n",
+            "- **sensitivity** - This is a sensitivity.\n\n",
+            ".. rubric:: Intermediates\n\n",
+            "- **inter (int)** - This is an intermediate.\n\n",
+            ".. rubric:: Returns\n\n",
+            "- **ret (int)** - This is a return.\n\n",
+            ".. rubric:: Meta\n\n",
+            "- **meta** - This is meta.\n\n",
+            ".. rubric:: Steps\n\n",
+            "1) **_add** - Do addition.\n",
+            "2) **_subtract** - Do subtraction.\n\n",
+            ".. warnings also::\n\n",
+            "This is a warning.\n\n",
+            ".. note::\n\n",
+            "This is a note.\n\n",
+        ]
+        assert test == "".join(expected)
 
 
 def test_model_attributes():
