@@ -37,9 +37,6 @@ flake8 = "^3.7"
 black = "^19.10b"
 pre-commit = "^2.1"
 nox = ">=2020.0.0"
-toolz = "^0.11"
-dask = ">=2021.0"
-ray = "^1.1"
 
 
 [build-system]
