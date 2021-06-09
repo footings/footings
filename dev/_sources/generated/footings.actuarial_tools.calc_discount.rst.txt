@@ -1,6 +1,0 @@
-﻿footings.actuarial\_tools.calc\_discount
-========================================
-
-.. currentmodule:: footings.actuarial_tools
-
-.. autofunction:: calc_discount

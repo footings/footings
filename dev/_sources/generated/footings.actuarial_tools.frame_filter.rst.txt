@@ -1,6 +1,0 @@
-﻿footings.actuarial\_tools.frame\_filter
-=======================================
-
-.. currentmodule:: footings.actuarial_tools
-
-.. autofunction:: frame_filter

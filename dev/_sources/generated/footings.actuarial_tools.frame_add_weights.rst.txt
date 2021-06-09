@@ -1,6 +1,0 @@
-﻿footings.actuarial\_tools.frame\_add\_weights
-=============================================
-
-.. currentmodule:: footings.actuarial_tools
-
-.. autofunction:: frame_add_weights

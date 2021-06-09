@@ -1,6 +1,0 @@
-﻿footings.actuarial\_tools.convert\_to\_records
-==============================================
-
-.. currentmodule:: footings.actuarial_tools
-
-.. autofunction:: convert_to_records

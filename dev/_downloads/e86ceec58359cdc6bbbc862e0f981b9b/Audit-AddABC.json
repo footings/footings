@@ -1,7 +1,7 @@
 {
   "name": "AddABC",
   "signature": "AddABC(*, a: int, b: int, c: int)",
-  "docstring": "\nThis model takes 3 parameters - a, b, and c and adds them together in two steps.\n\nParameters\n----------\na : int\n    This is parameter a.\nb : int\n    This is parameter b.\nc : int\n    This is parameter c.\n\nIntermediates\n-------------\nab : int\n    This holds a + b.\n\nReturns\n-------\nabc : int\n    The sum of ab and c.\n\nSteps\n-----\n1) _add_a_b - Add a and b together and assign to ab.\n2) _add_ab_c - Add ab and c together for final return.\n",
+  "docstring": "This model takes 3 parameters - a, b, and c and adds them together in two steps.\n\n.. rubric:: Parameters\n\n- **a (int)** - This is parameter a.\n- **b (int)** - This is parameter b.\n- **c (int)** - This is parameter c.\n\n.. rubric:: Intermediates\n\n- **ab (int)** - This holds a + b.\n\n.. rubric:: Returns\n\n- **abc (int)** - The sum of ab and c.\n\n.. rubric:: Steps\n\n1) **_add_a_b** - Add a and b together and assign to ab.\n2) **_add_ab_c** - Add ab and c together for final return.\n\n",
   "instantiation": {
     "parameter.a": 1,
     "parameter.b": 2,

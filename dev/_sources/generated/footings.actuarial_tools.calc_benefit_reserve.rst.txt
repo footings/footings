@@ -1,6 +1,0 @@
-﻿footings.actuarial\_tools.calc\_benefit\_reserve
-================================================
-
-.. currentmodule:: footings.actuarial_tools
-
-.. autofunction:: calc_benefit_reserve
