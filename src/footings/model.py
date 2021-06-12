@@ -589,7 +589,10 @@ def model(cls: type = None, *, steps: List[str] = []):
         new_cls = make_class(
             cls.__name__,
             attrs=attrs,
-            bases=(cls, Model,),
+            bases=(
+                cls,
+                Model,
+            ),
             kw_only=True,
             on_setattr=frozen,
             repr=False,

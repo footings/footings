@@ -371,7 +371,9 @@ class DataDictionary:
         if add_dtype_validator is True:
             validator.append(instance_of(dtype))
         return def_parameter(
-            dtype=dtype, description=col.description, validator=validator,
+            dtype=dtype,
+            description=col.description,
+            validator=validator,
         )
 
     def def_sensitivity(self, column):

@@ -169,7 +169,9 @@ def make_assumption_set(name: str, description: str, registry: dict):
     cls = make_class(name=name, attrs={}, bases=(AssumptionSet,), slots=True, frozen=True)
     for k, v in registry.items():
         setattr(
-            cls, k, MethodType(v, cls) if v.bounded else staticmethod(v),
+            cls,
+            k,
+            MethodType(v, cls) if v.bounded else staticmethod(v),
         )
     cls.__doc__ = make_assumption_set_doc(name, description, registry)
     return cls()

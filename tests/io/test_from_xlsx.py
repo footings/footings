@@ -23,7 +23,12 @@ def test_load_xlsx_file():
 
     expected_dict = {
         FootingsXlsxEntry(
-            mapping="/outer", row_start=2, col_start=2, row_end=2, col_end=2, **kws_str,
+            mapping="/outer",
+            row_start=2,
+            col_start=2,
+            row_end=2,
+            col_end=2,
+            **kws_str,
         ): "outer",
         FootingsXlsxEntry(
             mapping="/outer/inner",

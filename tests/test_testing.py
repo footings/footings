@@ -90,7 +90,10 @@ class Test_compare_values:
 
         # fail expected type
         msg = "The expected_value is not type pd.Series."
-        assert compare_values(pd.Series([0.5], name="X"), [0.5]) == (False, msg,)
+        assert compare_values(pd.Series([0.5], name="X"), [0.5]) == (
+            False,
+            msg,
+        )
 
         # fail names
         msg = "The test_value name [X] is different then the expected_value name [Y]."

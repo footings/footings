@@ -289,13 +289,19 @@ class TestDataDictionary:
         assert issubclass(DD.__class__, DataDictionary)
 
     def test_columns(self, DD):
-        assert DD.columns == ("COL1", "COL2",)
+        assert DD.columns == (
+            "COL1",
+            "COL2",
+        )
 
     def test_list_columns(self, DD):
         assert DD.list_columns() == [getattr(DD, "COL1"), getattr(DD, "COL2")]
 
     def test_cols_valid(self, DD, df_correct, df_extra_column, df_missing_column):
-        assert DD._cols_valid(df_correct) == ([True, True], [],)
+        assert DD._cols_valid(df_correct) == (
+            [True, True],
+            [],
+        )
         assert DD._cols_valid(df_extra_column) == (
             [True, True, False],
             [
@@ -311,7 +317,10 @@ class TestDataDictionary:
 
     def test_types_valid(self, DD, df_correct, df_wrong_type):
 
-        assert DD._types_valid(df_correct) == ([True, True], [],)
+        assert DD._types_valid(df_correct) == (
+            [True, True],
+            [],
+        )
         assert DD._types_valid(df_wrong_type) == (
             [True, False],
             [
@@ -328,7 +337,10 @@ class TestDataDictionary:
         assert dd_all_dtypes.validate(df_all_dtypes)
 
     def test_validators_valid(self, DD, df_correct, df_fail_validator):
-        assert DD._validators_valid(df_correct) == ([True], [],)
+        assert DD._validators_valid(df_correct) == (
+            [True],
+            [],
+        )
         assert DD._validators_valid(df_fail_validator) == (
             [False],
             ["The column [COL1] failed equal_to(value=1) validator."],

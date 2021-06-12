@@ -153,7 +153,10 @@ def _(test_value, expected_value, tolerance=None):
         msg += f"The expected_value columns are - \n\n{str(list(expected_value.columns))}\n\n"
         return False, msg
     series_compare = [
-        (col, compare_values(test_value[col], expected_value[col], tolerance),)
+        (
+            col,
+            compare_values(test_value[col], expected_value[col], tolerance),
+        )
         for col in test_value.columns
     ]
     result = all(x[1][0] for x in series_compare)
@@ -255,7 +258,10 @@ def assert_footings_json_files_equal(
     test = load_footings_json_file(test)
     expected = load_footings_json_file(expected)
     result, message = compare_file_dicts(
-        test=test, expected=expected, tolerance=tolerance, exclude_keys=exclude_keys,
+        test=test,
+        expected=expected,
+        tolerance=tolerance,
+        exclude_keys=exclude_keys,
     )
     if result is False:
         raise AssertionError(f"\n{str(message)}")
@@ -286,7 +292,10 @@ def assert_footings_xlsx_files_equal(
     test = load_footings_xlsx_file(test)
     expected = load_footings_xlsx_file(expected)
     result, message = compare_file_dicts(
-        test=test, expected=expected, tolerance=tolerance, exclude_keys=exclude_keys,
+        test=test,
+        expected=expected,
+        tolerance=tolerance,
+        exclude_keys=exclude_keys,
     )
     if result is False:
         raise AssertionError(f"\n{message}")

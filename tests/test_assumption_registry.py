@@ -24,7 +24,10 @@ class TestAssumption:
         name="Assumption2", description="This is assumption 2.", assumption=func
     )
     asn_3 = Assumption.create(
-        name="Assumption3", description="This is assumption 3.", uses=(), assumption=func,
+        name="Assumption3",
+        description="This is assumption 3.",
+        uses=(),
+        assumption=func,
     )
     asn_4 = Assumption.create(
         name="Assumption4",

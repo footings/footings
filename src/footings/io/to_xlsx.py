@@ -201,7 +201,9 @@ class FootingsXlsxWb:
     ):
         """Add worksheet."""
         wrksht = FootingsXlsxSheet(
-            obj=self.workbook.create_sheet(name), row=start_row, col=start_col,
+            obj=self.workbook.create_sheet(name),
+            row=start_row,
+            col=start_col,
         )
         if hidden:
             wrksht.obj.sheet_state = "hidden"

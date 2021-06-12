@@ -55,7 +55,10 @@ class WrappedModel:
     model = attrib()
     iterator_keys = attrib(type=tuple, validator=instance_of(tuple))
     pass_iterator_keys = attrib(
-        type=Optional[Tuple], kw_only=True, validator=instance_of(tuple), factory=tuple,
+        type=Optional[Tuple],
+        kw_only=True,
+        validator=instance_of(tuple),
+        factory=tuple,
     )
     parallel_wrap = attrib(
         type=Optional[Callable],
@@ -203,7 +206,12 @@ class ForeachJig:
 
     model = attrib(
         type=Union[WrappedModel, MappedModel],
-        validator=instance_of((WrappedModel, MappedModel,)),
+        validator=instance_of(
+            (
+                WrappedModel,
+                MappedModel,
+            )
+        ),
     )
     iterator_name = attrib(type=str, validator=instance_of(str))
     constant_params = attrib(type=Optional[Tuple], validator=instance_of(tuple))

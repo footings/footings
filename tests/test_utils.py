@@ -163,7 +163,16 @@ class Test_get_kws:
 
         # pass
         assert get_kws(lambda x: x, test) == {"x": 1}
-        assert get_kws(lambda x, y: (x, y,), test) == {"x": 1, "y": 2}
+        assert (
+            get_kws(
+                lambda x, y: (
+                    x,
+                    y,
+                ),
+                test,
+            )
+            == {"x": 1, "y": 2}
+        )
 
         # error
         pytest.raises(AttributeError, get_kws, lambda z: z, test)
