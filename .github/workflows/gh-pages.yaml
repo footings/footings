@@ -2,9 +2,9 @@ name: gh-pages
 
 on:
   push:
-    branches: [dev, master]
+    branches: [dev, main]
   pull_request:
-    branches: [dev, master]
+    branches: [dev, main]
 
 jobs:
   create-and-publish-docs:
@@ -40,14 +40,14 @@ jobs:
           poetry run python -m ipykernel install --user --name footings --display-name "Footings"
       - name: Run sphinx
         run:  nox -s create_docs
-      - name: Deploy docs to github pages - master
-        if: github.ref == 'refs/heads/master'
+      - name: Deploy docs to github pages - main
+        if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: ./docs/_build
-          destination_dir: ./master
+          destination_dir: ./main
       - name: Deploy docs to github pages - dev
         if: github.ref == 'refs/heads/dev'
         uses: peaceiris/actions-gh-pages@v3
