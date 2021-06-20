@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>footings.model &#8212; Footings 0.10.0 documentation</title>
+    <title>footings.model &#8212; Footings 0.11.0 documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet" />
   <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -752,7 +752,10 @@
         <span class="n">new_cls</span> <span class="o">=</span> <span class="n">make_class</span><span class="p">(</span>
             <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
             <span class="n">attrs</span><span class="o">=</span><span class="n">attrs</span><span class="p">,</span>
-            <span class="n">bases</span><span class="o">=</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">Model</span><span class="p">,),</span>
+            <span class="n">bases</span><span class="o">=</span><span class="p">(</span>
+                <span class="bp">cls</span><span class="p">,</span>
+                <span class="n">Model</span><span class="p">,</span>
+            <span class="p">),</span>
             <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">on_setattr</span><span class="o">=</span><span class="n">frozen</span><span class="p">,</span>
             <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>

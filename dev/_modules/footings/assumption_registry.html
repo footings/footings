@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>footings.assumption_registry &#8212; Footings 0.10.0 documentation</title>
+    <title>footings.assumption_registry &#8212; Footings 0.11.0 documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet" />
   <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -332,7 +332,9 @@
     <span class="bp">cls</span> <span class="o">=</span> <span class="n">make_class</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{},</span> <span class="n">bases</span><span class="o">=</span><span class="p">(</span><span class="n">AssumptionSet</span><span class="p">,),</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="nb">setattr</span><span class="p">(</span>
-            <span class="bp">cls</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">MethodType</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">bounded</span> <span class="k">else</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>
+            <span class="bp">cls</span><span class="p">,</span>
+            <span class="n">k</span><span class="p">,</span>
+            <span class="n">MethodType</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">bounded</span> <span class="k">else</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>
         <span class="p">)</span>
     <span class="bp">cls</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">make_assumption_set_doc</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">registry</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">cls</span><span class="p">()</span>

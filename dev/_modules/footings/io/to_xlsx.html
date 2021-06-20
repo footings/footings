@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>footings.io.to_xlsx &#8212; Footings 0.10.0 documentation</title>
+    <title>footings.io.to_xlsx &#8212; Footings 0.11.0 documentation</title>
     
   <link href="../../../_static/css/theme.css" rel="stylesheet" />
   <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -364,7 +364,9 @@
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add worksheet.&quot;&quot;&quot;</span>
         <span class="n">wrksht</span> <span class="o">=</span> <span class="n">FootingsXlsxSheet</span><span class="p">(</span>
-            <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workbook</span><span class="o">.</span><span class="n">create_sheet</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">row</span><span class="o">=</span><span class="n">start_row</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">start_col</span><span class="p">,</span>
+            <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workbook</span><span class="o">.</span><span class="n">create_sheet</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
+            <span class="n">row</span><span class="o">=</span><span class="n">start_row</span><span class="p">,</span>
+            <span class="n">col</span><span class="o">=</span><span class="n">start_col</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">hidden</span><span class="p">:</span>
             <span class="n">wrksht</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">sheet_state</span> <span class="o">=</span> <span class="s2">&quot;hidden&quot;</span>

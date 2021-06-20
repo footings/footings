@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>footings.jigs &#8212; Footings 0.10.0 documentation</title>
+    <title>footings.jigs &#8212; Footings 0.11.0 documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet" />
   <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -218,7 +218,10 @@
     <span class="n">model</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">()</span>
     <span class="n">iterator_keys</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="n">instance_of</span><span class="p">(</span><span class="nb">tuple</span><span class="p">))</span>
     <span class="n">pass_iterator_keys</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">(</span>
-        <span class="nb">type</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">],</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="n">instance_of</span><span class="p">(</span><span class="nb">tuple</span><span class="p">),</span> <span class="n">factory</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">],</span>
+        <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">validator</span><span class="o">=</span><span class="n">instance_of</span><span class="p">(</span><span class="nb">tuple</span><span class="p">),</span>
+        <span class="n">factory</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parallel_wrap</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">(</span>
         <span class="nb">type</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">],</span>
@@ -366,7 +369,12 @@
 
     <span class="n">model</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">(</span>
         <span class="nb">type</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">WrappedModel</span><span class="p">,</span> <span class="n">MappedModel</span><span class="p">],</span>
-        <span class="n">validator</span><span class="o">=</span><span class="n">instance_of</span><span class="p">((</span><span class="n">WrappedModel</span><span class="p">,</span> <span class="n">MappedModel</span><span class="p">,)),</span>
+        <span class="n">validator</span><span class="o">=</span><span class="n">instance_of</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">WrappedModel</span><span class="p">,</span>
+                <span class="n">MappedModel</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">iterator_name</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="n">instance_of</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
     <span class="n">constant_params</span> <span class="o">=</span> <span class="n">attrib</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">],</span> <span class="n">validator</span><span class="o">=</span><span class="n">instance_of</span><span class="p">(</span><span class="nb">tuple</span><span class="p">))</span>
