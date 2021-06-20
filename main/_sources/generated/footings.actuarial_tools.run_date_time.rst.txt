@@ -1,6 +1,0 @@
-﻿footings.actuarial\_tools.run\_date\_time
-=========================================
-
-.. currentmodule:: footings.actuarial_tools
-
-.. autodata:: run_date_time

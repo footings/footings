@@ -1,6 +1,0 @@
-﻿footings.parallel\_tools.dask.create\_dask\_foreach\_jig
-========================================================
-
-.. currentmodule:: footings.parallel_tools.dask
-
-.. autofunction:: create_dask_foreach_jig

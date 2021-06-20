@@ -2,7 +2,7 @@
 
 BSD 3-Clause License
 
-Copyright (c) 2019-2020 Dustin Tindall
+Copyright (c) 2019-2021 Dustin Tindall
 
 All rights reserved.
 

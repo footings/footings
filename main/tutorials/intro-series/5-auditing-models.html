@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Auditing Models &#8212; Footings 0.10.0 documentation</title>
+    <title>Auditing Models &#8212; Footings 0.11.0 documentation</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet" />
-  <link href="../../_static/css/index.f6b7ca918bee2f46fd9abac01cfb07d5.css" rel="stylesheet" />
+  <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
 
     
   <link rel="stylesheet"
@@ -27,7 +27,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.1e043a052b0af929e4d8.js">
+  <link rel="preload" as="script" href="../../_static/js/index.1c5a1a01449ed65a7b51.js">
 
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -41,26 +41,36 @@
     <link rel="prev" title="Running Models" href="4-running-models.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
+    
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
     
+    <div class="container-fluid" id="banner"></div>
+
+    
     <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Footings</p>
+</a>
 
     
-    <a class="navbar-brand" href="../../index.html">
-      <p class="title">Footings</p>
-    </a>
-    
+  </div>
 
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-    
-    <div id="navbar-menu" class="col-lg-9 collapse navbar-collapse">
-      <ul id="navbar-main-elements" class="navbar-nav mr-auto">
-        <li class="toctree-l1 nav-item">
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../../installation.html">
   Installation
  </a>
@@ -96,14 +106,16 @@
  </a>
 </li>
 
-        
-      </ul>
+    
+</ul>
+      </div>
+      
+    </div>
 
-      <form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this site..." aria-label="Search this site..." autocomplete="off" >
-</form>
-      <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
           <a class="nav-link" href="https://github.com/footings/footings" rel="noopener" target="_blank" title="GitHub">
             <span><i class="fab fa-github-square"></i></span>
@@ -111,7 +123,10 @@
           </a>
         </li>
       </ul>
+      </div>
+      
     </div>
+  </div>
 </div>
     </nav>
     
@@ -121,52 +136,68 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this site..." aria-label="Search this site..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
     <ul class="current nav bd-sidenav">
- <li class="toctree-l2 current active">
+ <li class="toctree-l1 current active has-children">
   <a class="reference internal" href="index.html">
    Intro Series
   </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
   <ul class="current">
-   <li class="toctree-l3">
+   <li class="toctree-l2">
     <a class="reference internal" href="1-building-a-model.html">
      Building a Model
     </a>
    </li>
-   <li class="toctree-l3">
+   <li class="toctree-l2">
     <a class="reference internal" href="2-attributes-and-instantiation.html">
      Attributes and Instantiation
     </a>
    </li>
-   <li class="toctree-l3">
+   <li class="toctree-l2">
     <a class="reference internal" href="3-documenting-models.html">
      Documenting Models
     </a>
    </li>
-   <li class="toctree-l3">
+   <li class="toctree-l2">
     <a class="reference internal" href="4-running-models.html">
      Running Models
     </a>
    </li>
-   <li class="toctree-l3 current active">
+   <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
      Auditing Models
     </a>
    </li>
   </ul>
  </li>
- <li class="toctree-l2">
+ <li class="toctree-l1 has-children">
   <a class="reference internal" href="../pattern-series/index.html">
    Pattern Series
   </a>
- </li>
- <li class="toctree-l2">
-  <a class="reference internal" href="../actuarial-series/index.html">
-   Actuarial Series
-  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../pattern-series/1-dispatch-function.html">
+     Function Dispatch
+    </a>
+   </li>
+  </ul>
  </li>
 </ul>
+
   </div>
 </nav>
             </div>
@@ -175,7 +206,10 @@
 
           
           <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
+              <div class="toc-item">
+                
 <div class="tocsection onthispage pt-5 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
@@ -200,9 +234,13 @@
 </ul>
 
 </nav>
-
-
+              </div>
               
+              <div class="toc-item">
+                
+              </div>
+              
+            
           </div>
           
 
@@ -264,7 +302,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AuditContainer(name=&#39;AddABC&#39;, instantiation={&#39;parameter.a&#39;: 1, &#39;parameter.b&#39;: 2, &#39;parameter.c&#39;: 3}, output={&#39;abc&#39;: 6}, docstring=&#39;\nThis model takes 3 parameters - a, b, and c and adds them together in two steps.\n\nParameters\n----------\na : int\n    This is parameter a.\nb : int\n    This is parameter b.\nc : int\n    This is parameter c.\n\nIntermediates\n-------------\nab : int\n    This holds a + b.\n\nReturns\n-------\nabc : int\n    The sum of ab and c.\n\nSteps\n-----\n1) _add_a_b - Add a and b together and assign to ab.\n2) _add_ab_c - Add ab and c together for final return.\n&#39;, signature=&#39;AddABC(*, a: int, b: int, c: int)&#39;, steps={&#39;_add_a_b&#39;: AuditStepContainer(name=&#39;_add_a_b&#39;, method_name=&#39;_add_a_b&#39;, docstring=&#39;Add a and b together and assign to ab.&#39;, uses=(&#39;parameter.a&#39;, &#39;parameter.b&#39;), impacts=(&#39;intermediate.ab&#39;,), output={&#39;intermediate.ab&#39;: 3}, metadata={}, config=AuditStepConfig(show_method_name=True, show_docstring=True, show_uses=True, show_impacts=True, show_output=True, show_metadata=True)), &#39;_add_ab_c&#39;: AuditStepContainer(name=&#39;_add_ab_c&#39;, method_name=&#39;_add_ab_c&#39;, docstring=&#39;Add ab and c together for final return.&#39;, uses=(&#39;intermediate.ab&#39;, &#39;parameter.c&#39;), impacts=(&#39;return.abc&#39;,), output={&#39;return.abc&#39;: 6}, metadata={}, config=AuditStepConfig(show_method_name=True, show_docstring=True, show_uses=True, show_impacts=True, show_output=True, show_metadata=True))}, metadata=None, config=AuditConfig(show_signature=True, show_docstring=True, show_steps=True, step_config=AuditStepConfig(show_method_name=True, show_docstring=True, show_uses=True, show_impacts=True, show_output=True, show_metadata=True)))
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AuditContainer(name=&#39;AddABC&#39;, instantiation={&#39;parameter.a&#39;: 1, &#39;parameter.b&#39;: 2, &#39;parameter.c&#39;: 3}, output={&#39;abc&#39;: 6}, docstring=&#39;This model takes 3 parameters - a, b, and c and adds them together in two steps.\n\n.. rubric:: Parameters\n\n- **a (int)** - This is parameter a.\n- **b (int)** - This is parameter b.\n- **c (int)** - This is parameter c.\n\n.. rubric:: Intermediates\n\n- **ab (int)** - This holds a + b.\n\n.. rubric:: Returns\n\n- **abc (int)** - The sum of ab and c.\n\n.. rubric:: Steps\n\n1) **_add_a_b** - Add a and b together and assign to ab.\n2) **_add_ab_c** - Add ab and c together for final return.\n\n&#39;, signature=&#39;AddABC(*, a: int, b: int, c: int)&#39;, steps={&#39;_add_a_b&#39;: AuditStepContainer(name=&#39;_add_a_b&#39;, method_name=&#39;_add_a_b&#39;, docstring=&#39;Add a and b together and assign to ab.&#39;, uses=(&#39;parameter.a&#39;, &#39;parameter.b&#39;), impacts=(&#39;intermediate.ab&#39;,), output={&#39;intermediate.ab&#39;: 3}, metadata={}, config=AuditStepConfig(show_method_name=True, show_docstring=True, show_uses=True, show_impacts=True, show_output=True, show_metadata=True)), &#39;_add_ab_c&#39;: AuditStepContainer(name=&#39;_add_ab_c&#39;, method_name=&#39;_add_ab_c&#39;, docstring=&#39;Add ab and c together for final return.&#39;, uses=(&#39;intermediate.ab&#39;, &#39;parameter.c&#39;), impacts=(&#39;return.abc&#39;,), output={&#39;return.abc&#39;: 6}, metadata={}, config=AuditStepConfig(show_method_name=True, show_docstring=True, show_uses=True, show_impacts=True, show_output=True, show_metadata=True))}, metadata=None, config=AuditConfig(show_signature=True, show_docstring=True, show_steps=True, step_config=AuditStepConfig(show_method_name=True, show_docstring=True, show_uses=True, show_impacts=True, show_output=True, show_metadata=True)))
 </pre></div>
 </div>
 </div>
@@ -333,17 +371,24 @@
 
       </div>
     </div>
+  
+  <script src="../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
 
-    
-  <script src="../../_static/js/index.1e043a052b0af929e4d8.js"></script>
-
-
-    <footer class="footer mt-5 mt-md-0">
+  <footer class="footer mt-5 mt-md-0">
   <div class="container">
-    <p>
-          &copy; Copyright 2020, Dustin Tindall.<br/>
-        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
-    </p>
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2020, Dustin Tindall.<br/>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+</p>
+    </div>
+    
   </div>
 </footer>
   </body>
